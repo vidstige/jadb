@@ -22,19 +22,38 @@ public class JadbConnection {
 		send("host:version");
 		verifyResponse();
 	}
-	
+
+	public void getDevices() throws IOException, JadbException
+	{
+		send("host:devices");
+		verifyResponse();
+		String body = readString();
+		System.out.println(body);		
+	}
+
+	private String readString() throws IOException {
+		String encodedLength = readString(4);
+		int length = Integer.parseInt(encodedLength, 16); 		
+		return readString(length);
+	}
+
 	public void close() throws IOException
 	{
 		_socket.close();
 	}
 	
 	private void verifyResponse() throws IOException, JadbException  {
+		String response = readString(4);
+		if ("OKAY".equals(response) == false) throw new JadbException("command failed");
+	}
+
+	private String readString(int length) throws IOException {
 		DataInput reader = new DataInputStream(_socket.getInputStream());
-		byte[] responseBuffer = new byte[4];		
+		byte[] responseBuffer = new byte[length];		
 		reader.readFully(responseBuffer);
 		String response = new String(responseBuffer, Charset.forName("utf-8"));
-		if ("OKAY".equals(response) == false) throw new JadbException("command failed");
-	}	
+		return response;
+	}
 
 	private String getCommandLength(String command) {
 		return String.format("%04x", Integer.valueOf(command.length()));

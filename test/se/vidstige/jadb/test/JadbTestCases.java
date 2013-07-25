@@ -7,8 +7,15 @@ import se.vidstige.jadb.JadbConnection;
 public class JadbTestCases {
 
 	@Test
-	public void test() throws Exception {
+	public void testGetHostVersion() throws Exception {
 		JadbConnection jadb = new JadbConnection();
 		jadb.getHostVersion();
+	}
+	
+	@Test
+	public void testGetDevices() throws Exception
+	{
+		JadbConnection jadb = new JadbConnection();
+		jadb.getDevices();
 	}
 }
