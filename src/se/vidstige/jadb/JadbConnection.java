@@ -20,21 +20,21 @@ public class JadbConnection {
 
 	public void getHostVersion() throws IOException, JadbException {
 		send("host:version");
-		String response = readResponse();
-		if ("OKAY".equals(response) == false) throw new JadbException("command");
-	}
-
-	private String readResponse() throws IOException  {
-		DataInput reader = new DataInputStream(_socket.getInputStream());
-		byte[] responseBuffer = new byte[4];		
-		reader.readFully(responseBuffer);
-		return new String(responseBuffer, Charset.forName("utf-8"));
+		verifyResponse();
 	}
 	
 	public void close() throws IOException
 	{
 		_socket.close();
 	}
+	
+	private void verifyResponse() throws IOException, JadbException  {
+		DataInput reader = new DataInputStream(_socket.getInputStream());
+		byte[] responseBuffer = new byte[4];		
+		reader.readFully(responseBuffer);
+		String response = new String(responseBuffer, Charset.forName("utf-8"));
+		if ("OKAY".equals(response) == false) throw new JadbException("command failed");
+	}	
 
 	private String getCommandLength(String command) {
 		return String.format("%04x", Integer.valueOf(command.length()));
