@@ -1,7 +1,12 @@
 package se.vidstige.jadb.test;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Assert;
 import org.junit.Test;
 
+import se.vidstige.jadb.AndroidDevice;
 import se.vidstige.jadb.JadbConnection;
 
 public class JadbTestCases {
@@ -16,6 +21,8 @@ public class JadbTestCases {
 	public void testGetDevices() throws Exception
 	{
 		JadbConnection jadb = new JadbConnection();
-		jadb.getDevices();
+		List<AndroidDevice> actual = jadb.getDevices();
+		AndroidDevice[] expected = { new AndroidDevice("emulator-5554") };
+		Assert.assertArrayEquals(expected, actual.toArray());
 	}
 }

@@ -3,6 +3,8 @@ package se.vidstige.jadb;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class JadbConnection {
 	
@@ -22,16 +24,27 @@ public class JadbConnection {
 		transport.verifyResponse();
 	}
 
-	public void getDevices() throws IOException, JadbException
+	public List<AndroidDevice> getDevices() throws IOException, JadbException
 	{
 		transport.send("host:devices");
 		transport.verifyResponse();
 		String body = transport.readString();
-		System.out.println(body);		
-	}
+		return parseDevices(body);
+	}	
 
 	public void close() throws IOException
 	{
 		_socket.close();
+	}	
+
+	private List<AndroidDevice> parseDevices(String body) {
+		String[] lines = body.split("\n");
+		ArrayList<AndroidDevice> devices = new ArrayList<AndroidDevice>(lines.length);
+		for (String line : lines)
+		{
+			String[] parts = line.split("\t");
+			devices.add(new AndroidDevice(parts[0], parts[1]));
+		}
+		return devices;
 	}
 }
