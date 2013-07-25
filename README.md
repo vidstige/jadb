@@ -12,8 +12,6 @@ Usage cannot be simpler. Just create a `JadbConnection` and off you go.
 
     JadbConnection jadb = new JadbConnection();
 	List<AndroidDevice> actual = jadb.getDevices();
-	AndroidDevice[] expected = { new AndroidDevice("emulator-5554") };
-	Assert.assertArrayEquals(expected, actual.toArray());`
 
 ## Protocol Description ##
 
