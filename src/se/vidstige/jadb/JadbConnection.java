@@ -1,68 +1,37 @@
 package se.vidstige.jadb;
 
-import java.io.DataInput;
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
 
 public class JadbConnection {
 	
-	private Socket _socket;
+	private final Socket _socket;
 	private static final int DEFAULTPORT = 5037;
+	
+	private final Transport transport;
 	
 	public JadbConnection() throws UnknownHostException, IOException
 	{
 		_socket = new Socket("localhost", DEFAULTPORT);
+		transport = new Transport(_socket.getOutputStream(), _socket.getInputStream());
 	}
 
 	public void getHostVersion() throws IOException, JadbException {
-		send("host:version");
-		verifyResponse();
+		transport.send("host:version");
+		transport.verifyResponse();
 	}
 
 	public void getDevices() throws IOException, JadbException
 	{
-		send("host:devices");
-		verifyResponse();
-		String body = readString();
+		transport.send("host:devices");
+		transport.verifyResponse();
+		String body = transport.readString();
 		System.out.println(body);		
-	}
-
-	private String readString() throws IOException {
-		String encodedLength = readString(4);
-		int length = Integer.parseInt(encodedLength, 16); 		
-		return readString(length);
 	}
 
 	public void close() throws IOException
 	{
 		_socket.close();
-	}
-	
-	private void verifyResponse() throws IOException, JadbException  {
-		String response = readString(4);
-		if ("OKAY".equals(response) == false) throw new JadbException("command failed");
-	}
-
-	private String readString(int length) throws IOException {
-		DataInput reader = new DataInputStream(_socket.getInputStream());
-		byte[] responseBuffer = new byte[length];		
-		reader.readFully(responseBuffer);
-		String response = new String(responseBuffer, Charset.forName("utf-8"));
-		return response;
-	}
-
-	private String getCommandLength(String command) {
-		return String.format("%04x", Integer.valueOf(command.length()));
-	}
-	
-	private void send(String command) throws IOException {
-		OutputStreamWriter writer = new OutputStreamWriter(_socket.getOutputStream());
-		writer.write(getCommandLength(command));
-		writer.write(command);
-		writer.flush();
 	}
 }
