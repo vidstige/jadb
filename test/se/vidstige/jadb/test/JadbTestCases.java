@@ -1,6 +1,5 @@
 package se.vidstige.jadb.test;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Assert;
