@@ -1,21 +1,32 @@
 package se.vidstige.jadb;
 
+import java.io.IOException;
+
 public class AndroidDevice {
 	private final String serial;
+	private Transport transport;
 	
-	public AndroidDevice(String serial, String type) {
+	AndroidDevice(String serial, String type, Transport transport) {
 		this.serial = serial;
+		this.transport = transport;
 	}	
-	
-	public AndroidDevice(String serial) {
-		this(serial, null);
-	}
 	
 	public String getSerial()
 	{
 		return serial;		
 	}
+
+	public String getStatus() throws IOException, JadbException {
+		transport.send(getPrefix() +  "get-state");
+		transport.verifyResponse();
+		return transport.readString();
+	}	
 	
+	private String getPrefix() {
+		//return "host-serial:" + serial + ":";
+		return "host-local:";
+	}
+
 	@Override
 	public String toString()
 	{
@@ -46,5 +57,4 @@ public class AndroidDevice {
 			return false;
 		return true;
 	}
-	
 }

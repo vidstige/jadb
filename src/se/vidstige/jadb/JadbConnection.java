@@ -43,7 +43,7 @@ public class JadbConnection {
 		for (String line : lines)
 		{
 			String[] parts = line.split("\t");
-			devices.add(new AndroidDevice(parts[0], parts[1]));
+			devices.add(new AndroidDevice(parts[0], parts[1], transport));
 		}
 		return devices;
 	}

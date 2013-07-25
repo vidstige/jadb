@@ -21,7 +21,6 @@ public class JadbTestCases {
 	{
 		JadbConnection jadb = new JadbConnection();
 		List<AndroidDevice> actual = jadb.getDevices();
-		AndroidDevice[] expected = { new AndroidDevice("emulator-5554") };
-		Assert.assertArrayEquals(expected, actual.toArray());
+		Assert.assertEquals("emulator-5554", actual.get(0).getSerial());
 	}
 }
