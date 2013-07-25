@@ -18,13 +18,17 @@ public class JadbConnection {
 		_socket = new Socket("localhost", DEFAULTPORT);
 	}
 
-	public void getHostVersion() throws IOException {
+	public void getHostVersion() throws IOException, JadbException {
 		send("host:version");
-		
+		String response = readResponse();
+		if ("OKAY".equals(response) == false) throw new JadbException("command");
+	}
+
+	private String readResponse() throws IOException  {
 		DataInput reader = new DataInputStream(_socket.getInputStream());
-		byte[] response = new byte[4];		
-		reader.readFully(response);
-		System.out.println(new String(response, Charset.forName("utf-8")));		
+		byte[] responseBuffer = new byte[4];		
+		reader.readFully(responseBuffer);
+		return new String(responseBuffer, Charset.forName("utf-8"));
 	}
 	
 	public void close() throws IOException
