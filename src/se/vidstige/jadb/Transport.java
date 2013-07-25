@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.Socket;
 import java.nio.charset.Charset;
 
 class Transport {
@@ -13,9 +14,13 @@ class Transport {
 	private final OutputStream outputStream;
 	private final InputStream inputStream;
 
-	public Transport(OutputStream outputStream, InputStream inputStream) {
+	private Transport(OutputStream outputStream, InputStream inputStream) {
 		this.outputStream = outputStream;
 		this.inputStream = inputStream;
+	}
+
+	public Transport(Socket socket) throws IOException {
+		this(socket.getOutputStream(), socket.getInputStream());
 	}
 
 	public String readString() throws IOException {
