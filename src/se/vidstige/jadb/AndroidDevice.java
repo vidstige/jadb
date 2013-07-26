@@ -16,11 +16,26 @@ public class AndroidDevice {
 		return serial;		
 	}
 
-	public String getStatus() throws IOException, JadbException {
+	public String getState() throws IOException, JadbException {
 		transport.send(getPrefix() +  "get-state");
 		transport.verifyResponse();
 		return transport.readString();
-	}	
+	}
+
+	public void executeShell(String command, String ... args) throws IOException, JadbException {
+		StringBuilder shellLine = new StringBuilder(command);
+		for (String arg : args)
+		{
+			shellLine.append(" ");
+			shellLine.append(arg);	
+		}
+		send("shell:" + shellLine.toString());
+		transport.verifyResponse();
+	}
+
+	private void send(String command) throws IOException {
+		transport.send(getPrefix() + command);
+	}
 	
 	private String getPrefix() {
 		//return "host-serial:" + serial + ":";
