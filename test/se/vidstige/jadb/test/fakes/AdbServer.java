@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
 
+// >set ANDROID_ADB_SERVER_PORT=15037
 public class AdbServer implements Runnable {
 
 	private int port = 15037;

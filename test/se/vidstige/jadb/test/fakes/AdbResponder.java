@@ -33,11 +33,18 @@ public class AdbResponder implements Runnable {
 			String command = new String(buffer, Charset.forName("utf-8"));
 			System.out.println("Command: " + command);
 			
-			if ("host.devices".equals(command)) {
+			if ("host:version".equals(command)) {
+				output.write("OKAY");			
+			}
+			else if ("host:devices".equals(command)) {
 				output.write("OKAY");
 				send(output, "X\tdevice\nY\tdevice");	
 			}
-			output.write("FAIL");
+			else
+			{
+				output.write("FAIL");
+			}
+			output.flush();
 			
 		} catch (IOException e) {
 		}		
@@ -50,6 +57,5 @@ public class AdbResponder implements Runnable {
 	public void send(OutputStreamWriter writer, String response) throws IOException {
 		writer.write(getCommandLength(response));
 		writer.write(response);
-		writer.flush();
 	}
 }
