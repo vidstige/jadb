@@ -27,12 +27,18 @@ public class AndroidDevice {
 		for (String arg : args)
 		{
 			shellLine.append(" ");
+			// TODO: throw if arg contains double quote
+			// TODO: quote arg if it contains space
 			shellLine.append(arg);	
 		}
 		send("shell:" + shellLine.toString());
 		transport.verifyResponse();
 	}
-
+	
+	public void push(String localPath, String remotePath) {
+		
+	}
+	
 	private void send(String command) throws IOException {
 		transport.send(getPrefix() + command);
 	}
