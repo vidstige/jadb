@@ -21,7 +21,7 @@ public class AndroidDeviceTestCases {
 	@Test(expected=JadbException.class)
 	public void invalidShellCommand() throws Exception
 	{
-		JadbConnection jadb = new JadbConnection();
+		JadbConnection jadb = new JadbConnection("localhost", 5037);
 		List<AndroidDevice> devices = jadb.getDevices();
 		AndroidDevice device = devices.get(0);
 		device.executeShell("cmd", "foo", "bar");
