@@ -17,8 +17,13 @@ public class JadbConnection {
 	
 	public JadbConnection() throws UnknownHostException, IOException
 	{
-		host = "localhost";
-		port = DEFAULTPORT;
+		this("localhost", DEFAULTPORT);
+	}
+	
+	public JadbConnection(String host, int port) throws UnknownHostException, IOException
+	{
+		this.host = host;
+		this.port = port;
 				
 		main = createTransport();
 	}
