@@ -2,8 +2,6 @@ package se.vidstige.jadb.test.fakes;
 
 import java.io.DataInput;
 import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
@@ -48,11 +46,12 @@ public class AdbResponder implements Runnable {
 			output.flush();
 			
 		} catch (IOException e) {
+            System.out.println(e.getMessage());
 		}		
 	}
 	
 	private String getCommandLength(String command) {
-		return String.format("%04x", Integer.valueOf(command.length()));
+		return String.format("%04x", command.length());
 	}
 	
 	public void send(OutputStreamWriter writer, String response) throws IOException {
