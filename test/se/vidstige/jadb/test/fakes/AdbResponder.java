@@ -34,7 +34,8 @@ public class AdbResponder implements Runnable {
 			System.out.println("Command: " + command);
 			
 			if ("host:version".equals(command)) {
-				output.write("OKAY");			
+				output.write("OKAY");
+                send(output, "001F");
 			}
 			else if ("host:devices".equals(command)) {
 				output.write("OKAY");
