@@ -16,35 +16,49 @@ public class AdbResponder implements Runnable {
 
 	@Override
 	public void run()
-	{		
+	{
+        System.out.println("Serving client");
+
 		try {
-			System.out.println("Serving client");
-			DataInput input = new DataInputStream(socket.getInputStream());
-			OutputStreamWriter output = new OutputStreamWriter(socket.getOutputStream());
-			byte[] buffer = new byte[4];
-			input.readFully(buffer);
-			String encodedLength = new String(buffer, Charset.forName("utf-8"));
-			int length = Integer.parseInt(encodedLength, 16);
-			
-			buffer = new byte[length];
-			input.readFully(buffer);
-			String command = new String(buffer, Charset.forName("utf-8"));
-			System.out.println("Command: " + command);
-			
-			if ("host:version".equals(command)) {
-				output.write("OKAY");
-                send(output, "001F");
-			}
-			else if ("host:devices".equals(command)) {
-				output.write("OKAY");
-				send(output, "X\tdevice\nY\tdevice");	
-			}
-			else
-			{
-				output.write("FAIL");
-			}
-			output.flush();
-			
+
+            while (true)
+            {
+                DataInput input = new DataInputStream(socket.getInputStream());
+                OutputStreamWriter output = new OutputStreamWriter(socket.getOutputStream());
+                byte[] buffer = new byte[4];
+                input.readFully(buffer);
+                String encodedLength = new String(buffer, Charset.forName("utf-8"));
+                System.out.println("DEBUG: " + encodedLength);
+                int length = Integer.parseInt(encodedLength, 16);
+
+                buffer = new byte[length];
+                input.readFully(buffer);
+                String command = new String(buffer, Charset.forName("utf-8"));
+                System.out.println("Command: " + command);
+
+                if ("host:version".equals(command)) {
+                    output.write("OKAY");
+                    send(output, "001F"); // version. required to be 31
+                    System.out.println("OK");
+                }
+                else if ("host:transport-any".equals(command))
+                {
+                    output.write("OKAY");
+                    System.out.println("OK");
+                }
+                else if ("host:devices".equals(command)) {
+                    output.write("OKAY");
+                    send(output, "X\tdevice\nY\tdevice");
+                    System.out.println("OK");
+                }
+                else
+                {
+                    output.write("FAIL");
+                    send(output, "Unknown command: " + command);
+                    System.out.println("FAIL");
+                }
+                output.flush();
+            }
 		} catch (IOException e) {
             System.out.println(e.getMessage());
 		}		
