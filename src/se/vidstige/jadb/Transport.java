@@ -31,7 +31,11 @@ class Transport {
 	
 	public void verifyResponse() throws IOException, JadbException  {
 		String response = readString(4);
-		if ("OKAY".equals(response) == false) throw new JadbException("command failed");
+		if ("OKAY".equals(response) == false)
+        {
+            String error = readString();
+            throw new JadbException("command failed: " + error);
+        }
 	}
 
 	public String readString(int length) throws IOException {
