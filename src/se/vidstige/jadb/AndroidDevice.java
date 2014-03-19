@@ -1,6 +1,8 @@
 package se.vidstige.jadb;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AndroidDevice {
 	private String serial;
@@ -64,15 +66,17 @@ public class AndroidDevice {
 		send("shell:" + shellLine.toString());
 	}
 
-    public void list(String remotePath) throws IOException, JadbException {
+    public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
         selectTransport();
         SyncTransport sync  = transport.startSync();
         sync.send("LIST", remotePath);
 
+        List<RemoteFile> result = new ArrayList<RemoteFile>();
         for (RemoteFile dent = sync.readDirectoryEntry(); dent != RemoteFile.DONE; dent = sync.readDirectoryEntry())
         {
-            System.out.println(dent.getName());
+            result.add(dent);
         }
+        return result;
     }
 
     public void push(String localPath, String remotePath) throws IOException, JadbException {

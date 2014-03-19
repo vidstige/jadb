@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import se.vidstige.jadb.AndroidDevice;
 import se.vidstige.jadb.JadbConnection;
+import se.vidstige.jadb.RemoteFile;
 import se.vidstige.jadb.test.fakes.AdbServer;
 
 public class JadbTestCases {
@@ -31,6 +32,10 @@ public class JadbTestCases {
     {
         JadbConnection jadb = new JadbConnection();
         AndroidDevice any = jadb.getAnyDevice();
-        any.list("/");
+        List<RemoteFile> files = any.list("/");
+        for (RemoteFile f : files)
+        {
+            System.out.println(f.getName());
+        }
     }
 }

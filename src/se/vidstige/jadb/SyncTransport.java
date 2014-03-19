@@ -42,6 +42,6 @@ class SyncTransport {
         String name = readString(nameLenght);
 
         if ("DENT".equals(id) == false) return RemoteFile.DONE;
-        return new RemoteFile(id, name);
+        return new RemoteFile(id, name, mode, size, time);
     }
 }
