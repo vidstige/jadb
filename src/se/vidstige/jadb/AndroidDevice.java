@@ -22,38 +22,42 @@ public class AndroidDevice {
         this.transport = transport;
     }
 
-    private void selectTransport() throws IOException, JadbException {
+    private void ensureTransportIsSelected() throws IOException, JadbException {
         if (!selected)
         {
-            if (serial == null)
-            {
-                transport.send("host:transport-any");
-                transport.verifyResponse();
-            }
-            else
-            {
-                transport.send("host:transport:" + serial);
-                transport.verifyResponse();
-
-            }
+            selectTransport();
             selected = true;
         }
     }
 
-	public String getSerial()
+    private void selectTransport() throws IOException, JadbException {
+        if (serial == null)
+        {
+            transport.send("host:transport-any");
+            transport.verifyResponse();
+        }
+        else
+        {
+            transport.send("host:transport:" + serial);
+            transport.verifyResponse();
+
+        }
+    }
+
+    public String getSerial()
 	{
 		return serial;
 	}
 
 	public String getState() throws IOException, JadbException {
-        selectTransport();
+        ensureTransportIsSelected();
 		transport.send("get-state");
 		transport.verifyResponse();
 		return transport.readString();
 	}
 
 	public void executeShell(String command, String ... args) throws IOException, JadbException {
-        selectTransport();
+        ensureTransportIsSelected();
 
 		StringBuilder shellLine = new StringBuilder(command);
 		for (String arg : args)
@@ -67,7 +71,7 @@ public class AndroidDevice {
 	}
 
     public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
-        selectTransport();
+        ensureTransportIsSelected();
         SyncTransport sync  = transport.startSync();
         sync.send("LIST", remotePath);
 
@@ -85,7 +89,7 @@ public class AndroidDevice {
     }
 
     public void push(String localPath, String remotePath) throws IOException, JadbException {
-		selectTransport();
+		ensureTransportIsSelected();
         SyncTransport sync  = transport.startSync();
         File local = new File(localPath);
         sync.send("SEND", remotePath + "," + Integer.toString(getMode(local)));
