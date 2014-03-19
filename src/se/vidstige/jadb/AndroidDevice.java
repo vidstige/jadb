@@ -69,7 +69,7 @@ public class AndroidDevice {
         SyncTransport sync  = transport.startSync();
         sync.send("LIST", remotePath);
 
-        for (DirectoryEntry dent = sync.readDirectoryEntry(); dent != DirectoryEntry.DONE; dent = sync.readDirectoryEntry())
+        for (RemoteFile dent = sync.readDirectoryEntry(); dent != RemoteFile.DONE; dent = sync.readDirectoryEntry())
         {
             System.out.println(dent.getName());
         }

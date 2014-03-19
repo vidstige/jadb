@@ -33,7 +33,7 @@ class SyncTransport {
         return new String(buffer, Charset.forName("utf-8"));
     }
 
-    public DirectoryEntry readDirectoryEntry() throws IOException {
+    public RemoteFile readDirectoryEntry() throws IOException {
         String id = readString(4);
         int mode = readInt();
         int size = readInt();
@@ -41,7 +41,7 @@ class SyncTransport {
         int nameLenght = readInt();
         String name = readString(nameLenght);
 
-        if ("DENT".equals(id) == false) return DirectoryEntry.DONE;
-        return new DirectoryEntry(id, name);
+        if ("DENT".equals(id) == false) return RemoteFile.DONE;
+        return new RemoteFile(id, name);
     }
 }
