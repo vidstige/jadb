@@ -3,26 +3,56 @@ package se.vidstige.jadb;
 import java.io.IOException;
 
 public class AndroidDevice {
-	private final String serial;
+	private String serial;
 	private Transport transport;
-	
+	private boolean selected = false;
+
 	AndroidDevice(String serial, String type, Transport transport) {
 		this.serial = serial;
 		this.transport = transport;
-	}	
-	
+	}
+
+    static AndroidDevice createAny(Transport transport) { return new AndroidDevice(transport); }
+
+    private AndroidDevice(Transport transport)
+    {
+        serial = null;
+        this.transport = transport;
+    }
+
+    private void selectTransport() throws IOException, JadbException {
+        if (!selected)
+        {
+            if (serial == null)
+            {
+                transport.send("host:transport-any");
+                transport.verifyResponse();
+            }
+            else
+            {
+                transport.send("host:transport:" + serial);
+                transport.verifyResponse();
+
+            }
+            selected = true;
+        }
+    }
+
 	public String getSerial()
 	{
-		return serial;		
+		return serial;
 	}
 
 	public String getState() throws IOException, JadbException {
+        selectTransport();
 		transport.send(getPrefix() +  "get-state");
 		transport.verifyResponse();
 		return transport.readString();
 	}
 
 	public void executeShell(String command, String ... args) throws IOException, JadbException {
+        selectTransport();
+
 		StringBuilder shellLine = new StringBuilder(command);
 		for (String arg : args)
 		{
@@ -32,15 +62,15 @@ public class AndroidDevice {
 			shellLine.append(arg);	
 		}
 		send("shell:" + shellLine.toString());
-		transport.verifyResponse();
 	}
 	
-	public void push(String localPath, String remotePath) {
-		
+	public void push(String localPath, String remotePath) throws IOException, JadbException {
+		selectTransport();
 	}
-	
-	private void send(String command) throws IOException {
-		transport.send(getPrefix() + command);
+
+	private void send(String command) throws IOException, JadbException {
+		transport.send(command);
+        transport.verifyResponse();
 	}
 	
 	private String getPrefix() {

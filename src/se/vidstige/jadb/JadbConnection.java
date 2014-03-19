@@ -2,7 +2,6 @@ package se.vidstige.jadb;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,12 +14,12 @@ public class JadbConnection {
 	
 	private final Transport main;
 	
-	public JadbConnection() throws UnknownHostException, IOException
+	public JadbConnection() throws IOException
 	{
 		this("localhost", DEFAULTPORT);
 	}
 	
-	public JadbConnection(String host, int port) throws UnknownHostException, IOException
+	public JadbConnection(String host, int port) throws IOException
 	{
 		this.host = host;
 		this.port = port;
@@ -57,4 +56,8 @@ public class JadbConnection {
 		}
 		return devices;
 	}
+
+    public AndroidDevice getAnyDevice() {
+        return AndroidDevice.createAny(main);
+    }
 }
