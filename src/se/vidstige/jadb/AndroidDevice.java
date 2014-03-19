@@ -1,6 +1,6 @@
 package se.vidstige.jadb;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class AndroidDevice {
 
 	public String getState() throws IOException, JadbException {
         selectTransport();
-		transport.send(getPrefix() +  "get-state");
+		transport.send("get-state");
 		transport.verifyResponse();
 		return transport.readString();
 	}
@@ -79,8 +79,23 @@ public class AndroidDevice {
         return result;
     }
 
+    private int getMode(File file)
+    {
+        return 0664;
+    }
+
     public void push(String localPath, String remotePath) throws IOException, JadbException {
 		selectTransport();
+        SyncTransport sync  = transport.startSync();
+        File local = new File(localPath);
+        sync.send("SEND", remotePath + "," + Integer.toString(getMode(local)));
+
+        FileInputStream fileStream = new FileInputStream(local);
+        sync.sendStream(fileStream);
+        fileStream.close();
+
+        sync.sendStatus("DONE", (int) local.lastModified());
+        sync.verifyStatus();
 	}
 
 	private void send(String command) throws IOException, JadbException {
@@ -88,11 +103,6 @@ public class AndroidDevice {
         transport.verifyResponse();
 	}
 	
-	private String getPrefix() {
-		//return "host-serial:" + serial + ":";
-		return "host-local:";
-	}
-
 	@Override
 	public String toString()
 	{

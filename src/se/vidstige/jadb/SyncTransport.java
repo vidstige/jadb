@@ -23,6 +23,25 @@ class SyncTransport {
         output.writeBytes(name);
     }
 
+    public void sendStatus(String statusCode, int length) throws IOException {
+        output.writeBytes(statusCode);
+        output.writeInt(Integer.reverseBytes(length));
+    }
+
+    public void verifyStatus() throws IOException, JadbException {
+        String status = readString(4);
+        int length = readInt();
+        if ("FAIL".equals(status))
+        {
+            String error = readString(length);
+            throw new JadbException(error);
+        }
+        if (!"OKAY".equals(status))
+        {
+            throw new JadbException("Unknown error: " + status);
+        }
+    }
+
     private int readInt() throws IOException {
         return Integer.reverseBytes(input.readInt());
     }
@@ -43,5 +62,20 @@ class SyncTransport {
 
         if (!"DENT".equals(id)) return RemoteFile.DONE;
         return new RemoteFile(id, name, mode, size, time);
+    }
+
+    private void sendBuffer(byte[] buffer, int offset, int length) throws IOException {
+        output.writeBytes("DATA");
+        output.writeInt(Integer.reverseBytes(length));
+        output.write(buffer, offset, length);
+    }
+
+    public void sendStream(InputStream in) throws IOException {
+        byte[] buffer = new byte[1024 * 64];
+        int n = in.read(buffer);
+        while (n != -1) {
+            sendBuffer(buffer, 0, n);
+            n = in.read(buffer);
+        }
     }
 }

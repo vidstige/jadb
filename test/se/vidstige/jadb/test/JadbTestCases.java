@@ -38,4 +38,12 @@ public class JadbTestCases {
             System.out.println(f.getName());
         }
     }
+
+    @Test
+    public void testPushFile() throws Exception
+    {
+        JadbConnection jadb = new JadbConnection();
+        AndroidDevice any = jadb.getAnyDevice();
+        any.push("README.md", "/sdcard/README.md");
+    }
 }
