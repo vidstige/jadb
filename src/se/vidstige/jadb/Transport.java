@@ -1,11 +1,6 @@
 package se.vidstige.jadb;
 
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.Socket;
 import java.nio.charset.Charset;
 
@@ -56,4 +51,10 @@ class Transport {
 		writer.write(command);
 		writer.flush();
 	}
+
+    public SyncTransport startSync() throws IOException, JadbException {
+        send("sync:");
+        verifyResponse();
+        return new SyncTransport(outputStream, inputStream);
+    }
 }

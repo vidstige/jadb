@@ -63,8 +63,19 @@ public class AndroidDevice {
 		}
 		send("shell:" + shellLine.toString());
 	}
-	
-	public void push(String localPath, String remotePath) throws IOException, JadbException {
+
+    public void list(String remotePath) throws IOException, JadbException {
+        selectTransport();
+        SyncTransport sync  = transport.startSync();
+        sync.send("LIST", remotePath);
+
+        for (DirectoryEntry dent = sync.readDirectoryEntry(); dent != DirectoryEntry.DONE; dent = sync.readDirectoryEntry())
+        {
+            System.out.println(dent.getName());
+        }
+    }
+
+    public void push(String localPath, String remotePath) throws IOException, JadbException {
 		selectTransport();
 	}
 
