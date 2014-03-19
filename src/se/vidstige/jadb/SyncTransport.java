@@ -29,7 +29,7 @@ class SyncTransport {
 
     private String readString(int length) throws IOException {
         byte[] buffer = new byte[length];
-        input.read(buffer);
+        input.readFully(buffer);
         return new String(buffer, Charset.forName("utf-8"));
     }
 
@@ -38,10 +38,10 @@ class SyncTransport {
         int mode = readInt();
         int size = readInt();
         int time = readInt();
-        int nameLenght = readInt();
-        String name = readString(nameLenght);
+        int nameLength = readInt();
+        String name = readString(nameLength);
 
-        if ("DENT".equals(id) == false) return RemoteFile.DONE;
+        if (!"DENT".equals(id)) return RemoteFile.DONE;
         return new RemoteFile(id, name, mode, size, time);
     }
 }
