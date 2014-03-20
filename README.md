@@ -15,6 +15,11 @@ Usage cannot be simpler. Just create a `JadbConnection` and off you go.
 
 Make sure the adb server is running. You can start it by running `adb` once from the command line.
 
+It's very easy to send and receive files from your android device, for example as below.
+
+    JadbDevice device = ...
+    device.pull(new RemoteFile("/path/to/file.txt"), new File("file.txt"));
+
 ## Protocol Description ##
 
 An overview of the protocol can be found here: [Overview](https://github.com/cgjones/android-system-core/blob/master/adb/OVERVIEW.TXT)
