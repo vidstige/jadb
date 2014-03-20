@@ -44,4 +44,12 @@ public class JadbTestCases {
         JadbDevice any = jadb.getAnyDevice();
         any.push("README.md", "/sdcard/README.md");
     }
+
+    @Test
+    public void testPullFile() throws Exception
+    {
+        JadbConnection jadb = new JadbConnection();
+        JadbDevice any = jadb.getAnyDevice();
+        any.pull("/sdcard/README.md", "foobar.md");
+    }
 }

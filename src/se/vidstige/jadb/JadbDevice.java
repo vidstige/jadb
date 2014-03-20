@@ -102,6 +102,16 @@ public class JadbDevice {
         sync.verifyStatus();
 	}
 
+    public void pull(String remotePath, String localPath) throws IOException, JadbException {
+        ensureTransportIsSelected();
+        SyncTransport sync = transport.startSync();
+        sync.send("RECV", remotePath);
+
+        FileOutputStream fileStream = new FileOutputStream(new File(localPath));
+        sync.readChunksTo(fileStream);
+        fileStream.close();
+    }
+
 	private void send(String command) throws IOException, JadbException {
 		transport.send(command);
         transport.verifyResponse();

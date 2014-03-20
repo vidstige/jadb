@@ -64,18 +64,34 @@ class SyncTransport {
         return new RemoteFile(id, name, mode, size, time);
     }
 
-    private void sendBuffer(byte[] buffer, int offset, int length) throws IOException {
+    private void sendChunk(byte[] buffer, int offset, int length) throws IOException {
         output.writeBytes("DATA");
         output.writeInt(Integer.reverseBytes(length));
         output.write(buffer, offset, length);
+    }
+
+    private int readChunk(byte[] buffer) throws IOException {
+        String id = readString(4);
+        if (!"DATA".equals(id)) return -1;
+        int n = readInt();
+        return input.read(buffer, 0, n);
     }
 
     public void sendStream(InputStream in) throws IOException {
         byte[] buffer = new byte[1024 * 64];
         int n = in.read(buffer);
         while (n != -1) {
-            sendBuffer(buffer, 0, n);
+            sendChunk(buffer, 0, n);
             n = in.read(buffer);
+        }
+    }
+
+    public void readChunksTo(OutputStream stream) throws IOException {
+        byte[] buffer = new byte[1024 * 64];
+        int n = readChunk(buffer);
+        while (n != -1) {
+            stream.write(buffer, 0, n);
+            n = readChunk(buffer);
         }
     }
 }
