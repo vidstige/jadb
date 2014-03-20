@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbConnection;
+import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
 
 public class RealDeviceTestCases {
@@ -44,6 +45,14 @@ public class RealDeviceTestCases {
         JadbConnection jadb = new JadbConnection();
         JadbDevice any = jadb.getAnyDevice();
         any.push(new File("README.md"), new RemoteFile("/sdcard/README.md"));
+    }
+
+    @Test(expected = JadbException.class)
+    public void testPushFileToInvalidPath() throws Exception
+    {
+        JadbConnection jadb = new JadbConnection();
+        JadbDevice any = jadb.getAnyDevice();
+        any.push(new File("README.md"), new RemoteFile("/no/such/directory/README.md"));
     }
 
     @Test
