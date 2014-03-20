@@ -88,26 +88,34 @@ public class JadbDevice {
         return 0664;
     }
 
-    public void push(File local, RemoteFile remote) throws IOException, JadbException {
-		ensureTransportIsSelected();
+    public void push(InputStream source, long lastModified, int mode, RemoteFile remote) throws IOException, JadbException {
+        ensureTransportIsSelected();
         SyncTransport sync  = transport.startSync();
-        sync.send("SEND", remote.getPath() + "," + Integer.toString(getMode(local)));
+        sync.send("SEND", remote.getPath() + "," + Integer.toString(mode));
 
-        FileInputStream fileStream = new FileInputStream(local);
-        sync.sendStream(fileStream);
-        fileStream.close();
+        sync.sendStream(source);
 
-        sync.sendStatus("DONE", (int) local.lastModified());
+        sync.sendStatus("DONE", (int)lastModified);
         sync.verifyStatus();
+    }
+
+    public void push(File local, RemoteFile remote) throws IOException, JadbException {
+        FileInputStream fileStream = new FileInputStream(local);
+        push(fileStream, local.lastModified(), getMode(local), remote);
+        fileStream.close();
 	}
 
-    public void pull(RemoteFile remote, File local) throws IOException, JadbException {
+    public void pull(RemoteFile remote, OutputStream destination) throws IOException, JadbException {
         ensureTransportIsSelected();
         SyncTransport sync = transport.startSync();
         sync.send("RECV", remote.getPath());
 
+        sync.readChunksTo(destination);
+    }
+
+    public void pull(RemoteFile remote, File local) throws IOException, JadbException {
         FileOutputStream fileStream = new FileOutputStream(local);
-        sync.readChunksTo(fileStream);
+        pull(remote, fileStream);
         fileStream.close();
     }
 
