@@ -88,11 +88,10 @@ public class JadbDevice {
         return 0664;
     }
 
-    public void push(String localPath, String remotePath) throws IOException, JadbException {
+    public void push(File local, RemoteFile remote) throws IOException, JadbException {
 		ensureTransportIsSelected();
         SyncTransport sync  = transport.startSync();
-        File local = new File(localPath);
-        sync.send("SEND", remotePath + "," + Integer.toString(getMode(local)));
+        sync.send("SEND", remote.getPath() + "," + Integer.toString(getMode(local)));
 
         FileInputStream fileStream = new FileInputStream(local);
         sync.sendStream(fileStream);
@@ -102,12 +101,12 @@ public class JadbDevice {
         sync.verifyStatus();
 	}
 
-    public void pull(String remotePath, String localPath) throws IOException, JadbException {
+    public void pull(RemoteFile remote, File local) throws IOException, JadbException {
         ensureTransportIsSelected();
         SyncTransport sync = transport.startSync();
-        sync.send("RECV", remotePath);
+        sync.send("RECV", remote.getPath());
 
-        FileOutputStream fileStream = new FileOutputStream(new File(localPath));
+        FileOutputStream fileStream = new FileOutputStream(local);
         sync.readChunksTo(fileStream);
         fileStream.close();
     }

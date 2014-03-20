@@ -14,4 +14,6 @@ public class RemoteFile {
     public int getSize() { throw new NotImplementedException(); }
     public long getLastModified() { throw new NotImplementedException(); }
     public boolean isDirectory() { throw new NotImplementedException(); }
+
+    public String getPath() { return path;}
 }

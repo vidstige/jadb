@@ -1,11 +1,13 @@
 package se.vidstige.jadb.test;
 
+import java.io.File;
 import java.util.List;
 
 import org.junit.Test;
 
 import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbConnection;
+import se.vidstige.jadb.RemoteFile;
 import se.vidstige.jadb.RemoteFileRecord;
 
 public class RealDeviceTestCases {
@@ -33,7 +35,7 @@ public class RealDeviceTestCases {
         List<RemoteFileRecord> files = any.list("/");
         for (RemoteFileRecord f : files)
         {
-            System.out.println(f.getName());
+            System.out.println(f.getPath());
         }
     }
 
@@ -42,7 +44,7 @@ public class RealDeviceTestCases {
     {
         JadbConnection jadb = new JadbConnection();
         JadbDevice any = jadb.getAnyDevice();
-        any.push("README.md", "/sdcard/README.md");
+        any.push(new File("README.md"), new RemoteFile("/sdcard/README.md"));
     }
 
     @Test
@@ -50,6 +52,6 @@ public class RealDeviceTestCases {
     {
         JadbConnection jadb = new JadbConnection();
         JadbDevice any = jadb.getAnyDevice();
-        any.pull("/sdcard/README.md", "foobar.md");
+        any.pull(new RemoteFile("/sdcard/README.md"), new File("foobar.md"));
     }
 }
