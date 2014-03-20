@@ -6,8 +6,6 @@ import org.junit.Before;
 import org.junit.Test;
 import se.vidstige.jadb.JadbConnection;
 import se.vidstige.jadb.JadbDevice;
-import se.vidstige.jadb.server.AdbServer;
-import se.vidstige.jadb.server.SocketServer;
 import se.vidstige.jadb.test.fakes.FakeAdbServer;
 
 import java.util.List;
@@ -36,4 +34,11 @@ public class MockedTestCases {
         List<JadbDevice> devices = connection.getDevices();
         Assert.assertEquals("serial-123", devices.get(0).getSerial());
     }
+
+    @Test
+    public void testListNoDevices() throws Exception {
+        List<JadbDevice> devices = connection.getDevices();
+        Assert.assertEquals(0, devices.size());
+    }
+
 }

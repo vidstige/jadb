@@ -52,7 +52,9 @@ public class JadbConnection {
 		for (String line : lines)
 		{
 			String[] parts = line.split("\t");
-			devices.add(new JadbDevice(parts[0], parts[1], main));
+            if (parts.length > 1) {
+			    devices.add(new JadbDevice(parts[0], parts[1], main));
+            }
 		}
 		return devices;
 	}

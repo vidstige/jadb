@@ -1,9 +1,6 @@
 package se.vidstige.jadb.server;
 
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.Socket;
 import java.nio.charset.Charset;
 
@@ -47,11 +44,14 @@ public class AdbProtocolHandler implements Runnable {
                     output.write("OKAY");
                 }
                 else if ("host:devices".equals(command)) {
-                    output.write("OKAY");
+                    ByteArrayOutputStream tmp = new ByteArrayOutputStream();
+                    DataOutputStream writer = new DataOutputStream(tmp);
                     for (AdbDeviceResponder d : responder.getDevices())
                     {
-                        send(output, d.getSerial() + "\t" + d.getType() + "\n");
+                        writer.writeBytes(d.getSerial() + "\t" + d.getType() + "\n");
                     }
+                    output.write("OKAY");
+                    send(output, new String(tmp.toByteArray(), Charset.forName("utf-8")));
                 }
                 else
                 {
@@ -61,7 +61,7 @@ public class AdbProtocolHandler implements Runnable {
                 output.flush();
             }
 		} catch (IOException e) {
-            System.out.println(e.getMessage());
+            System.out.println("IO Error: " + e.getMessage());
 		}		
 	}
 	
