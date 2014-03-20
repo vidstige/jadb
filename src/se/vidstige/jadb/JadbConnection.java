@@ -60,4 +60,8 @@ public class JadbConnection {
     public JadbDevice getAnyDevice() {
         return JadbDevice.createAny(main);
     }
+
+    public void close() throws IOException {
+        main.close();
+    }
 }

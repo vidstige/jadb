@@ -56,7 +56,10 @@ public class AdbServer implements Runnable {
 				clientThread.start();		
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
+
+    public void stop() throws IOException {
+        socket.close();
+    }
 }

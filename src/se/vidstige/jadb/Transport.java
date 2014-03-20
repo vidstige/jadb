@@ -57,4 +57,9 @@ class Transport {
         verifyResponse();
         return new SyncTransport(outputStream, inputStream);
     }
+
+    public void close() throws IOException {
+        inputStream.close();
+        outputStream.close();
+    }
 }
