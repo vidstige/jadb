@@ -62,4 +62,12 @@ public class RealDeviceTestCases {
         JadbDevice any = jadb.getAnyDevice();
         any.pull(new RemoteFile("/sdcard/README.md"), new File("foobar.md"));
     }
+
+    @Test(expected = JadbException.class)
+    public void testPullInvalidFile() throws Exception
+    {
+        JadbConnection jadb = new JadbConnection();
+        JadbDevice any = jadb.getAnyDevice();
+        any.pull(new RemoteFile("/file/does/not/exist"), new File("xyz"));
+    }
 }

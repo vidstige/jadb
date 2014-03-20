@@ -70,10 +70,14 @@ class SyncTransport {
         output.write(buffer, offset, length);
     }
 
-    private int readChunk(byte[] buffer) throws IOException {
+    private int readChunk(byte[] buffer) throws IOException, JadbException {
         String id = readString(4);
-        if (!"DATA".equals(id)) return -1;
         int n = readInt();
+        if ("FAIL".equals(id))
+        {
+            throw new JadbException(readString(n));
+        }
+        if (!"DATA".equals(id)) return -1;
         return input.read(buffer, 0, n);
     }
 
@@ -86,7 +90,7 @@ class SyncTransport {
         }
     }
 
-    public void readChunksTo(OutputStream stream) throws IOException {
+    public void readChunksTo(OutputStream stream) throws IOException, JadbException {
         byte[] buffer = new byte[1024 * 64];
         int n = readChunk(buffer);
         while (n != -1) {
