@@ -7,7 +7,8 @@ import java.net.Socket;
 // >set ANDROID_ADB_SERVER_PORT=15037
 public class AdbServer implements Runnable {
 
-	private int port = 15037;
+    private static final int DEFAULT_PORT = 15037;
+	private final int port;
 	private ServerSocket socket;
 	private Thread thread;
 	private final Object lockObject = new Object();
@@ -17,6 +18,15 @@ public class AdbServer implements Runnable {
 		AdbServer server = new AdbServer();
 		server.run();
 	}
+
+    public AdbServer()
+    {
+        this(DEFAULT_PORT);
+    }
+    public AdbServer(int port)
+    {
+        this.port = port;
+    }
 		
 	public void start() throws InterruptedException
 	{
