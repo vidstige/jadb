@@ -8,7 +8,7 @@ import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbConnection;
 import se.vidstige.jadb.RemoteFile;
 
-public class JadbTestCases {
+public class RealDeviceTestCases {
 
 	@Test
 	public void testGetHostVersion() throws Exception {

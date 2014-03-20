@@ -8,7 +8,7 @@ import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbConnection;
 import se.vidstige.jadb.JadbException;
 
-public class AndroidDeviceTestCases {
+public class MockedTestCases {
 
 	@Test
 	public void testGetState() throws Exception {
