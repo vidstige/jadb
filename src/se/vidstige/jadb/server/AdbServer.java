@@ -1,4 +1,4 @@
-package se.vidstige.jadb.test.fakes;
+package se.vidstige.jadb.server;
 
 import java.net.Socket;
 

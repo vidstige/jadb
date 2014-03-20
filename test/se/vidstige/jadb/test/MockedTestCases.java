@@ -6,8 +6,8 @@ import org.junit.Before;
 import org.junit.Test;
 import se.vidstige.jadb.JadbConnection;
 import se.vidstige.jadb.JadbDevice;
-import se.vidstige.jadb.test.fakes.AdbServer;
-import se.vidstige.jadb.test.fakes.SocketServer;
+import se.vidstige.jadb.server.AdbServer;
+import se.vidstige.jadb.server.SocketServer;
 
 import java.util.List;
 
