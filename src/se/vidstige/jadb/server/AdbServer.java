@@ -8,24 +8,20 @@ import java.net.Socket;
 public class AdbServer extends SocketServer {
 
     public static final int DEFAULT_PORT = 15037;
+    private AdbResponder responder;
 
-    public AdbServer()
+    public AdbServer(AdbResponder responder)
     {
-        this(DEFAULT_PORT);
+        this(responder, DEFAULT_PORT);
     }
 
-    public AdbServer(int port) {
+    public AdbServer(AdbResponder responder, int port) {
         super(port);
+        this.responder = responder;
     }
 
     @Override
     protected Runnable createResponder(Socket socket) {
-        return new AdbProtocolHandler(socket);
-    }
-
-    public static void main(String[] args)
-    {
-        SocketServer server = new AdbServer();
-        server.run();
+        return new AdbProtocolHandler(socket, responder);
     }
 }

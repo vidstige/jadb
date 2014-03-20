@@ -32,7 +32,8 @@ public class MockedTestCases {
 
     @Test
     public void testListDevices() throws Exception {
+        server.add("serial-123");
         List<JadbDevice> devices = connection.getDevices();
-        Assert.assertEquals("X", devices.get(0).getSerial());
+        Assert.assertEquals("serial-123", devices.get(0).getSerial());
     }
 }

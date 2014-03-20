@@ -8,11 +8,13 @@ import java.net.Socket;
 import java.nio.charset.Charset;
 
 public class AdbProtocolHandler implements Runnable {
-	private Socket socket;
+	private final Socket socket;
+    private final AdbResponder responder;
 
-	public AdbProtocolHandler(Socket socket) {
+    public AdbProtocolHandler(Socket socket, AdbResponder responder) {
 		this.socket = socket;
-	}
+        this.responder = responder;
+    }
 
 	@Override
 	public void run()
@@ -28,34 +30,33 @@ public class AdbProtocolHandler implements Runnable {
                 byte[] buffer = new byte[4];
                 input.readFully(buffer);
                 String encodedLength = new String(buffer, Charset.forName("utf-8"));
-                System.out.println("DEBUG: " + encodedLength);
                 int length = Integer.parseInt(encodedLength, 16);
 
                 buffer = new byte[length];
                 input.readFully(buffer);
                 String command = new String(buffer, Charset.forName("utf-8"));
-                System.out.println("Command: " + command);
+
+                responder.onCommand(command);
 
                 if ("host:version".equals(command)) {
                     output.write("OKAY");
-                    send(output, "001F"); // version. required to be 31
-                    System.out.println("OK");
+                    send(output, String.format("%04x", responder.getVersion()));
                 }
                 else if ("host:transport-any".equals(command))
                 {
                     output.write("OKAY");
-                    System.out.println("OK");
                 }
                 else if ("host:devices".equals(command)) {
                     output.write("OKAY");
-                    send(output, "X\tdevice\nY\tdevice");
-                    System.out.println("OK");
+                    for (AdbDeviceResponder d : responder.getDevices())
+                    {
+                        send(output, d.getSerial() + "\t" + d.getType() + "\n");
+                    }
                 }
                 else
                 {
                     output.write("FAIL");
                     send(output, "Unknown command: " + command);
-                    System.out.println("FAIL");
                 }
                 output.flush();
             }
