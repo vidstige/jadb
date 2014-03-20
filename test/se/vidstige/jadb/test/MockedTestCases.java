@@ -8,17 +8,18 @@ import se.vidstige.jadb.JadbConnection;
 import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.server.AdbServer;
 import se.vidstige.jadb.server.SocketServer;
+import se.vidstige.jadb.test.fakes.FakeAdbServer;
 
 import java.util.List;
 
 public class MockedTestCases {
 
-    private SocketServer server;
+    private FakeAdbServer server;
     private JadbConnection connection;
 
     @Before
     public void setUp() throws Exception{
-        server = new AdbServer(15037);
+        server = new FakeAdbServer(15037);
         server.start();
         connection = new JadbConnection("localhost", 15037);
     }
