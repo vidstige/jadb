@@ -11,7 +11,9 @@ This projects aims at providing an up to date implementation of the ADB protocol
 Usage cannot be simpler. Just create a `JadbConnection` and off you go.
 
     JadbConnection jadb = new JadbConnection();
-	List<AndroidDevice> actual = jadb.getDevices();
+	List<JadbDevice> devices = jadb.getDevices();
+
+Make sure the adb server is running. You can start it by running `adb` once from the command line.
 
 ## Protocol Description ##
 
