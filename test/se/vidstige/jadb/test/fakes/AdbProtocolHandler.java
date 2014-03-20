@@ -7,10 +7,10 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.nio.charset.Charset;
 
-public class AdbResponder implements Runnable {
+public class AdbProtocolHandler implements Runnable {
 	private Socket socket;
 
-	public AdbResponder(Socket socket) {
+	public AdbProtocolHandler(Socket socket) {
 		this.socket = socket;
 	}
 

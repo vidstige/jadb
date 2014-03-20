@@ -20,7 +20,7 @@ public class AdbServer extends SocketServer {
 
     @Override
     protected Runnable createResponder(Socket socket) {
-        return new AdbResponder(socket);
+        return new AdbProtocolHandler(socket);
     }
 
     public static void main(String[] args)
