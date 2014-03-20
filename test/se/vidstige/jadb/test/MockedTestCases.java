@@ -7,12 +7,13 @@ import org.junit.Test;
 import se.vidstige.jadb.JadbConnection;
 import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.test.fakes.AdbServer;
+import se.vidstige.jadb.test.fakes.SocketServer;
 
 import java.util.List;
 
 public class MockedTestCases {
 
-    private AdbServer server;
+    private SocketServer server;
     private JadbConnection connection;
 
     @Before
