@@ -8,7 +8,6 @@ import org.junit.Test;
 import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbConnection;
 import se.vidstige.jadb.RemoteFile;
-import se.vidstige.jadb.RemoteFileRecord;
 
 public class RealDeviceTestCases {
 
@@ -32,8 +31,8 @@ public class RealDeviceTestCases {
     {
         JadbConnection jadb = new JadbConnection();
         JadbDevice any = jadb.getAnyDevice();
-        List<RemoteFileRecord> files = any.list("/");
-        for (RemoteFileRecord f : files)
+        List<RemoteFile> files = any.list("/");
+        for (RemoteFile f : files)
         {
             System.out.println(f.getPath());
         }

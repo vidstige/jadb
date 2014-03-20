@@ -70,12 +70,12 @@ public class JadbDevice {
 		send("shell:" + shellLine.toString());
 	}
 
-    public List<RemoteFileRecord> list(String remotePath) throws IOException, JadbException {
+    public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
         ensureTransportIsSelected();
         SyncTransport sync  = transport.startSync();
         sync.send("LIST", remotePath);
 
-        List<RemoteFileRecord> result = new ArrayList<RemoteFileRecord>();
+        List<RemoteFile> result = new ArrayList<RemoteFile>();
         for (RemoteFileRecord dent = sync.readDirectoryEntry(); dent != RemoteFileRecord.DONE; dent = sync.readDirectoryEntry())
         {
             result.add(dent);
