@@ -2,13 +2,11 @@ package se.vidstige.jadb.test;
 
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-import se.vidstige.jadb.AndroidDevice;
+import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbConnection;
 import se.vidstige.jadb.RemoteFile;
-import se.vidstige.jadb.test.fakes.AdbServer;
 
 public class JadbTestCases {
 
@@ -23,7 +21,7 @@ public class JadbTestCases {
 	{
 		//JadbConnection jadb = new JadbConnection("localhost", 15037);
 		JadbConnection jadb = new JadbConnection();
-		List<AndroidDevice> actual = jadb.getDevices();
+		List<JadbDevice> actual = jadb.getDevices();
 		//Assert.assertEquals("emulator-5554", actual.get(0).getSerial());
 	}
 
@@ -31,7 +29,7 @@ public class JadbTestCases {
     public void testListFiles() throws Exception
     {
         JadbConnection jadb = new JadbConnection();
-        AndroidDevice any = jadb.getAnyDevice();
+        JadbDevice any = jadb.getAnyDevice();
         List<RemoteFile> files = any.list("/");
         for (RemoteFile f : files)
         {
@@ -43,7 +41,7 @@ public class JadbTestCases {
     public void testPushFile() throws Exception
     {
         JadbConnection jadb = new JadbConnection();
-        AndroidDevice any = jadb.getAnyDevice();
+        JadbDevice any = jadb.getAnyDevice();
         any.push("README.md", "/sdcard/README.md");
     }
 }

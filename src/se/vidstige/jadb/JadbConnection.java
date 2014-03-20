@@ -36,7 +36,7 @@ public class JadbConnection {
 		main.verifyResponse();
 	}
 
-	public List<AndroidDevice> getDevices() throws IOException, JadbException
+	public List<JadbDevice> getDevices() throws IOException, JadbException
 	{
 		Transport devices = createTransport();
 		
@@ -46,18 +46,18 @@ public class JadbConnection {
 		return parseDevices(body);
 	}
 
-	private List<AndroidDevice> parseDevices(String body) {
+	private List<JadbDevice> parseDevices(String body) {
 		String[] lines = body.split("\n");
-		ArrayList<AndroidDevice> devices = new ArrayList<AndroidDevice>(lines.length);
+		ArrayList<JadbDevice> devices = new ArrayList<JadbDevice>(lines.length);
 		for (String line : lines)
 		{
 			String[] parts = line.split("\t");
-			devices.add(new AndroidDevice(parts[0], parts[1], main));
+			devices.add(new JadbDevice(parts[0], parts[1], main));
 		}
 		return devices;
 	}
 
-    public AndroidDevice getAnyDevice() {
-        return AndroidDevice.createAny(main);
+    public JadbDevice getAnyDevice() {
+        return JadbDevice.createAny(main);
     }
 }

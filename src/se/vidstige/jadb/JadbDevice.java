@@ -4,19 +4,19 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AndroidDevice {
+public class JadbDevice {
 	private String serial;
 	private Transport transport;
 	private boolean selected = false;
 
-	AndroidDevice(String serial, String type, Transport transport) {
+	JadbDevice(String serial, String type, Transport transport) {
 		this.serial = serial;
 		this.transport = transport;
 	}
 
-    static AndroidDevice createAny(Transport transport) { return new AndroidDevice(transport); }
+    static JadbDevice createAny(Transport transport) { return new JadbDevice(transport); }
 
-    private AndroidDevice(Transport transport)
+    private JadbDevice(Transport transport)
     {
         serial = null;
         this.transport = transport;
@@ -129,7 +129,7 @@ public class AndroidDevice {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AndroidDevice other = (AndroidDevice) obj;
+		JadbDevice other = (JadbDevice) obj;
 		if (serial == null) {
 			if (other.serial != null)
 				return false;
