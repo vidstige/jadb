@@ -1,13 +1,8 @@
 package se.vidstige.jadb.test.fakes;
 
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.charset.Charset;
 
 // >set ANDROID_ADB_SERVER_PORT=15037
 public class AdbServer implements Runnable {
@@ -15,7 +10,7 @@ public class AdbServer implements Runnable {
 	private int port = 15037;
 	private ServerSocket socket;
 	private Thread thread;
-	private Object lockObject = new Object();
+	private final Object lockObject = new Object();
 	
 	public static void main(String[] args)
 	{
@@ -59,7 +54,8 @@ public class AdbServer implements Runnable {
 		}
 	}
 
-    public void stop() throws IOException {
+    public void stop() throws IOException, InterruptedException {
         socket.close();
+        thread.join();
     }
 }

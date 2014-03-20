@@ -26,7 +26,7 @@ class Transport {
 	
 	public void verifyResponse() throws IOException, JadbException  {
 		String response = readString(4);
-		if ("OKAY".equals(response) == false)
+		if (!"OKAY".equals(response))
         {
             String error = readString();
             throw new JadbException("command failed: " + error);
@@ -37,12 +37,11 @@ class Transport {
 		DataInput reader = new DataInputStream(inputStream);
 		byte[] responseBuffer = new byte[length];		
 		reader.readFully(responseBuffer);
-		String response = new String(responseBuffer, Charset.forName("utf-8"));
-		return response;
+        return new String(responseBuffer, Charset.forName("utf-8"));
 	}
 
 	public String getCommandLength(String command) {
-		return String.format("%04x", Integer.valueOf(command.length()));
+		return String.format("%04x", command.length());
 	}
 	
 	public void send(String command) throws IOException {

@@ -1,13 +1,14 @@
 package se.vidstige.jadb.test;
 
-import java.util.List;
-
-import org.junit.*;
-
-import se.vidstige.jadb.JadbDevice;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import se.vidstige.jadb.JadbConnection;
-import se.vidstige.jadb.JadbException;
+import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.test.fakes.AdbServer;
+
+import java.util.List;
 
 public class MockedTestCases {
 
@@ -30,6 +31,6 @@ public class MockedTestCases {
     @Test
     public void testListDevices() throws Exception {
         List<JadbDevice> devices = connection.getDevices();
-        Assert.assertEquals("X",  devices.get(0).getSerial());
+        Assert.assertEquals("X", devices.get(0).getSerial());
     }
 }
