@@ -1,37 +1,17 @@
 package se.vidstige.jadb;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 /**
- * Created by vidstige on 2014-03-19.
+ * Created by vidstige on 2014-03-20
  */
 public class RemoteFile {
-    public static final RemoteFile DONE = new RemoteFile("DONE", null, 0, 0, 0);
+    private final String path;
 
-    private final String name;
-    private final int mode;
-    private final int size;
-    private final long lastModified;
+    public RemoteFile(String path) { this.path = path;}
 
-    public RemoteFile(String id, String name, int mode, int size, long lastModified) {
-        this.name = name;
-        this.mode = mode;
-        this.size = size;
-        this.lastModified = lastModified;
-    }
-
-    public String getName() {
-
-        return name;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public long getLastModified() {
-        return lastModified;
-    }
-
-    public boolean isDirectory() {
-        return (mode & (1 << 14)) == (1 << 14);
-    }
+    public String getName() { throw new NotImplementedException(); }
+    public int getSize() { throw new NotImplementedException(); }
+    public long getLastModified() { throw new NotImplementedException(); }
+    public boolean isDirectory() { throw new NotImplementedException(); }
 }

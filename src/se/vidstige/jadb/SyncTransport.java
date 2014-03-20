@@ -52,7 +52,7 @@ class SyncTransport {
         return new String(buffer, Charset.forName("utf-8"));
     }
 
-    public RemoteFile readDirectoryEntry() throws IOException {
+    public RemoteFileRecord readDirectoryEntry() throws IOException {
         String id = readString(4);
         int mode = readInt();
         int size = readInt();
@@ -60,8 +60,8 @@ class SyncTransport {
         int nameLength = readInt();
         String name = readString(nameLength);
 
-        if (!"DENT".equals(id)) return RemoteFile.DONE;
-        return new RemoteFile(id, name, mode, size, time);
+        if (!"DENT".equals(id)) return RemoteFileRecord.DONE;
+        return new RemoteFileRecord(name, mode, size, time);
     }
 
     private void sendChunk(byte[] buffer, int offset, int length) throws IOException {
