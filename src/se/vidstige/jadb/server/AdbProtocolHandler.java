@@ -1,6 +1,7 @@
 package se.vidstige.jadb.server;
 
 import java.io.*;
+import java.net.ProtocolException;
 import java.net.Socket;
 import java.nio.charset.Charset;
 
@@ -13,34 +14,50 @@ public class AdbProtocolHandler implements Runnable {
         this.responder = responder;
     }
 
+    private AdbDeviceResponder findDevice(String serial) throws ProtocolException {
+        for (AdbDeviceResponder d : responder.getDevices())
+        {
+            if (d.getSerial().equals(serial)) return d;
+        }
+        throw new ProtocolException("'" + serial + "' not connected");
+    }
+
 	@Override
 	public void run()
 	{
-        System.out.println("Serving client");
+        try{
+            runServer();
+        } catch (IOException e) {
+            System.out.println("IO Error: " + e.getMessage());
+        }
+    }
 
-		try {
+    private void runServer() throws IOException {
+        DataInput input = new DataInputStream(socket.getInputStream());
+        OutputStreamWriter output = new OutputStreamWriter(socket.getOutputStream());
 
-            while (true)
+        while (true)
+        {
+            byte[] buffer = new byte[4];
+            input.readFully(buffer);
+            String encodedLength = new String(buffer, Charset.forName("utf-8"));
+            int length = Integer.parseInt(encodedLength, 16);
+
+            buffer = new byte[length];
+            input.readFully(buffer);
+            String command = new String(buffer, Charset.forName("utf-8"));
+
+            responder.onCommand(command);
+
+            try
             {
-                DataInput input = new DataInputStream(socket.getInputStream());
-                OutputStreamWriter output = new OutputStreamWriter(socket.getOutputStream());
-                byte[] buffer = new byte[4];
-                input.readFully(buffer);
-                String encodedLength = new String(buffer, Charset.forName("utf-8"));
-                int length = Integer.parseInt(encodedLength, 16);
-
-                buffer = new byte[length];
-                input.readFully(buffer);
-                String command = new String(buffer, Charset.forName("utf-8"));
-
-                responder.onCommand(command);
-
                 if ("host:version".equals(command)) {
                     output.write("OKAY");
                     send(output, String.format("%04x", responder.getVersion()));
                 }
                 else if ("host:transport-any".equals(command))
                 {
+                    // TODO: Check so that exactly one device is selected.
                     output.write("OKAY");
                 }
                 else if ("host:devices".equals(command)) {
@@ -53,17 +70,22 @@ public class AdbProtocolHandler implements Runnable {
                     output.write("OKAY");
                     send(output, new String(tmp.toByteArray(), Charset.forName("utf-8")));
                 }
+                else if (command.startsWith("host:transport:"))
+                {
+                    String serial = command.substring("host:transport:".length());
+                    findDevice(serial);
+                }
                 else
                 {
-                    output.write("FAIL");
-                    send(output, "Unknown command: " + command);
+                    throw new ProtocolException("Unknown command: " + command);
                 }
-                output.flush();
+            } catch (ProtocolException e) {
+                output.write("FAIL");
+                send(output, e.getMessage());
             }
-		} catch (IOException e) {
-            System.out.println("IO Error: " + e.getMessage());
-		}		
-	}
+            output.flush();
+        }
+    }
 	
 	private String getCommandLength(String command) {
 		return String.format("%04x", command.length());
