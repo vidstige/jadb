@@ -1,5 +1,8 @@
 package se.vidstige.jadb.server;
 
+import se.vidstige.jadb.JadbException;
+import se.vidstige.jadb.SyncTransport;
+
 import java.io.*;
 import java.net.ProtocolException;
 import java.net.Socket;
@@ -34,7 +37,7 @@ public class AdbProtocolHandler implements Runnable {
 
     private void runServer() throws IOException {
         DataInput input = new DataInputStream(socket.getInputStream());
-        OutputStreamWriter output = new OutputStreamWriter(socket.getOutputStream());
+        DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 
         while (true)
         {
@@ -52,13 +55,13 @@ public class AdbProtocolHandler implements Runnable {
             try
             {
                 if ("host:version".equals(command)) {
-                    output.write("OKAY");
+                    output.writeBytes("OKAY");
                     send(output, String.format("%04x", responder.getVersion()));
                 }
                 else if ("host:transport-any".equals(command))
                 {
                     // TODO: Check so that exactly one device is selected.
-                    output.write("OKAY");
+                    output.writeBytes("OKAY");
                 }
                 else if ("host:devices".equals(command)) {
                     ByteArrayOutputStream tmp = new ByteArrayOutputStream();
@@ -67,32 +70,64 @@ public class AdbProtocolHandler implements Runnable {
                     {
                         writer.writeBytes(d.getSerial() + "\t" + d.getType() + "\n");
                     }
-                    output.write("OKAY");
+                    output.writeBytes("OKAY");
                     send(output, new String(tmp.toByteArray(), Charset.forName("utf-8")));
                 }
                 else if (command.startsWith("host:transport:"))
                 {
                     String serial = command.substring("host:transport:".length());
                     findDevice(serial);
+                    output.writeBytes("OKAY");
+                }
+                else if ("sync:".equals(command)) {
+                    output.writeBytes("OKAY");
+                    sync(output, input);
                 }
                 else
                 {
                     throw new ProtocolException("Unknown command: " + command);
                 }
             } catch (ProtocolException e) {
-                output.write("FAIL");
+                output.writeBytes("FAIL");
+                send(output, e.getMessage());
+            } catch (JadbException e) {
+                output.writeBytes("FAIL");
                 send(output, e.getMessage());
             }
             output.flush();
         }
     }
-	
-	private String getCommandLength(String command) {
+
+    private int readInt(DataInput input) throws IOException {
+        return Integer.reverseBytes(input.readInt());
+    }
+
+    private String readString(DataInput input, int length) throws IOException {
+        byte[] responseBuffer = new byte[length];
+        input.readFully(responseBuffer);
+        return new String(responseBuffer, Charset.forName("utf-8"));
+    }
+
+    private void sync(DataOutput output, DataInput input) throws IOException, JadbException {
+        String id = readString(input, 4);
+        int length = readInt(input);
+        if ("SEND".equals(id))
+        {
+            String remotePath = readString(input, length);
+            SyncTransport transport = new SyncTransport(output, input);
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            transport.readChunksTo(buffer);
+            transport.sendStatus("OKAY", 0); // 0 = ignored
+        }
+        else throw new JadbException("Unknown sync id " + id);
+    }
+
+    private String getCommandLength(String command) {
 		return String.format("%04x", command.length());
 	}
 	
-	public void send(OutputStreamWriter writer, String response) throws IOException {
-		writer.write(getCommandLength(response));
-		writer.write(response);
+	public void send(DataOutput writer, String response) throws IOException {
+		writer.writeBytes(getCommandLength(response));
+		writer.writeBytes(response);
 	}
 }

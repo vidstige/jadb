@@ -6,8 +6,13 @@ import org.junit.Before;
 import org.junit.Test;
 import se.vidstige.jadb.JadbConnection;
 import se.vidstige.jadb.JadbDevice;
+import se.vidstige.jadb.RemoteFile;
 import se.vidstige.jadb.test.fakes.FakeAdbServer;
 
+import java.io.ByteArrayInputStream;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class MockedTestCases {
@@ -39,6 +44,19 @@ public class MockedTestCases {
     public void testListNoDevices() throws Exception {
         List<JadbDevice> devices = connection.getDevices();
         Assert.assertEquals(0, devices.size());
+    }
+
+    @Test
+    public void testPushFile() throws Exception {
+        server.add("serial-123");
+        JadbDevice device = connection.getDevices().get(0);
+        ByteArrayInputStream fileContents = new ByteArrayInputStream("abc".getBytes());
+        device.push(fileContents, parseDate("1981-08-25 13:37"), 0666, new RemoteFile("/remote/path/abc.txt"));
+    }
+
+    private long parseDate(String date) throws ParseException {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        return dateFormat.parse(date).getTime();
     }
 
 }

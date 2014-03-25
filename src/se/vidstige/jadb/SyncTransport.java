@@ -6,16 +6,20 @@ import java.nio.charset.Charset;
 /**
  * Created by vidstige on 2014-03-19.
  */
-class SyncTransport {
+public class SyncTransport {
 
-    private final DataOutputStream output;
-    private final DataInputStream input;
+    private final DataOutput output;
+    private final DataInput input;
 
     public SyncTransport(OutputStream outputStream, InputStream inputStream) {
         output = new DataOutputStream(outputStream);
         input = new DataInputStream(inputStream);
     }
 
+    public SyncTransport(DataOutput outputStream, DataInput inputStream) {
+        output = outputStream;
+        input = inputStream;
+    }
     public void send(String syncCommand, String name) throws IOException {
         if (syncCommand.length() != 4) throw new IllegalArgumentException("sync commands must have length 4");
         output.writeBytes(syncCommand);
@@ -42,11 +46,11 @@ class SyncTransport {
         }
     }
 
-    private int readInt() throws IOException {
+    public int readInt() throws IOException {
         return Integer.reverseBytes(input.readInt());
     }
 
-    private String readString(int length) throws IOException {
+    public String readString(int length) throws IOException {
         byte[] buffer = new byte[length];
         input.readFully(buffer);
         return new String(buffer, Charset.forName("utf-8"));
@@ -78,7 +82,8 @@ class SyncTransport {
             throw new JadbException(readString(n));
         }
         if (!"DATA".equals(id)) return -1;
-        return input.read(buffer, 0, n);
+        input.readFully(buffer, 0, n);
+        return n;
     }
 
     public void sendStream(InputStream in) throws IOException {
