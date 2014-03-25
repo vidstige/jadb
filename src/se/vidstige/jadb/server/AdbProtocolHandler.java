@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 public class AdbProtocolHandler implements Runnable {
 	private final Socket socket;
     private final AdbResponder responder;
+    private AdbDeviceResponder selected;
 
     public AdbProtocolHandler(Socket socket, AdbResponder responder) {
 		this.socket = socket;
@@ -61,6 +62,7 @@ public class AdbProtocolHandler implements Runnable {
                 else if ("host:transport-any".equals(command))
                 {
                     // TODO: Check so that exactly one device is selected.
+                    selected = responder.getDevices().get(0);
                     output.writeBytes("OKAY");
                 }
                 else if ("host:devices".equals(command)) {
@@ -76,7 +78,7 @@ public class AdbProtocolHandler implements Runnable {
                 else if (command.startsWith("host:transport:"))
                 {
                     String serial = command.substring("host:transport:".length());
-                    findDevice(serial);
+                    selected = findDevice(serial);
                     output.writeBytes("OKAY");
                 }
                 else if ("sync:".equals(command)) {
@@ -114,10 +116,20 @@ public class AdbProtocolHandler implements Runnable {
         if ("SEND".equals(id))
         {
             String remotePath = readString(input, length);
+            int idx = remotePath.lastIndexOf(',');
+            String path = remotePath;
+            int mode = 0666;
+            if (idx > 0)
+            {
+                path = remotePath.substring(0, idx);
+                mode = Integer.parseInt(remotePath.substring(idx + 1));
+            }
             SyncTransport transport = new SyncTransport(output, input);
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             transport.readChunksTo(buffer);
             transport.sendStatus("OKAY", 0); // 0 = ignored
+
+            selected.filePushed(path, mode, buffer);
         }
         else throw new JadbException("Unknown sync id " + id);
     }

@@ -4,6 +4,7 @@ import se.vidstige.jadb.server.AdbDeviceResponder;
 import se.vidstige.jadb.server.AdbResponder;
 import se.vidstige.jadb.server.AdbServer;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +64,11 @@ public class FakeAdbServer implements AdbResponder {
         @Override
         public String getType() {
             return "device";
+        }
+
+        @Override
+        public void filePushed(String path, int mode, ByteArrayOutputStream buffer) {
+
         }
     }
 }
