@@ -47,6 +47,10 @@ public class FakeAdbServer implements AdbResponder {
         devices.add(new DeviceResponder(serial));
     }
 
+    public void verifyExpectations() {
+        org.junit.Assert.assertEquals(0, remoteFileExpectations.size());
+    }
+
     private static class RemoteFileExpectation {
 
         private final String serial;
@@ -83,7 +87,7 @@ public class FakeAdbServer implements AdbResponder {
         }
     }
 
-    private List<RemoteFileExpectation> _remoteFileExpectations = new ArrayList<RemoteFileExpectation>();
+    private List<RemoteFileExpectation> remoteFileExpectations = new ArrayList<RemoteFileExpectation>();
 
     public void expectPush(String serial, RemoteFile path, String contents){
         expectPush(serial, path, contents.getBytes(Charset.forName("UTF-8")));
@@ -91,11 +95,11 @@ public class FakeAdbServer implements AdbResponder {
 
     public void expectPush(String serial, RemoteFile path, byte[] contents)
     {
-        _remoteFileExpectations.add(new RemoteFileExpectation(serial, path, contents));
+        remoteFileExpectations.add(new RemoteFileExpectation(serial, path, contents));
     }
 
     private void filePushed(String serial, RemoteFile path, byte[] contents) {
-        boolean removed = _remoteFileExpectations.remove(new RemoteFileExpectation(serial, path, contents));
+        boolean removed = remoteFileExpectations.remove(new RemoteFileExpectation(serial, path, contents));
         if (!removed) throw new RuntimeException("Unexpected push to device " + serial + " at " + path.getPath());
 
     }

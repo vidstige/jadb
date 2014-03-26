@@ -31,6 +31,7 @@ public class MockedTestCases {
     public void tearDown() throws Exception {
         connection.close();
         server.stop();
+        server.verifyExpectations();
     }
 
     @Test
