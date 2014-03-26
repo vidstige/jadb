@@ -1,5 +1,6 @@
 package se.vidstige.jadb.test.fakes;
 
+import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
 import se.vidstige.jadb.server.AdbDeviceResponder;
 import se.vidstige.jadb.server.AdbResponder;
@@ -9,7 +10,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class FakeAdbServer implements AdbResponder {
     private final AdbServer server;
-    private List<AdbDeviceResponder> devices = new ArrayList<AdbDeviceResponder>();
+    private List<DeviceResponder> devices = new ArrayList<DeviceResponder>();
 
     public FakeAdbServer(int port) {
         server = new AdbServer(this, port);
@@ -48,69 +48,36 @@ public class FakeAdbServer implements AdbResponder {
     }
 
     public void verifyExpectations() {
-        org.junit.Assert.assertEquals(0, remoteFileExpectations.size());
+        for (DeviceResponder d : devices)
+            d.verifyExpectations();
     }
 
-    private static class RemoteFileExpectation {
-
-        private final String serial;
-        private final RemoteFile path;
-        private final byte[] contents;
-
-        public RemoteFileExpectation(String serial, RemoteFile path, byte[] contents) {
-
-            this.serial = serial;
-            this.path = path;
-            this.contents = contents;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            RemoteFileExpectation that = (RemoteFileExpectation) o;
-
-            if (!Arrays.equals(contents, that.contents)) return false;
-            if (!path.equals(that.path)) return false;
-            if (serial != null ? !serial.equals(that.serial) : that.serial != null) return false;
-
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = serial != null ? serial.hashCode() : 0;
-            result = 31 * result + path.hashCode();
-            result = 31 * result + Arrays.hashCode(contents);
-            return result;
-        }
+    public interface ExpectationBuilder {
+        void failWith(String message);
+        void withContent(byte[] content);
+        void withContent(String content);
     }
 
-    private List<RemoteFileExpectation> remoteFileExpectations = new ArrayList<RemoteFileExpectation>();
-
-    public void expectPush(String serial, RemoteFile path, String contents){
-        expectPush(serial, path, contents.getBytes(Charset.forName("UTF-8")));
+    private DeviceResponder findBySerial(String serial) {
+        for (DeviceResponder d : devices) {
+            if (d.getSerial().equals(serial)) return d;
+        }
+        return null;
     }
 
-    public void expectPush(String serial, RemoteFile path, byte[] contents)
+    public ExpectationBuilder expectPush(String serial, RemoteFile path)
     {
-        remoteFileExpectations.add(new RemoteFileExpectation(serial, path, contents));
-    }
-
-    private void filePushed(String serial, RemoteFile path, byte[] contents) {
-        boolean removed = remoteFileExpectations.remove(new RemoteFileExpectation(serial, path, contents));
-        if (!removed) throw new RuntimeException("Unexpected push to device " + serial + " at " + path.getPath());
-
+        return findBySerial(serial).expectPush(path);
     }
 
     @Override
     public List<AdbDeviceResponder> getDevices() {
-        return devices;
+        return new ArrayList<AdbDeviceResponder>(devices);
     }
 
     private class DeviceResponder implements AdbDeviceResponder {
         private final String serial;
+        private List<FileExpectation> expectations = new ArrayList<FileExpectation>();
 
         private DeviceResponder(String serial) {
             this.serial = serial;
@@ -127,8 +94,67 @@ public class FakeAdbServer implements AdbResponder {
         }
 
         @Override
-        public void filePushed(String path, int mode, ByteArrayOutputStream buffer) {
-            FakeAdbServer.this.filePushed(serial, new RemoteFile(path), buffer.toByteArray());
+        public void filePushed(RemoteFile path, int mode, ByteArrayOutputStream buffer) throws JadbException {
+            for (FileExpectation fe : expectations) {
+                if (fe.matches(path))
+                {
+                    expectations.remove(fe);
+                    fe.throwIfFail();
+                    fe.verifyContent(buffer.toByteArray());
+                    return;
+                }
+            }
+            new JadbException("Unexpected push to device " + serial + " at " + path);
+        }
+
+        public void verifyExpectations() {
+            org.junit.Assert.assertEquals(0, expectations.size());
+        }
+
+        private class FileExpectation implements ExpectationBuilder {
+            private final RemoteFile path;
+            private byte[] content;
+            private String failMessage;
+
+            public FileExpectation(RemoteFile path) {
+
+                this.path = path;
+                content = null;
+                failMessage = null;
+            }
+
+            @Override
+            public void failWith(String message) {
+                failMessage = message;
+            }
+
+            @Override
+            public void withContent(byte[] content) {
+                this.content = content;
+            }
+
+            @Override
+            public void withContent(String content) {
+                this.content = content.getBytes(Charset.forName("utf-8"));
+            }
+
+            public boolean matches(RemoteFile path) throws JadbException {
+                return this.path.equals(path);
+            }
+
+            public void throwIfFail() throws JadbException {
+                if (failMessage != null) throw new JadbException(failMessage);
+            }
+
+            public void verifyContent(byte[] content) {
+                org.junit.Assert.assertArrayEquals(this.content, content);
+            }
+        }
+
+        public ExpectationBuilder expectPush(RemoteFile path) {
+            FileExpectation expectation = new FileExpectation(path);
+            expectations.add(expectation);
+            return expectation;
         }
     }
 }

@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import se.vidstige.jadb.JadbConnection;
 import se.vidstige.jadb.JadbDevice;
+import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
 import se.vidstige.jadb.test.fakes.FakeAdbServer;
 
@@ -50,12 +51,20 @@ public class MockedTestCases {
     @Test
     public void testPushFile() throws Exception {
         server.add("serial-123");
-        server.expectPush("serial-123", new RemoteFile("/remote/path/abc.txt"), "abc");
+        server.expectPush("serial-123", new RemoteFile("/remote/path/abc.txt")).withContent("abc");
         JadbDevice device = connection.getDevices().get(0);
         ByteArrayInputStream fileContents = new ByteArrayInputStream("abc".getBytes());
         device.push(fileContents, parseDate("1981-08-25 13:37"), 0666, new RemoteFile("/remote/path/abc.txt"));
     }
 
+    @Test(expected = JadbException.class)
+    public void testPushToInvalidPath() throws Exception {
+        server.add("serial-123");
+        server.expectPush("serial-123", new RemoteFile("/remote/path/abc.txt")).failWith("No such directory");
+        JadbDevice device = connection.getDevices().get(0);
+        ByteArrayInputStream fileContents = new ByteArrayInputStream("abc".getBytes());
+        device.push(fileContents, parseDate("1981-08-25 13:37"), 0666, new RemoteFile("/remote/path/abc.txt"));
+    }
 
     private long parseDate(String date) throws ParseException {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");

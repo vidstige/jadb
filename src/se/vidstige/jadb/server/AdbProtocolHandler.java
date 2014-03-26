@@ -1,6 +1,7 @@
 package se.vidstige.jadb.server;
 
 import se.vidstige.jadb.JadbException;
+import se.vidstige.jadb.RemoteFile;
 import se.vidstige.jadb.SyncTransport;
 
 import java.io.*;
@@ -32,7 +33,8 @@ public class AdbProtocolHandler implements Runnable {
         try{
             runServer();
         } catch (IOException e) {
-            System.out.println("IO Error: " + e.getMessage());
+            if (e.getMessage() != null) // thrown when exiting for some reason
+                System.out.println("IO Error: " + e.getMessage());
         }
     }
 
@@ -83,16 +85,20 @@ public class AdbProtocolHandler implements Runnable {
                 }
                 else if ("sync:".equals(command)) {
                     output.writeBytes("OKAY");
-                    sync(output, input);
+                    try
+                    {
+                        sync(output, input);
+                    }
+                    catch (JadbException e) { // sync response with a different type of fail message
+                        SyncTransport sync = new SyncTransport(output, input);
+                        sync.send("FAIL", e.getMessage());
+                    }
                 }
                 else
                 {
                     throw new ProtocolException("Unknown command: " + command);
                 }
             } catch (ProtocolException e) {
-                output.writeBytes("FAIL");
-                send(output, e.getMessage());
-            } catch (JadbException e) {
                 output.writeBytes("FAIL");
                 send(output, e.getMessage());
             }
@@ -127,9 +133,8 @@ public class AdbProtocolHandler implements Runnable {
             SyncTransport transport = new SyncTransport(output, input);
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             transport.readChunksTo(buffer);
+            selected.filePushed(new RemoteFile(path), mode, buffer);
             transport.sendStatus("OKAY", 0); // 0 = ignored
-
-            selected.filePushed(path, mode, buffer);
         }
         else throw new JadbException("Unknown sync id " + id);
     }

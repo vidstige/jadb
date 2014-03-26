@@ -1,5 +1,8 @@
 package se.vidstige.jadb.server;
 
+import se.vidstige.jadb.JadbException;
+import se.vidstige.jadb.RemoteFile;
+
 import java.io.ByteArrayOutputStream;
 
 /**
@@ -9,5 +12,5 @@ public interface AdbDeviceResponder {
     String getSerial();
     String getType();
 
-    void filePushed(String path, int mode, ByteArrayOutputStream buffer);
+    void filePushed(RemoteFile path, int mode, ByteArrayOutputStream buffer) throws JadbException;
 }
