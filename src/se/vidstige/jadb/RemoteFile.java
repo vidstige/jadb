@@ -16,4 +16,21 @@ public class RemoteFile {
     public boolean isDirectory() { throw new NotImplementedException(); }
 
     public String getPath() { return path;}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        RemoteFile that = (RemoteFile) o;
+
+        if (!path.equals(that.path)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return path.hashCode();
+    }
 }

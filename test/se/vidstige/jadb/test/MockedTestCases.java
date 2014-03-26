@@ -49,10 +49,12 @@ public class MockedTestCases {
     @Test
     public void testPushFile() throws Exception {
         server.add("serial-123");
+        server.expectPush("serial-123", new RemoteFile("/remote/path/abc.txt"), "abc");
         JadbDevice device = connection.getDevices().get(0);
         ByteArrayInputStream fileContents = new ByteArrayInputStream("abc".getBytes());
         device.push(fileContents, parseDate("1981-08-25 13:37"), 0666, new RemoteFile("/remote/path/abc.txt"));
     }
+
 
     private long parseDate(String date) throws ParseException {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
