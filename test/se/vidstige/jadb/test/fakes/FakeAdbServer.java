@@ -70,6 +70,10 @@ public class FakeAdbServer implements AdbResponder {
         return findBySerial(serial).expectPush(path);
     }
 
+    public ExpectationBuilder expectPull(String serial, RemoteFile path) {
+        return findBySerial(serial).expectPull(path);
+    }
+
     @Override
     public List<AdbDeviceResponder> getDevices() {
         return new ArrayList<AdbDeviceResponder>(devices);
@@ -101,6 +105,20 @@ public class FakeAdbServer implements AdbResponder {
                     expectations.remove(fe);
                     fe.throwIfFail();
                     fe.verifyContent(buffer.toByteArray());
+                    return;
+                }
+            }
+            new JadbException("Unexpected push to device " + serial + " at " + path);
+        }
+
+        @Override
+        public void filePulled(RemoteFile path, ByteArrayOutputStream buffer) throws JadbException, IOException {
+            for (FileExpectation fe : expectations) {
+                if (fe.matches(path))
+                {
+                    expectations.remove(fe);
+                    fe.throwIfFail();
+                    fe.returnFile(buffer);
                     return;
                 }
             }
@@ -149,6 +167,10 @@ public class FakeAdbServer implements AdbResponder {
             public void verifyContent(byte[] content) {
                 org.junit.Assert.assertArrayEquals(this.content, content);
             }
+
+            public void returnFile(ByteArrayOutputStream buffer) throws IOException {
+                buffer.write(content);
+            }
         }
 
         public ExpectationBuilder expectPush(RemoteFile path) {
@@ -156,5 +178,12 @@ public class FakeAdbServer implements AdbResponder {
             expectations.add(expectation);
             return expectation;
         }
+
+        public ExpectationBuilder expectPull(RemoteFile path) {
+            FileExpectation expectation = new FileExpectation(path);
+            expectations.add(expectation);
+            return expectation;
+        }
+
     }
 }

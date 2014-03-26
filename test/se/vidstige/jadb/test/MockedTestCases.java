@@ -11,6 +11,8 @@ import se.vidstige.jadb.RemoteFile;
 import se.vidstige.jadb.test.fakes.FakeAdbServer;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -64,6 +66,16 @@ public class MockedTestCases {
         JadbDevice device = connection.getDevices().get(0);
         ByteArrayInputStream fileContents = new ByteArrayInputStream("abc".getBytes());
         device.push(fileContents, parseDate("1981-08-25 13:37"), 0666, new RemoteFile("/remote/path/abc.txt"));
+    }
+
+    @Test
+    public void testPullFile() throws Exception {
+        server.add("serial-123");
+        server.expectPull("serial-123", new RemoteFile("/remote/path/abc.txt")).withContent("foobar");
+        JadbDevice device = connection.getDevices().get(0);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        device.pull(new RemoteFile("/remote/path/abc.txt"), buffer);
+        Assert.assertArrayEquals("foobar".getBytes(Charset.forName("utf-8")), buffer.toByteArray());
     }
 
     private long parseDate(String date) throws ParseException {

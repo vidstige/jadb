@@ -136,6 +136,14 @@ public class AdbProtocolHandler implements Runnable {
             selected.filePushed(new RemoteFile(path), mode, buffer);
             transport.sendStatus("OKAY", 0); // 0 = ignored
         }
+        else if ("RECV".equals(id)) {
+            String remotePath = readString(input, length);
+            SyncTransport transport = new SyncTransport(output, input);
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+            selected.filePulled(new RemoteFile(remotePath), buffer);
+            transport.sendStream(new ByteArrayInputStream(buffer.toByteArray()));
+            transport.sendStatus("DONE", 0); // ignored
+        }
         else throw new JadbException("Unknown sync id " + id);
     }
 
