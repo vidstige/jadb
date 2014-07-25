@@ -108,7 +108,7 @@ public class FakeAdbServer implements AdbResponder {
                     return;
                 }
             }
-            new JadbException("Unexpected push to device " + serial + " at " + path);
+            throw new JadbException("Unexpected push to device " + serial + " at " + path);
         }
 
         @Override
@@ -122,7 +122,7 @@ public class FakeAdbServer implements AdbResponder {
                     return;
                 }
             }
-            new JadbException("Unexpected push to device " + serial + " at " + path);
+            throw new JadbException("Unexpected push to device " + serial + " at " + path);
         }
 
         public void verifyExpectations() {
