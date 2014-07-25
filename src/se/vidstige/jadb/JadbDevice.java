@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JadbDevice {
-	private String serial;
-	private Transport transport;
+	private final String serial;
+	private final Transport transport;
 	private boolean selected = false;
 
 	JadbDevice(String serial, String type, Transport transport) {

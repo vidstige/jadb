@@ -156,7 +156,7 @@ public class FakeAdbServer implements AdbResponder {
                 this.content = content.getBytes(Charset.forName("utf-8"));
             }
 
-            public boolean matches(RemoteFile path) throws JadbException {
+            public boolean matches(RemoteFile path) {
                 return this.path.equals(path);
             }
 

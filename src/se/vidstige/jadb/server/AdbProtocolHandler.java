@@ -9,7 +9,7 @@ import java.net.ProtocolException;
 import java.net.Socket;
 import java.nio.charset.Charset;
 
-public class AdbProtocolHandler implements Runnable {
+class AdbProtocolHandler implements Runnable {
 	private final Socket socket;
     private final AdbResponder responder;
     private AdbDeviceResponder selected;

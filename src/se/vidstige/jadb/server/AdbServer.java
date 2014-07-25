@@ -8,7 +8,7 @@ import java.net.Socket;
 public class AdbServer extends SocketServer {
 
     public static final int DEFAULT_PORT = 15037;
-    private AdbResponder responder;
+    private final AdbResponder responder;
 
     public AdbServer(AdbResponder responder)
     {

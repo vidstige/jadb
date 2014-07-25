@@ -12,7 +12,7 @@ public abstract class SocketServer implements Runnable {
 	private Thread thread;
 	private final Object lockObject = new Object();
 
-    public SocketServer(int port)
+    protected SocketServer(int port)
     {
         this.port = port;
     }
