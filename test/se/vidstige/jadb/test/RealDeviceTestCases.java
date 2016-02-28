@@ -37,6 +37,12 @@ public class RealDeviceTestCases {
         {
             System.out.println(f.getPath());
         }
+        //second read on the same device
+        List<RemoteFile> files2 = any.list("/");
+        for (RemoteFile f : files2)
+        {
+            System.out.println(f.getPath());
+        }
     }
 
     @Test
@@ -44,6 +50,8 @@ public class RealDeviceTestCases {
     {
         JadbConnection jadb = new JadbConnection();
         JadbDevice any = jadb.getAnyDevice();
+        any.push(new File("README.md"), new RemoteFile("/sdcard/README.md"));
+        //second read on the same device
         any.push(new File("README.md"), new RemoteFile("/sdcard/README.md"));
     }
 
@@ -61,6 +69,8 @@ public class RealDeviceTestCases {
         JadbConnection jadb = new JadbConnection();
         JadbDevice any = jadb.getAnyDevice();
         any.pull(new RemoteFile("/sdcard/README.md"), new File("foobar.md"));
+        //second read on the same device
+        any.pull(new RemoteFile("/sdcard/README.md"), new File("foobar.md"));
     }
 
     @Test(expected = JadbException.class)
@@ -69,5 +79,17 @@ public class RealDeviceTestCases {
         JadbConnection jadb = new JadbConnection();
         JadbDevice any = jadb.getAnyDevice();
         any.pull(new RemoteFile("/file/does/not/exist"), new File("xyz"));
+    }
+
+    @Test
+    public void testShell() throws Exception
+    {
+        JadbConnection jadb = new JadbConnection();
+        JadbDevice any = jadb.getAnyDevice();
+        String s=any.executeShell("ls -la");
+        System.out.println(s);
+        //second read on the same device
+        String s2=any.executeShell("ls");
+        System.out.println(s2);
     }
 }

@@ -6,28 +6,26 @@ import java.util.List;
 
 public class JadbDevice {
 	private final String serial;
-	private final Transport transport;
-	private boolean selected = false;
+	private Transport transport;
+    private final JadbConnection connection;
 
-	JadbDevice(String serial, String type, Transport transport) {
+	JadbDevice(String serial, String type, JadbConnection connection) {
 		this.serial = serial;
-		this.transport = transport;
+        this.connection = connection;
+		this.transport = connection.getMain();
 	}
 
-    static JadbDevice createAny(Transport transport) { return new JadbDevice(transport); }
+    static JadbDevice createAny(JadbConnection connection) { return new JadbDevice(connection); }
 
-    private JadbDevice(Transport transport)
+    private JadbDevice(JadbConnection connection)
     {
         serial = null;
-        this.transport = transport;
+        this.connection = connection;
+        this.transport = connection.getMain();
     }
 
     private void ensureTransportIsSelected() throws IOException, JadbException {
-        if (!selected)
-        {
             selectTransport();
-            selected = true;
-        }
     }
 
     private void selectTransport() throws IOException, JadbException {
@@ -56,7 +54,7 @@ public class JadbDevice {
 		return transport.readString();
 	}
 
-	public void executeShell(String command, String ... args) throws IOException, JadbException {
+	public String executeShell(String command, String ... args) throws IOException, JadbException {
         ensureTransportIsSelected();
 
 		StringBuilder shellLine = new StringBuilder(command);
@@ -68,6 +66,9 @@ public class JadbDevice {
 			shellLine.append(arg);	
 		}
 		send("shell:" + shellLine.toString());
+        String ret = this.transport.readResponse();
+        reOpenTransport();
+        return ret;
 	}
 
     public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
@@ -80,6 +81,7 @@ public class JadbDevice {
         {
             result.add(dent);
         }
+        reOpenTransport();
         return result;
     }
 
@@ -97,6 +99,7 @@ public class JadbDevice {
 
         sync.sendStatus("DONE", (int)lastModified);
         sync.verifyStatus();
+        reOpenTransport();
     }
 
     public void push(File local, RemoteFile remote) throws IOException, JadbException {
@@ -111,6 +114,7 @@ public class JadbDevice {
         sync.send("RECV", remote.getPath());
 
         sync.readChunksTo(destination);
+        reOpenTransport();
     }
 
     public void pull(RemoteFile remote, File local) throws IOException, JadbException {
@@ -123,6 +127,11 @@ public class JadbDevice {
 		transport.send(command);
         transport.verifyResponse();
 	}
+
+    private void reOpenTransport() throws IOException {
+        transport.close();
+        transport = connection.getFreshTransport();
+    }
 	
 	@Override
 	public String toString()

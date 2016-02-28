@@ -27,8 +27,16 @@ public class JadbConnection {
 		main = createTransport();
 	}
 
+	protected Transport getMain(){
+		return main;
+	}
+
 	private Transport createTransport() throws IOException {
 		return new Transport(new Socket(host, port));
+	}
+
+	public Transport getFreshTransport() throws IOException {
+		return createTransport();
 	}
 
 	public void getHostVersion() throws IOException, JadbException {
@@ -53,14 +61,14 @@ public class JadbConnection {
 		{
 			String[] parts = line.split("\t");
             if (parts.length > 1) {
-			    devices.add(new JadbDevice(parts[0], parts[1], main));
+			    devices.add(new JadbDevice(parts[0], parts[1], this));
             }
 		}
 		return devices;
 	}
 
     public JadbDevice getAnyDevice() {
-        return JadbDevice.createAny(main);
+        return JadbDevice.createAny(this);
     }
 
     public void close() throws IOException {

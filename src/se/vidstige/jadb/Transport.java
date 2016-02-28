@@ -1,5 +1,8 @@
 package se.vidstige.jadb;
 
+
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.Charset;
@@ -22,6 +25,10 @@ class Transport {
 		String encodedLength = readString(4);
 		int length = Integer.parseInt(encodedLength, 16); 		
 		return readString(length);
+	}
+
+	public String readResponse() throws IOException {
+		return new String(IOUtils.toByteArray(inputStream), Charset.forName("utf-8"));
 	}
 	
 	public void verifyResponse() throws IOException, JadbException  {
