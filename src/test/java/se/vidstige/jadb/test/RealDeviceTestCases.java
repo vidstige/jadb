@@ -1,14 +1,13 @@
 package se.vidstige.jadb.test;
 
-import java.io.File;
-import java.util.List;
-
 import org.junit.Test;
-
-import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbConnection;
+import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
+
+import java.io.File;
+import java.util.List;
 
 public class RealDeviceTestCases {
 
