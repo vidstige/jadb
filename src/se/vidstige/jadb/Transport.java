@@ -30,7 +30,11 @@ class Transport {
 	public String readResponse() throws IOException {
 		return new String(IOUtils.toByteArray(inputStream), Charset.forName("utf-8"));
 	}
-	
+
+	public byte[] readResponseAsArray() throws IOException {
+		return repairTransportedArray(IOUtils.toByteArray(inputStream));
+	}
+
 	public void verifyResponse() throws IOException, JadbException  {
 		String response = readString(4);
 		if (!"OKAY".equals(response))
@@ -68,4 +72,21 @@ class Transport {
         inputStream.close();
         outputStream.close();
     }
+
+	private byte[] repairTransportedArray(byte[] encoded) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		for (int i=0; i<encoded.length; i++) {
+			if (encoded.length > i+1 && encoded[i] == 0x0d && encoded[i+1] == 0x0a) {
+				//skip 0x0d
+			} else {
+				baos.write(encoded[i]);
+			}
+		}
+		try {
+			baos.close();
+		} catch (IOException ioe) {
+
+		}
+		return baos.toByteArray();
+	}
 }

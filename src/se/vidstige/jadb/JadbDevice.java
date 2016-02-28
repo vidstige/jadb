@@ -55,21 +55,32 @@ public class JadbDevice {
 	}
 
 	public String executeShell(String command, String ... args) throws IOException, JadbException {
-        ensureTransportIsSelected();
-
-		StringBuilder shellLine = new StringBuilder(command);
-		for (String arg : args)
-		{
-			shellLine.append(" ");
-			// TODO: throw if arg contains double quote
-			// TODO: quote arg if it contains space
-			shellLine.append(arg);	
-		}
-		send("shell:" + shellLine.toString());
+        execShell(command, args);
         String ret = this.transport.readResponse();
         reOpenTransport();
         return ret;
 	}
+
+    public byte[] executeShellGetBytearr(String command, String ... args) throws IOException, JadbException {
+        execShell(command, args);
+        byte[] ret = this.transport.readResponseAsArray();
+        reOpenTransport();
+        return ret;
+    }
+
+    private void execShell(String command, String[] args) throws IOException, JadbException {
+        ensureTransportIsSelected();
+
+        StringBuilder shellLine = new StringBuilder(command);
+        for (String arg : args)
+        {
+            shellLine.append(" ");
+            // TODO: throw if arg contains double quote
+            // TODO: quote arg if it contains space
+            shellLine.append(arg);
+        }
+        send("shell:" + shellLine.toString());
+    }
 
     public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
         ensureTransportIsSelected();

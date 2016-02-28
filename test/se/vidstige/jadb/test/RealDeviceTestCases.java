@@ -1,8 +1,11 @@
 package se.vidstige.jadb.test;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import se.vidstige.jadb.JadbDevice;
@@ -91,5 +94,14 @@ public class RealDeviceTestCases {
         //second read on the same device
         String s2=any.executeShell("ls");
         System.out.println(s2);
+    }
+
+    @Test
+    public void testShellArray() throws Exception
+    {
+        JadbConnection jadb = new JadbConnection();
+        JadbDevice any = jadb.getAnyDevice();
+        byte[] s=any.executeShellGetBytearr("screencap -p");
+        FileUtils.writeByteArrayToFile(new File("screen.png"), s);
     }
 }
