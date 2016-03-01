@@ -7,28 +7,26 @@ import java.util.List;
 public class JadbDevice {
 	private final String serial;
 	private Transport transport;
-    private final JadbConnection connection;
+    private final ITransportFactory tFactory;
 
-	JadbDevice(String serial, String type, JadbConnection connection) {
+	JadbDevice(String serial, String type, ITransportFactory tFactory) {
 		this.serial = serial;
-        this.connection = connection;
-		this.transport = connection.getMain();
+        this.tFactory = tFactory;
 	}
 
     static JadbDevice createAny(JadbConnection connection) { return new JadbDevice(connection); }
 
-    private JadbDevice(JadbConnection connection)
+    private JadbDevice(ITransportFactory tFactory)
     {
         serial = null;
-        this.connection = connection;
-        this.transport = connection.getMain();
+        this.tFactory = tFactory;
     }
 
-    private void ensureTransportIsSelected() throws IOException, JadbException {
-            selectTransport();
-    }
-
-    private void selectTransport() throws IOException, JadbException {
+    private void getTransport() throws IOException, JadbException {
+        if(transport!=null && !transport.isClosed()){
+            transport.close();
+        }
+        transport = tFactory.createTransport();
         if (serial == null)
         {
             transport.send("host:transport-any");
@@ -48,7 +46,7 @@ public class JadbDevice {
 	}
 
 	public String getState() throws IOException, JadbException {
-        ensureTransportIsSelected();
+        getTransport();
 		transport.send("get-state");
 		transport.verifyResponse();
 		return transport.readString();
@@ -57,20 +55,17 @@ public class JadbDevice {
 	public String executeShell(String command, String ... args) throws IOException, JadbException {
         execShell(command, args);
         String ret = this.transport.readResponse();
-        reOpenTransport();
         return ret;
 	}
 
     public byte[] executeShellGetBytearr(String command, String ... args) throws IOException, JadbException {
         execShell(command, args);
         byte[] ret = this.transport.readResponseAsArray();
-        reOpenTransport();
         return ret;
     }
 
     private void execShell(String command, String[] args) throws IOException, JadbException {
-        ensureTransportIsSelected();
-
+        getTransport();
         StringBuilder shellLine = new StringBuilder(command);
         for (String arg : args)
         {
@@ -83,7 +78,7 @@ public class JadbDevice {
     }
 
     public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
-        ensureTransportIsSelected();
+        getTransport();
         SyncTransport sync  = transport.startSync();
         sync.send("LIST", remotePath);
 
@@ -92,7 +87,6 @@ public class JadbDevice {
         {
             result.add(dent);
         }
-        reOpenTransport();
         return result;
     }
 
@@ -102,7 +96,7 @@ public class JadbDevice {
     }
 
     public void push(InputStream source, long lastModified, int mode, RemoteFile remote) throws IOException, JadbException {
-        ensureTransportIsSelected();
+        getTransport();
         SyncTransport sync  = transport.startSync();
         sync.send("SEND", remote.getPath() + "," + Integer.toString(mode));
 
@@ -110,7 +104,6 @@ public class JadbDevice {
 
         sync.sendStatus("DONE", (int)lastModified);
         sync.verifyStatus();
-        reOpenTransport();
     }
 
     public void push(File local, RemoteFile remote) throws IOException, JadbException {
@@ -120,12 +113,11 @@ public class JadbDevice {
 	}
 
     public void pull(RemoteFile remote, OutputStream destination) throws IOException, JadbException {
-        ensureTransportIsSelected();
+        getTransport();
         SyncTransport sync = transport.startSync();
         sync.send("RECV", remote.getPath());
 
         sync.readChunksTo(destination);
-        reOpenTransport();
     }
 
     public void pull(RemoteFile remote, File local) throws IOException, JadbException {
@@ -138,11 +130,6 @@ public class JadbDevice {
 		transport.send(command);
         transport.verifyResponse();
 	}
-
-    private void reOpenTransport() throws IOException {
-        transport.close();
-        transport = connection.getFreshTransport();
-    }
 	
 	@Override
 	public String toString()
