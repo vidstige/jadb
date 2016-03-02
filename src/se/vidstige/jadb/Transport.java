@@ -1,5 +1,8 @@
 package se.vidstige.jadb;
 
+
+import org.apache.commons.io.IOUtils;
+
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.Charset;
@@ -8,6 +11,11 @@ class Transport {
 
 	private final OutputStream outputStream;
 	private final InputStream inputStream;
+	private boolean closed=false;
+
+	public boolean isClosed(){
+		return closed;
+	}
 
 	private Transport(OutputStream outputStream, InputStream inputStream) {
 		this.outputStream = outputStream;
@@ -23,7 +31,15 @@ class Transport {
 		int length = Integer.parseInt(encodedLength, 16); 		
 		return readString(length);
 	}
-	
+
+	public String readResponse() throws IOException {
+		return new String(IOUtils.toByteArray(inputStream), Charset.forName("utf-8"));
+	}
+
+	public byte[] readResponseAsArray() throws IOException {
+		return repairTransportedArray(IOUtils.toByteArray(inputStream));
+	}
+
 	public void verifyResponse() throws IOException, JadbException  {
 		String response = readString(4);
 		if (!"OKAY".equals(response))
@@ -60,5 +76,23 @@ class Transport {
     public void close() throws IOException {
         inputStream.close();
         outputStream.close();
+		closed = true;
     }
+
+	private byte[] repairTransportedArray(byte[] encoded) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		for (int i=0; i<encoded.length; i++) {
+			if (encoded.length > i+1 && encoded[i] == 0x0d && encoded[i+1] == 0x0a) {
+				//skip 0x0d
+			} else {
+				baos.write(encoded[i]);
+			}
+		}
+		try {
+			baos.close();
+		} catch (IOException ioe) {
+
+		}
+		return baos.toByteArray();
+	}
 }

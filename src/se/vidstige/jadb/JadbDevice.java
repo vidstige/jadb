@@ -6,31 +6,27 @@ import java.util.List;
 
 public class JadbDevice {
 	private final String serial;
-	private final Transport transport;
-	private boolean selected = false;
+	private Transport transport;
+    private final ITransportFactory tFactory;
 
-	JadbDevice(String serial, String type, Transport transport) {
+	JadbDevice(String serial, String type, ITransportFactory tFactory) {
 		this.serial = serial;
-		this.transport = transport;
+        this.tFactory = tFactory;
 	}
 
-    static JadbDevice createAny(Transport transport) { return new JadbDevice(transport); }
+    static JadbDevice createAny(JadbConnection connection) { return new JadbDevice(connection); }
 
-    private JadbDevice(Transport transport)
+    private JadbDevice(ITransportFactory tFactory)
     {
         serial = null;
-        this.transport = transport;
+        this.tFactory = tFactory;
     }
 
-    private void ensureTransportIsSelected() throws IOException, JadbException {
-        if (!selected)
-        {
-            selectTransport();
-            selected = true;
+    private void getTransport() throws IOException, JadbException {
+        if(transport!=null && !transport.isClosed()){
+            transport.close();
         }
-    }
-
-    private void selectTransport() throws IOException, JadbException {
+        transport = tFactory.createTransport();
         if (serial == null)
         {
             transport.send("host:transport-any");
@@ -50,28 +46,39 @@ public class JadbDevice {
 	}
 
 	public String getState() throws IOException, JadbException {
-        ensureTransportIsSelected();
+        getTransport();
 		transport.send("get-state");
 		transport.verifyResponse();
 		return transport.readString();
 	}
 
-	public void executeShell(String command, String ... args) throws IOException, JadbException {
-        ensureTransportIsSelected();
-
-		StringBuilder shellLine = new StringBuilder(command);
-		for (String arg : args)
-		{
-			shellLine.append(" ");
-			// TODO: throw if arg contains double quote
-			// TODO: quote arg if it contains space
-			shellLine.append(arg);	
-		}
-		send("shell:" + shellLine.toString());
+	public String executeShell(String command, String ... args) throws IOException, JadbException {
+        execShell(command, args);
+        String ret = this.transport.readResponse();
+        return ret;
 	}
 
+    public byte[] executeShellGetBytearr(String command, String ... args) throws IOException, JadbException {
+        execShell(command, args);
+        byte[] ret = this.transport.readResponseAsArray();
+        return ret;
+    }
+
+    private void execShell(String command, String[] args) throws IOException, JadbException {
+        getTransport();
+        StringBuilder shellLine = new StringBuilder(command);
+        for (String arg : args)
+        {
+            shellLine.append(" ");
+            // TODO: throw if arg contains double quote
+            // TODO: quote arg if it contains space
+            shellLine.append(arg);
+        }
+        send("shell:" + shellLine.toString());
+    }
+
     public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
-        ensureTransportIsSelected();
+        getTransport();
         SyncTransport sync  = transport.startSync();
         sync.send("LIST", remotePath);
 
@@ -89,7 +96,7 @@ public class JadbDevice {
     }
 
     public void push(InputStream source, long lastModified, int mode, RemoteFile remote) throws IOException, JadbException {
-        ensureTransportIsSelected();
+        getTransport();
         SyncTransport sync  = transport.startSync();
         sync.send("SEND", remote.getPath() + "," + Integer.toString(mode));
 
@@ -106,7 +113,7 @@ public class JadbDevice {
 	}
 
     public void pull(RemoteFile remote, OutputStream destination) throws IOException, JadbException {
-        ensureTransportIsSelected();
+        getTransport();
         SyncTransport sync = transport.startSync();
         sync.send("RECV", remote.getPath());
 

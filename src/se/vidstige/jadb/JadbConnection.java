@@ -5,14 +5,12 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JadbConnection {
+public class JadbConnection implements ITransportFactory{
 	
 	private final String host;
 	private final int port;
 	
 	private static final int DEFAULTPORT = 5037;
-	
-	private final Transport main;
 	
 	public JadbConnection() throws IOException
 	{
@@ -23,17 +21,17 @@ public class JadbConnection {
 	{
 		this.host = host;
 		this.port = port;
-				
-		main = createTransport();
 	}
 
-	private Transport createTransport() throws IOException {
+	public Transport createTransport() throws IOException {
 		return new Transport(new Socket(host, port));
 	}
 
 	public void getHostVersion() throws IOException, JadbException {
+		Transport main = createTransport();
 		main.send("host:version");
 		main.verifyResponse();
+		main.close();
 	}
 
 	public List<JadbDevice> getDevices() throws IOException, JadbException
@@ -53,17 +51,13 @@ public class JadbConnection {
 		{
 			String[] parts = line.split("\t");
             if (parts.length > 1) {
-			    devices.add(new JadbDevice(parts[0], parts[1], main));
+			    devices.add(new JadbDevice(parts[0], parts[1], this));
             }
 		}
 		return devices;
 	}
 
     public JadbDevice getAnyDevice() {
-        return JadbDevice.createAny(main);
-    }
-
-    public void close() throws IOException {
-        main.close();
+        return JadbDevice.createAny(this);
     }
 }
