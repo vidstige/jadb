@@ -6,12 +6,11 @@ import java.util.List;
 
 public class JadbDevice {
 	private final String serial;
-	private Transport transport;
-    private final ITransportFactory tFactory;
+    private final ITransportFactory transportFactory;
 
 	JadbDevice(String serial, String type, ITransportFactory tFactory) {
 		this.serial = serial;
-        this.tFactory = tFactory;
+        this.transportFactory = tFactory;
 	}
 
     static JadbDevice createAny(JadbConnection connection) { return new JadbDevice(connection); }
@@ -19,14 +18,11 @@ public class JadbDevice {
     private JadbDevice(ITransportFactory tFactory)
     {
         serial = null;
-        this.tFactory = tFactory;
+        this.transportFactory = tFactory;
     }
 
-    private void getTransport() throws IOException, JadbException {
-        if(transport!=null && !transport.isClosed()){
-            transport.close();
-        }
-        transport = tFactory.createTransport();
+    private Transport getTransport() throws IOException, JadbException {
+        Transport transport = transportFactory.createTransport();
         if (serial == null)
         {
             transport.send("host:transport-any");
@@ -36,8 +32,8 @@ public class JadbDevice {
         {
             transport.send("host:transport:" + serial);
             transport.verifyResponse();
-
         }
+        return transport;
     }
 
     public String getSerial()
@@ -46,19 +42,18 @@ public class JadbDevice {
 	}
 
 	public String getState() throws IOException, JadbException {
-        getTransport();
+        Transport transport = getTransport();
 		transport.send("get-state");
 		transport.verifyResponse();
 		return transport.readString();
 	}
 
-	public void executeShell(OutputStream stdout, String command, String ... args) throws IOException, JadbException {
-        executeShell(command, args);
-        this.transport.readResponseTo(stdout);
+	public void executeShell(String command, String ... args) throws IOException, JadbException {
+        executeShell(null, command, args);
 	}
 
-    private void executeShell(String command, String[] args) throws IOException, JadbException {
-        getTransport();
+    public void executeShell(OutputStream stdout, String command, String ... args) throws IOException, JadbException {
+        Transport transport = getTransport();
         StringBuilder shellLine = new StringBuilder(command);
         for (String arg : args)
         {
@@ -67,11 +62,14 @@ public class JadbDevice {
             // TODO: quote arg if it contains space
             shellLine.append(arg);
         }
-        send("shell:" + shellLine.toString());
+        send(transport, "shell:" + shellLine.toString());
+        if (stdout != null) {
+            transport.readResponseTo(stdout);
+        }
     }
 
     public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
-        getTransport();
+        Transport transport = getTransport();
         SyncTransport sync  = transport.startSync();
         sync.send("LIST", remotePath);
 
@@ -90,7 +88,7 @@ public class JadbDevice {
     }
 
     public void push(InputStream source, long lastModified, int mode, RemoteFile remote) throws IOException, JadbException {
-        getTransport();
+        Transport transport = getTransport();
         SyncTransport sync  = transport.startSync();
         sync.send("SEND", remote.getPath() + "," + Integer.toString(mode));
 
@@ -107,7 +105,7 @@ public class JadbDevice {
 	}
 
     public void pull(RemoteFile remote, OutputStream destination) throws IOException, JadbException {
-        getTransport();
+        Transport transport = getTransport();
         SyncTransport sync = transport.startSync();
         sync.send("RECV", remote.getPath());
 
@@ -120,7 +118,7 @@ public class JadbDevice {
         fileStream.close();
     }
 
-	private void send(String command) throws IOException, JadbException {
+	private void send(Transport transport, String command) throws IOException, JadbException {
 		transport.send(command);
         transport.verifyResponse();
 	}

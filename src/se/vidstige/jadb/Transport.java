@@ -8,11 +8,6 @@ class Transport {
 
 	private final OutputStream outputStream;
 	private final InputStream inputStream;
-	private boolean closed=false;
-
-	public boolean isClosed(){
-		return closed;
-	}
 
 	private Transport(OutputStream outputStream, InputStream inputStream) {
 		this.outputStream = outputStream;
@@ -78,6 +73,5 @@ class Transport {
     public void close() throws IOException {
         inputStream.close();
         outputStream.close();
-		closed = true;
     }
 }
