@@ -52,19 +52,12 @@ public class JadbDevice {
 		return transport.readString();
 	}
 
-	public String executeShell(String command, String ... args) throws IOException, JadbException {
-        execShell(command, args);
-        String ret = this.transport.readResponse();
-        return ret;
+	public void executeShell(OutputStream stdout, String command, String ... args) throws IOException, JadbException {
+        executeShell(command, args);
+        this.transport.readResponseTo(stdout);
 	}
 
-    public byte[] executeShellGetBytearr(String command, String ... args) throws IOException, JadbException {
-        execShell(command, args);
-        byte[] ret = this.transport.readResponseAsArray();
-        return ret;
-    }
-
-    private void execShell(String command, String[] args) throws IOException, JadbException {
+    private void executeShell(String command, String[] args) throws IOException, JadbException {
         getTransport();
         StringBuilder shellLine = new StringBuilder(command);
         for (String arg : args)
@@ -92,6 +85,7 @@ public class JadbDevice {
 
     private int getMode(File file)
     {
+        //noinspection OctalInteger
         return 0664;
     }
 

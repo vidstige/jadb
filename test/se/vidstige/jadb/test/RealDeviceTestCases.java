@@ -1,17 +1,13 @@
 package se.vidstige.jadb.test;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.List;
-
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
-
-import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbConnection;
+import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
+
+import java.io.File;
+import java.util.List;
 
 public class RealDeviceTestCases {
 
@@ -31,18 +27,16 @@ public class RealDeviceTestCases {
 	}
 
     @Test
-    public void testListFiles() throws Exception
+    public void testListFilesTwice() throws Exception
     {
         JadbConnection jadb = new JadbConnection();
         JadbDevice any = jadb.getAnyDevice();
-        List<RemoteFile> files = any.list("/");
-        for (RemoteFile f : files)
+        for (RemoteFile f : any.list("/"))
         {
             System.out.println(f.getPath());
         }
-        //second read on the same device
-        List<RemoteFile> files2 = any.list("/");
-        for (RemoteFile f : files2)
+
+        for (RemoteFile f : any.list("/"))
         {
             System.out.println(f.getPath());
         }
@@ -85,23 +79,11 @@ public class RealDeviceTestCases {
     }
 
     @Test
-    public void testShell() throws Exception
+    public void testShellExecuteTwice() throws Exception
     {
         JadbConnection jadb = new JadbConnection();
         JadbDevice any = jadb.getAnyDevice();
-        String s=any.executeShell("ls -la");
-        System.out.println(s);
-        //second read on the same device
-        String s2=any.executeShell("ls");
-        System.out.println(s2);
-    }
-
-    @Test
-    public void testShellArray() throws Exception
-    {
-        JadbConnection jadb = new JadbConnection();
-        JadbDevice any = jadb.getAnyDevice();
-        byte[] s=any.executeShellGetBytearr("screencap -p");
-        FileUtils.writeByteArrayToFile(new File("screen.png"), s);
+        any.executeShell(System.out, "ls /");
+        any.executeShell(System.out, "ls", "-la", "/");
     }
 }

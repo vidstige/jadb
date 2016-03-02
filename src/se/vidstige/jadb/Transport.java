@@ -1,8 +1,5 @@
 package se.vidstige.jadb;
 
-
-import org.apache.commons.io.IOUtils;
-
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.Charset;
@@ -32,12 +29,17 @@ class Transport {
 		return readString(length);
 	}
 
-	public String readResponse() throws IOException {
-		return new String(IOUtils.toByteArray(inputStream), Charset.forName("utf-8"));
+
+	private static void copy(InputStream in, OutputStream out) throws IOException {
+		byte[] buffer = new byte[1024 * 10];
+		int len;
+		while ((len = in.read(buffer)) != -1) {
+			out.write(buffer, 0, len);
+		}
 	}
 
-	public byte[] readResponseAsArray() throws IOException {
-		return repairTransportedArray(IOUtils.toByteArray(inputStream));
+	public void readResponseTo(OutputStream output) throws IOException {
+		copy(inputStream, output);
 	}
 
 	public void verifyResponse() throws IOException, JadbException  {
@@ -78,21 +80,4 @@ class Transport {
         outputStream.close();
 		closed = true;
     }
-
-	private byte[] repairTransportedArray(byte[] encoded) {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		for (int i=0; i<encoded.length; i++) {
-			if (encoded.length > i+1 && encoded[i] == 0x0d && encoded[i+1] == 0x0a) {
-				//skip 0x0d
-			} else {
-				baos.write(encoded[i]);
-			}
-		}
-		try {
-			baos.close();
-		} catch (IOException ioe) {
-
-		}
-		return baos.toByteArray();
-	}
 }
