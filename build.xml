@@ -3,11 +3,9 @@
   
   
   <property file="build.properties"/>
-  <!-- Uncomment the following property if no tests compilation is needed -->
-  <!-- 
-  <property name="skip.tests" value="true"/>
-   -->
-  
+  <property environment="env"/>
+  <property name="jdk.home.1.6" value="${env.JAVA_HOME}"/>
+
   <!-- Compiler options -->
   
   <property name="compiler.debug" value="on"/>
@@ -55,7 +53,7 @@
   </patternset>
   
   <!-- JDK definitions -->
-  
+
   <property name="jdk.bin.1.6" value="${jdk.home.1.6}/bin"/>
   <path id="jdk.classpath.1.6">
     <fileset dir="${jdk.home.1.6}">
@@ -132,6 +130,6 @@
   <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
 
   <target name="test" depends="build.modules">
-    
+
   </target>
 </project>
