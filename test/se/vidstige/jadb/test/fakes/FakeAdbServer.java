@@ -23,18 +23,19 @@ public class FakeAdbServer implements AdbResponder {
         server = new AdbServer(this, port);
     }
 
-
     public void start() throws InterruptedException {
+        System.out.println("Starting fake on port " + server.getPort());
         server.start();
     }
 
     public void stop() throws IOException, InterruptedException {
+        System.out.println("Stopping fake on port " + server.getPort());
         server.stop();
     }
 
     @Override
     public void onCommand(String command) {
-        System.out.println("command: " +command);
+        System.out.println("command: " + command);
     }
 
     @Override
@@ -42,8 +43,7 @@ public class FakeAdbServer implements AdbResponder {
         return 31;
     }
 
-    public void add(String serial)
-    {
+    public void add(String serial) {
         devices.add(new DeviceResponder(serial));
     }
 
@@ -54,7 +54,9 @@ public class FakeAdbServer implements AdbResponder {
 
     public interface ExpectationBuilder {
         void failWith(String message);
+
         void withContent(byte[] content);
+
         void withContent(String content);
     }
 
@@ -65,8 +67,7 @@ public class FakeAdbServer implements AdbResponder {
         return null;
     }
 
-    public ExpectationBuilder expectPush(String serial, RemoteFile path)
-    {
+    public ExpectationBuilder expectPush(String serial, RemoteFile path) {
         return findBySerial(serial).expectPush(path);
     }
 
@@ -100,8 +101,7 @@ public class FakeAdbServer implements AdbResponder {
         @Override
         public void filePushed(RemoteFile path, int mode, ByteArrayOutputStream buffer) throws JadbException {
             for (FileExpectation fe : expectations) {
-                if (fe.matches(path))
-                {
+                if (fe.matches(path)) {
                     expectations.remove(fe);
                     fe.throwIfFail();
                     fe.verifyContent(buffer.toByteArray());
@@ -114,8 +114,7 @@ public class FakeAdbServer implements AdbResponder {
         @Override
         public void filePulled(RemoteFile path, ByteArrayOutputStream buffer) throws JadbException, IOException {
             for (FileExpectation fe : expectations) {
-                if (fe.matches(path))
-                {
+                if (fe.matches(path)) {
                     expectations.remove(fe);
                     fe.throwIfFail();
                     fe.returnFile(buffer);
@@ -184,6 +183,5 @@ public class FakeAdbServer implements AdbResponder {
             expectations.add(expectation);
             return expectation;
         }
-
     }
 }

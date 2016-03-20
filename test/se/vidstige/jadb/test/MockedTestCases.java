@@ -24,7 +24,7 @@ public class MockedTestCases {
     private JadbConnection connection;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         server = new FakeAdbServer(15037);
         server.start();
         connection = new JadbConnection("localhost", 15037);
@@ -81,5 +81,4 @@ public class MockedTestCases {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         return dateFormat.parse(date).getTime();
     }
-
 }

@@ -3,7 +3,7 @@ package se.vidstige.jadb;
 /**
  * Created by vidstige on 2014-03-19.
  */
-class RemoteFileRecord extends RemoteFile{
+class RemoteFileRecord extends RemoteFile {
     public static final RemoteFileRecord DONE = new RemoteFileRecord(null, 0, 0, 0);
 
     private final int mode;

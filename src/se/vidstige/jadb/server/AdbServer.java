@@ -10,8 +10,7 @@ public class AdbServer extends SocketServer {
     public static final int DEFAULT_PORT = 15037;
     private final AdbResponder responder;
 
-    public AdbServer(AdbResponder responder)
-    {
+    public AdbServer(AdbResponder responder) {
         this(responder, DEFAULT_PORT);
     }
 

@@ -6,7 +6,7 @@ package se.vidstige.jadb;
 public class RemoteFile {
     private final String path;
 
-    public RemoteFile(String path) { this.path = path;}
+    public RemoteFile(String path) { this.path = path; }
 
     public String getName() { throw new UnsupportedOperationException(); }
     public int getSize() { throw new UnsupportedOperationException(); }
