@@ -60,7 +60,7 @@ public class JadbDevice {
         }
         send(transport, "shell:" + shellLine.toString());
         if (stdout != null) {
-            transport.readResponseTo(stdout);
+            transport.readResponseTo(new AdbFilterOutputStream(stdout));
         }
     }
 
