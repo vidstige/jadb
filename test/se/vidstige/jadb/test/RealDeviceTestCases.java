@@ -1,11 +1,9 @@
 package se.vidstige.jadb.test;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import se.vidstige.jadb.JadbConnection;
-import se.vidstige.jadb.JadbDevice;
-import se.vidstige.jadb.JadbException;
-import se.vidstige.jadb.RemoteFile;
+import se.vidstige.jadb.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,6 +13,17 @@ import java.util.List;
 public class RealDeviceTestCases {
 
     private JadbConnection jadb;
+
+    @BeforeClass
+    public static void tryToStartAdbServer() {
+        try {
+            new AdbServerLauncher().launch();
+        } catch (IOException e) {
+            System.out.println("Could not start adb-server");
+        } catch (InterruptedException e) {
+            System.out.println("Could not start adb-server");
+        }
+    }
 
     @Before
     public void connect() throws IOException {
