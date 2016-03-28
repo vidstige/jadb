@@ -15,8 +15,14 @@ public class RealDeviceTestCases {
     private JadbConnection jadb;
 
     @BeforeClass
-    public static void tryToStartAdbServer() throws IOException, InterruptedException {
-        new AdbServerLauncher().launch();
+    public static void tryToStartAdbServer() {
+        try {
+            new AdbServerLauncher().launch();
+        } catch (IOException e) {
+            System.out.println("Could not start adb-server");
+        } catch (InterruptedException e) {
+            System.out.println("Could not start adb-server");
+        }
     }
 
     @Before
