@@ -130,6 +130,18 @@
   <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
 
   <target name="test" depends="build.modules">
-
+    <junit haltonfailure="yes">
+      <classpath>
+        <pathelement path="bin/"/>
+        <pathelement location="lib/junit-4.10.jar"/>
+      </classpath>
+      <formatter type="plain" usefile="false" />
+      <batchtest>
+        <fileset dir="test/">
+          <include name="**/*TestCases.java" />
+          <include name="**/*Fixture.java" />
+        </fileset>
+      </batchtest>
+    </junit>
   </target>
 </project>
