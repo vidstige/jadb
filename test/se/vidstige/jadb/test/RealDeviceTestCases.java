@@ -1,11 +1,9 @@
 package se.vidstige.jadb.test;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import se.vidstige.jadb.JadbConnection;
-import se.vidstige.jadb.JadbDevice;
-import se.vidstige.jadb.JadbException;
-import se.vidstige.jadb.RemoteFile;
+import se.vidstige.jadb.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -15,6 +13,11 @@ import java.util.List;
 public class RealDeviceTestCases {
 
     private JadbConnection jadb;
+
+    @BeforeClass
+    public static void tryToStartAdbServer() throws IOException, InterruptedException {
+        new AdbServerLauncher().launch();
+    }
 
     @Before
     public void connect() throws IOException {
