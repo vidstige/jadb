@@ -7,6 +7,7 @@ import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.List;
 
 public class RealDeviceTestCases {
@@ -76,5 +77,13 @@ public class RealDeviceTestCases {
         JadbDevice any = jadb.getAnyDevice();
         any.executeShell(System.out, "ls /");
         any.executeShell(System.out, "ls", "-la", "/");
+    }
+
+    @Test
+    public void testScreenshot() throws Exception {
+        JadbConnection jadb = new JadbConnection();
+        JadbDevice any = jadb.getAnyDevice();
+        FileOutputStream outputStream = new FileOutputStream(new File("screenshot.png"));
+        any.executeShell(outputStream, "screencap", "-p");
     }
 }
