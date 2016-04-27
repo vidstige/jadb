@@ -1,6 +1,6 @@
 package se.vidstige.jadb.test;
 
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import se.vidstige.jadb.*;
 
@@ -12,10 +12,10 @@ import java.util.List;
 
 public class RealDeviceTestCases {
 
-    private JadbConnection jadb;
+    private static JadbConnection jadb;
 
-    @Before
-    public void connect() throws IOException {
+    @BeforeClass
+    public static void connect() throws IOException {
         try {
             jadb = new JadbConnection();
             jadb.getHostVersion();
