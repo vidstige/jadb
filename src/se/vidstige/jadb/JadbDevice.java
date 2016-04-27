@@ -58,6 +58,12 @@ public class JadbDevice {
         return new AdbFilterInputStream(new BufferedInputStream(transport.getInputStream()));
     }
 
+    /**
+     *
+     * @deprecated Use InputStream executeShell(String command, String... args) method instead. Together with
+     * Stream.copy(in, out), it is possible to achieve the same effect.
+     */
+    @Deprecated
     public void executeShell(OutputStream output, String command, String... args) throws IOException, JadbException {
         Transport transport = getTransport();
         StringBuilder shellLine = new StringBuilder(command);
