@@ -8,6 +8,7 @@ import se.vidstige.jadb.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 public class RealDeviceTestCases {
@@ -96,7 +97,13 @@ public class RealDeviceTestCases {
     @Test
     public void testScreenshot() throws Exception {
         JadbDevice any = jadb.getAnyDevice();
-        FileOutputStream outputStream = new FileOutputStream(new File("screenshot.png"));
-        any.executeShell(outputStream, "screencap", "-p");
+        FileOutputStream outputStream = null;
+        try {
+            outputStream = new FileOutputStream(new File("screenshot.png"));
+            InputStream stdout = any.executeShell("screencap", "-p");
+            Stream.copy(stdout, outputStream);
+        }  finally {
+            if (outputStream != null) outputStream.close();
+        }
     }
 }

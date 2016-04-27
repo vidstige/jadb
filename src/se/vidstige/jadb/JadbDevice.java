@@ -45,11 +45,7 @@ public class JadbDevice {
         return transport.readString();
     }
 
-    public void executeShell(String command, String... args) throws IOException, JadbException {
-        executeShell(null, command, args);
-    }
-
-    public void executeShell(OutputStream stdout, String command, String... args) throws IOException, JadbException {
+    public InputStream executeShell(String command, String... args) throws IOException, JadbException {
         Transport transport = getTransport();
         StringBuilder shellLine = new StringBuilder(command);
         for (String arg : args) {
@@ -59,9 +55,29 @@ public class JadbDevice {
             shellLine.append(arg);
         }
         send(transport, "shell:" + shellLine.toString());
-        if (stdout != null) {
-            transport.readResponseTo(new AdbFilterOutputStream(stdout));
+        return new AdbFilterInputStream(new BufferedInputStream(transport.getInputStream()));
+    }
+
+    /**
+     *
+     * @deprecated Use InputStream executeShell(String command, String... args) method instead. Together with
+     * Stream.copy(in, out), it is possible to achieve the same effect.
+     */
+    @Deprecated
+    public void executeShell(OutputStream output, String command, String... args) throws IOException, JadbException {
+        Transport transport = getTransport();
+        StringBuilder shellLine = new StringBuilder(command);
+        for (String arg : args) {
+            shellLine.append(" ");
+            // TODO: throw if arg contains double quote
+            // TODO: quote arg if it contains space
+            shellLine.append(arg);
         }
+        send(transport, "shell:" + shellLine.toString());
+        if (output != null) {
+            transport.readResponseTo(new AdbFilterOutputStream(output));
+        }
+        //return AdbFilterInputStream(transport.getInputStream());
     }
 
     public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
