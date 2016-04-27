@@ -24,17 +24,12 @@ class Transport {
         return readString(length);
     }
 
-
-    private static void copy(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[1024 * 10];
-        int len;
-        while ((len = in.read(buffer)) != -1) {
-            out.write(buffer, 0, len);
-        }
+    public void readResponseTo(OutputStream output) throws IOException {
+        Stream.copy(inputStream, output);
     }
 
-    public void readResponseTo(OutputStream output) throws IOException {
-        copy(inputStream, output);
+    public InputStream getInputStream() {
+        return inputStream;
     }
 
     public void verifyResponse() throws IOException, JadbException {
