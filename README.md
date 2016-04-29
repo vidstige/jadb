@@ -22,6 +22,11 @@ It's very easy to send and receive files from your android device, for example a
     JadbDevice device = ...
     device.pull(new RemoteFile("/path/to/file.txt"), new File("file.txt"));
 
+Some high level operations such as installing and uninstalling packages are also available.
+
+    JadbDevice device = ...
+    new PackageManager(device).install(new File("/path/to/my.apk"));
+
 ## Protocol Description ##
 
 An overview of the protocol can be found here: [Overview](https://github.com/cgjones/android-system-core/blob/master/adb/OVERVIEW.TXT)

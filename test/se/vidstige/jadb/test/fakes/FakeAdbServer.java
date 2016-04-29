@@ -8,6 +8,7 @@ import se.vidstige.jadb.server.AdbServer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.ProtocolException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +76,10 @@ public class FakeAdbServer implements AdbResponder {
         return findBySerial(serial).expectPull(path);
     }
 
+    public void expectShell(String serial, String commands) {
+        findBySerial(serial).expectShell(commands);
+    }
+
     @Override
     public List<AdbDeviceResponder> getDevices() {
         return new ArrayList<AdbDeviceResponder>(devices);
@@ -82,7 +87,8 @@ public class FakeAdbServer implements AdbResponder {
 
     private class DeviceResponder implements AdbDeviceResponder {
         private final String serial;
-        private List<FileExpectation> expectations = new ArrayList<FileExpectation>();
+        private List<FileExpectation> fileExpectations = new ArrayList<FileExpectation>();
+        private List<ShellExpectation> shellExpectations = new ArrayList<ShellExpectation>();
 
         private DeviceResponder(String serial) {
             this.serial = serial;
@@ -100,9 +106,9 @@ public class FakeAdbServer implements AdbResponder {
 
         @Override
         public void filePushed(RemoteFile path, int mode, ByteArrayOutputStream buffer) throws JadbException {
-            for (FileExpectation fe : expectations) {
+            for (FileExpectation fe : fileExpectations) {
                 if (fe.matches(path)) {
-                    expectations.remove(fe);
+                    fileExpectations.remove(fe);
                     fe.throwIfFail();
                     fe.verifyContent(buffer.toByteArray());
                     return;
@@ -113,9 +119,9 @@ public class FakeAdbServer implements AdbResponder {
 
         @Override
         public void filePulled(RemoteFile path, ByteArrayOutputStream buffer) throws JadbException, IOException {
-            for (FileExpectation fe : expectations) {
+            for (FileExpectation fe : fileExpectations) {
                 if (fe.matches(path)) {
-                    expectations.remove(fe);
+                    fileExpectations.remove(fe);
                     fe.throwIfFail();
                     fe.returnFile(buffer);
                     return;
@@ -124,8 +130,20 @@ public class FakeAdbServer implements AdbResponder {
             throw new JadbException("Unexpected push to device " + serial + " at " + path);
         }
 
+        @Override
+        public void shell(String command) throws IOException {
+            for (ShellExpectation se : shellExpectations) {
+                if (se.matches(command)) {
+                    shellExpectations.remove(se);
+                    se.throwIfFail();
+                    return;
+                }
+            }
+            throw new ProtocolException("Unexpected shell to device " + serial + ": " + command);
+        }
+
         public void verifyExpectations() {
-            org.junit.Assert.assertEquals(0, expectations.size());
+            org.junit.Assert.assertEquals(0, fileExpectations.size());
         }
 
         private class FileExpectation implements ExpectationBuilder {
@@ -172,15 +190,37 @@ public class FakeAdbServer implements AdbResponder {
             }
         }
 
+        public class ShellExpectation {
+            private final String command;
+
+            public ShellExpectation(String command) {
+                this.command = command;
+            }
+
+            public boolean matches(String command) {
+                return command.equals(this.command);
+            }
+
+            public void throwIfFail() {
+
+            }
+        }
+
         public ExpectationBuilder expectPush(RemoteFile path) {
             FileExpectation expectation = new FileExpectation(path);
-            expectations.add(expectation);
+            fileExpectations.add(expectation);
             return expectation;
         }
 
         public ExpectationBuilder expectPull(RemoteFile path) {
             FileExpectation expectation = new FileExpectation(path);
-            expectations.add(expectation);
+            fileExpectations.add(expectation);
+            return expectation;
+        }
+
+        public ShellExpectation expectShell(String command) {
+            ShellExpectation expectation = new ShellExpectation(command);
+            shellExpectations.add(new ShellExpectation(command));
             return expectation;
         }
     }

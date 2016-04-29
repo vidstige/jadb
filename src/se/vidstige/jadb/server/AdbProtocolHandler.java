@@ -80,6 +80,9 @@ class AdbProtocolHandler implements Runnable {
                         SyncTransport sync = new SyncTransport(output, input);
                         sync.send("FAIL", e.getMessage());
                     }
+                } else if (command.startsWith("shell:")) {
+                    shell(command.substring("shell:".length()));
+                    output.writeBytes("OKAY");
                 } else {
                     throw new ProtocolException("Unknown command: " + command);
                 }
@@ -89,6 +92,10 @@ class AdbProtocolHandler implements Runnable {
             }
             output.flush();
         }
+    }
+
+    private void shell(String command) throws IOException {
+        selected.shell(command);
     }
 
     private int readInt(DataInput input) throws IOException {
