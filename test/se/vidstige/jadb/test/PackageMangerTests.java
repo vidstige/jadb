@@ -32,6 +32,11 @@ public class PackageMangerTests {
     }
 
     @Test
+    public void testLaunchActivity() throws Exception {
+        pm.launch(new Package("com.android.settings"));
+    }
+
+    @Test
     public void testListPackages() throws Exception {
         List<Package> packages = pm.getPackages();
         for (Package p : packages) {

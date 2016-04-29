@@ -60,4 +60,8 @@ public class PackageManager {
         String result = Stream.readAll(s, Charset.forName("UTF-8"));
         verifyOperation("uninstall", name.toString(), result);
     }
+
+    public void launch(Package name) throws IOException, JadbException {
+        InputStream s = device.executeShell("monkey", "-p", name.toString(), "-c", "android.intent.category.LAUNCHER", "1");
+    }
 }

@@ -77,7 +77,6 @@ public class JadbDevice {
         if (output != null) {
             transport.readResponseTo(new AdbFilterOutputStream(output));
         }
-        //return AdbFilterInputStream(transport.getInputStream());
     }
 
     public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
