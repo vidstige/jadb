@@ -1,5 +1,7 @@
 package se.vidstige.jadb;
 
+import se.vidstige.jadb.managers.Bash;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,9 +52,7 @@ public class JadbDevice {
         StringBuilder shellLine = new StringBuilder(command);
         for (String arg : args) {
             shellLine.append(" ");
-            // TODO: throw if arg contains double quote
-            // TODO: quote arg if it contains space
-            shellLine.append(arg);
+            shellLine.append(Bash.quote(arg));
         }
         send(transport, "shell:" + shellLine.toString());
         return new AdbFilterInputStream(new BufferedInputStream(transport.getInputStream()));
@@ -69,9 +69,7 @@ public class JadbDevice {
         StringBuilder shellLine = new StringBuilder(command);
         for (String arg : args) {
             shellLine.append(" ");
-            // TODO: throw if arg contains double quote
-            // TODO: quote arg if it contains space
-            shellLine.append(arg);
+            shellLine.append(Bash.quote(arg));
         }
         send(transport, "shell:" + shellLine.toString());
         if (output != null) {

@@ -77,6 +77,22 @@ public class MockedTestCases {
         Assert.assertArrayEquals("foobar".getBytes(Charset.forName("utf-8")), buffer.toByteArray());
     }
 
+    @Test
+    public void testExecuteShell() throws Exception {
+        server.add("serial-123");
+        server.expectShell("serial-123", "ls -l");
+        JadbDevice device = connection.getDevices().get(0);
+        device.executeShell("ls", "-l");
+    }
+
+    @Test
+    public void testExecuteShellQuotesSpace() throws Exception {
+        server.add("serial-123");
+        server.expectShell("serial-123", "ls 'space file'");
+        JadbDevice device = connection.getDevices().get(0);
+        device.executeShell("ls", "space file");
+    }
+
     private long parseDate(String date) throws ParseException {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         return dateFormat.parse(date).getTime();
