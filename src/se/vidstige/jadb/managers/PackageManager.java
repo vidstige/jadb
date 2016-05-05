@@ -55,6 +55,17 @@ public class PackageManager {
         verifyOperation("install", apkFile.getName(), result);
     }
 
+    public void forceInstall(File apkFile) throws IOException, JadbException {
+        RemoteFile remote = new RemoteFile("/sdcard/tmp/" + apkFile.getName());
+        device.push(apkFile, remote);
+        InputStream s = device.executeShell("pm", "install","-r", Bash.quote(remote.getPath()));
+        String result = Stream.readAll(s, Charset.forName("UTF-8"));
+        // TODO: Remove remote file
+        s=device.executeShell("rm", "-f",Bash.quote(remote.getPath()));
+        Stream.readAll(s, Charset.forName("UTF-8"));
+        verifyOperation("install", apkFile.getName(), result);
+    }
+
     public void uninstall(Package name) throws IOException, JadbException {
         InputStream s = device.executeShell("pm", "uninstall", name.toString());
         String result = Stream.readAll(s, Charset.forName("UTF-8"));
