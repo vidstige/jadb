@@ -56,7 +56,7 @@ public class PackageManager {
             s= device.executeShell("pm", "install", Bash.quote(remote.getPath()));
         }
         String result = Stream.readAll(s, Charset.forName("UTF-8"));
-        s=device.executeShell("rm", "-f",Bash.quote(remote.getPath()));
+        s=device.executeShell("rm", "-f", Bash.quote(remote.getPath()));
         Stream.readAll(s, Charset.forName("UTF-8"));
         verifyOperation("install", apkFile.getName(), result);
     }
