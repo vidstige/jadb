@@ -47,7 +47,7 @@ public class PackageMangerTests {
     @Test
     public void testInstallUninstallCycle() throws Exception {
         File f = new File("test/data/Tiniest Smallest APK ever_v' platformBuildVersionName=_apkpure.com.apk");
-        pm.install(f);
+        pm.install(f, false);
         pm.uninstall(new Package("b.a"));
     }
 }
