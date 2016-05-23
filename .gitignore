@@ -219,6 +219,16 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 
-# IntelliJ
+
+#############
+#   Maven   #
+#############
 .idea/workspace.xml
+.idea/libraries
 out/
+
+
+#############
+#   Maven   #
+#############
+target/

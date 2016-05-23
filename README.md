@@ -35,5 +35,32 @@ A list of the available commands that a ADB Server may accept can be found here:
 [Services](https://github.com/cgjones/android-system-core/blob/master/adb/SERVICES.TXT)
 
 
+## Using JADB in your application ##
+
+Since version v1.1 Jadb support [maven](https://maven.apache.org/) as a build system. Although this project is not presented in official apache maven 
+repositories this library can be used as dependencies in your maven/gradle project with the help of [jitpack](https://jitpack.io). 
+[Оitpack](https://jitpack.io) is a system which parse github public repositories and make artifacts from them. 
+You will just only need to add [jitpack](https://jitpack.io) as a repository to let maven/gradle to search for artifacts in it
+
+```
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+```
+ 
+After that you will need to add actual dependency. [Jitpack](https://jitpack.io) takes groupId, artifactId and version id from repository name, 
+project name and **tag** ignoring actual values from pom.xml. So you need to write:
+ 
+```
+<dependency>
+    <groupId>com.github.vidstige</groupId>
+    <artifactId>jadb</artifactId>
+    <version>v1.1</version>
+</dependency>
+```
+
 ## Author ##
 Samuel Carlsson <samuel.carlsson@gmai.com>
