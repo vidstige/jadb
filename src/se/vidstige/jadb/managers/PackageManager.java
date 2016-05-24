@@ -8,6 +8,7 @@ import se.vidstige.jadb.Stream;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -46,13 +47,30 @@ public class PackageManager {
         if (!result.contains("Success")) throw new JadbException(getErrorMessage(operation, target, result));
     }
 
-    public void install(File apkFile) throws IOException, JadbException {
+    public void remove(RemoteFile file) throws IOException, JadbException {
+        InputStream s = device.executeShell("rm", "-f", Bash.quote(file.getPath()));
+        Stream.readAll(s, Charset.forName("UTF-8"));
+    }
+
+    public void install(File apkFile, List<String> extraArguments) throws IOException, JadbException {
         RemoteFile remote = new RemoteFile("/sdcard/tmp/" + apkFile.getName());
         device.push(apkFile, remote);
-        InputStream s = device.executeShell("pm", "install", Bash.quote(remote.getPath()));
+        ArrayList<String> arguments = new ArrayList<String>();
+        arguments.add("install");
+        arguments.addAll(extraArguments);
+        arguments.add(remote.getPath());
+        InputStream s = device.executeShell("pm", arguments.toArray(new String[arguments.size()]));
         String result = Stream.readAll(s, Charset.forName("UTF-8"));
-        // TODO: Remove remote file
+        remove(remote);
         verifyOperation("install", apkFile.getName(), result);
+    }
+
+    public void install(File apkFile) throws IOException, JadbException {
+        install(apkFile, new ArrayList<String>(0));
+    }
+
+    public void forceInstall(File apkFile) throws IOException, JadbException {
+        install(apkFile, Collections.singletonList("-r"));
     }
 
     public void uninstall(Package name) throws IOException, JadbException {

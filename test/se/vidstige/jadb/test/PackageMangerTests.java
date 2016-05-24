@@ -14,6 +14,7 @@ import java.util.List;
 public class PackageMangerTests {
     private static JadbConnection jadb;
     private PackageManager pm;
+    private final File miniApk = new File("test/data/Tiniest Smallest APK ever.apk");
 
     @BeforeClass
     public static void connect() throws IOException {
@@ -46,8 +47,8 @@ public class PackageMangerTests {
 
     @Test
     public void testInstallUninstallCycle() throws Exception {
-        File f = new File("test/data/Tiniest_Smallest_APK_ever_v_platformBuildVersionName=_apkpure.com.apk");
-        pm.install(f);
+        pm.install(miniApk);
+        pm.forceInstall(miniApk);
         pm.uninstall(new Package("b.a"));
     }
 }
