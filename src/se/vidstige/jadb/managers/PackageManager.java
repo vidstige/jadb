@@ -67,12 +67,16 @@ public class PackageManager {
     }
 
     public void install(File apkFile) throws IOException, JadbException {
-        install(apkFile, new ArrayList<>(0));
+        install(apkFile, new ArrayList<String>(0));
     }
 
     public void installWithOptions(File apkFile, List<? extends InstallOptions> options) throws IOException, JadbException {
-        List<String> optionsStr = options.stream().map(InstallOptions::getStringRepresentation).collect(Collectors.toList());
-        install(apkFile, optionsStr);
+        List<String> optionsAsStr = new ArrayList<>(options.size());
+
+        for(InstallOptions installOptions: options) {
+            optionsAsStr.add(installOptions.getStringRepresentation());
+        }
+        install(apkFile, optionsAsStr);
     }
 
     public void forceInstall(File apkFile) throws IOException, JadbException {
@@ -147,6 +151,9 @@ public class PackageManager {
         }
     }
 
+    /**
+     * This option is sSupported only from Android 6.X+
+     */
     public static final class GRANT_ALL_PERMISSIONS extends InstallOptions {
         public GRANT_ALL_PERMISSIONS() {
             super("-g");
