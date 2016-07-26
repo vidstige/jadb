@@ -2,7 +2,9 @@ package se.vidstige.jadb.test;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import se.vidstige.jadb.*;
 
 import java.io.File;
@@ -14,6 +16,9 @@ import java.util.List;
 public class RealDeviceTestCases {
 
     private JadbConnection jadb;
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder(); //Must be public
 
     @BeforeClass
     public static void tryToStartAdbServer() {
@@ -76,15 +81,15 @@ public class RealDeviceTestCases {
     @Test
     public void testPullFile() throws Exception {
         JadbDevice any = jadb.getAnyDevice();
-        any.pull(new RemoteFile("/sdcard/README.md"), new File("out/foobar.md"));
+        any.pull(new RemoteFile("/sdcard/README.md"), temporaryFolder.newFile("foobar.md"));
         //second read on the same device
-        any.pull(new RemoteFile("/sdcard/README.md"), new File("out/foobar.md"));
+        any.pull(new RemoteFile("/sdcard/README.md"), temporaryFolder.newFile("foobar.md"));
     }
 
     @Test(expected = JadbException.class)
     public void testPullInvalidFile() throws Exception {
         JadbDevice any = jadb.getAnyDevice();
-        any.pull(new RemoteFile("/file/does/not/exist"), new File("out/xyz"));
+        any.pull(new RemoteFile("/file/does/not/exist"), temporaryFolder.newFile("xyz"));
     }
 
     @Test
@@ -99,7 +104,7 @@ public class RealDeviceTestCases {
         JadbDevice any = jadb.getAnyDevice();
         FileOutputStream outputStream = null;
         try {
-            outputStream = new FileOutputStream(new File("out/screenshot.png"));
+            outputStream = new FileOutputStream(temporaryFolder.newFile("screenshot.png"));
             InputStream stdout = any.executeShell("screencap", "-p");
             Stream.copy(stdout, outputStream);
         }  finally {
