@@ -63,7 +63,7 @@ project name and tag ignoring actual values from pom.xml. So you need to write:
 ```
 
 ## Contributing ##
-This project would not be where it is if it where not for the helpful [contributors](https://github.com/vidstige/jadb/graphs/contributors)
+This project would not be where it is, if it where not for the helpful [contributors](https://github.com/vidstige/jadb/graphs/contributors)
 supporting jadb with pull requests, issue reports, and great ideas. If _you_ would like to
 contribute, please read through [CONTRIBUTING.md](CONTRIBUTING.md).
 
