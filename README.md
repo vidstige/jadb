@@ -67,5 +67,10 @@ This project would not be where it is if it where not for the many helpful contr
 supporting jadb with pull requests, issue reports, and great ideas. If _you_ would like to
 contribute, please read through [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Author ##
+## Authors ##
 Samuel Carlsson <samuel.carlsson@gmai.com>
+
+See [contributors](https://github.com/vidstige/jadb/graphs/contributors) for a full list.
+
+## License ##
+This project is released under the Apache License Version 2.0, see [LICENSE.md](LICENSE.md) for more information.
