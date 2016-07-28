@@ -62,5 +62,10 @@ project name and **tag** ignoring actual values from pom.xml. So you need to wri
 </dependency>
 ```
 
+## Contributing ##
+This project would not be where it is if it where not for the many helpful contributors
+supporting jadb with pull requests, issue reports, and great ideas. If _you_ would like to
+contribute, please read through [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Author ##
 Samuel Carlsson <samuel.carlsson@gmai.com>
