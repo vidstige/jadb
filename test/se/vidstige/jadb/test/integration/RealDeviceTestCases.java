@@ -1,4 +1,4 @@
-package se.vidstige.jadb.test;
+package se.vidstige.jadb.test.integration;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
