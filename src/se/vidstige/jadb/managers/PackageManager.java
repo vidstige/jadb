@@ -69,17 +69,17 @@ public class PackageManager {
         install(apkFile, new ArrayList<String>(0));
     }
 
-    public void installWithOptions(File apkFile, List<? extends InstallOptions> options) throws IOException, JadbException {
+    public void installWithOptions(File apkFile, List<? extends InstallOption> options) throws IOException, JadbException {
         List<String> optionsAsStr = new ArrayList<>(options.size());
 
-        for(InstallOptions installOptions: options) {
-            optionsAsStr.add(installOptions.getStringRepresentation());
+        for(InstallOption installOption : options) {
+            optionsAsStr.add(installOption.getStringRepresentation());
         }
         install(apkFile, optionsAsStr);
     }
 
     public void forceInstall(File apkFile) throws IOException, JadbException {
-        installWithOptions(apkFile, Collections.singletonList(new REINSTALL_KEEPING_DATA()));
+        installWithOptions(apkFile, Collections.singletonList(REINSTALL_KEEPING_DATA));
     }
 
     public void uninstall(Package name) throws IOException, JadbException {
@@ -92,9 +92,9 @@ public class PackageManager {
         InputStream s = device.executeShell("monkey", "-p", name.toString(), "-c", "android.intent.category.LAUNCHER", "1");
     }
 
-    //<editor-fold desc="InstallOptions">
-    public static abstract class InstallOptions {
-        InstallOptions(String ... varargs) {
+    //<editor-fold desc="InstallOption">
+    public static class InstallOption {
+        InstallOption(String ... varargs) {
             for(String str: varargs) {
                 stringBuilder.append(str).append(" ");
             }
@@ -107,62 +107,34 @@ public class PackageManager {
         }
     }
 
+    public static final InstallOption WITH_FORWARD_LOCK = new InstallOption("-l");
 
-    public static class WITH_FORWARD_LOCK extends InstallOptions {
-        public WITH_FORWARD_LOCK() {
-            super("-l");
-        }
+    public static final InstallOption REINSTALL_KEEPING_DATA =
+            new InstallOption("-r");
+
+    public static final InstallOption ALLOW_TEST_APK =
+            new InstallOption("-t");
+
+    public static InstallOption WITH_INSTALLER_PACKAGE_NAME(String name)
+    {
+        return new InstallOption("-t", name);
     }
 
-    public static class REINSTALL_KEEPING_DATA extends InstallOptions {
-        public REINSTALL_KEEPING_DATA() {
-            super("-r");
-        }
+    public static InstallOption ON_SHARED_MASS_STORAGE(String name) {
+        return new InstallOption("-s", name);
     }
 
-    public static final class ALLOW_TEST_APK extends InstallOptions {
-        public ALLOW_TEST_APK() {
-            super("-t");
-        }
+    public static InstallOption ON_INTERNAL_SYSTEM_MEMORY(String name) {
+        return new InstallOption("-f", name);
     }
 
-    public static final class WITH_INSTALLER_PACKAGE_NAME extends InstallOptions {
-        public WITH_INSTALLER_PACKAGE_NAME(String name) {
-            super("-t", name);
-        }
-    }
-
-    public static final class ON_SHARED_MASS_STORAGE extends InstallOptions {
-        public ON_SHARED_MASS_STORAGE(String name) {
-            super("-s", name);
-        }
-    }
-
-    public static final class ON_INTERNAL_SYSTEM_MEMORY extends InstallOptions {
-        public ON_INTERNAL_SYSTEM_MEMORY(String name) {
-            super("-f", name);
-        }
-    }
-
-    public static final class ALLOW_VERSION_DOWNGRADE extends InstallOptions {
-        public ALLOW_VERSION_DOWNGRADE() {
-            super("-d");
-        }
-    }
+    public static final InstallOption ALLOW_VERSION_DOWNGRADE =
+            new InstallOption("-d");
 
     /**
      * This option is sSupported only from Android 6.X+
      */
-    public static final class GRANT_ALL_PERMISSIONS extends InstallOptions {
-        public GRANT_ALL_PERMISSIONS() {
-            super("-g");
-        }
-    }
+    public static final InstallOption GRANT_ALL_PERMISSIONS = new InstallOption("-g");
 
-    public static final class CUSTOM_PARAMETER extends InstallOptions {
-        public CUSTOM_PARAMETER(String ... varargs) {
-            super(varargs);
-        }
-    }
     //</editor-fold>
 }
