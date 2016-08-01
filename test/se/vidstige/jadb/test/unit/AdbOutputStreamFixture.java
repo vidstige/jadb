@@ -1,4 +1,4 @@
-package se.vidstige.jadb.test;
+package se.vidstige.jadb.test.unit;
 
 import org.junit.Assert;
 import org.junit.Test;
