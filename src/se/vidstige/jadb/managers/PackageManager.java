@@ -69,11 +69,11 @@ public class PackageManager {
         install(apkFile, new ArrayList<String>(0));
     }
 
-    public void installWithOptions(File apkFile, List<? extends InstallOptions> options) throws IOException, JadbException {
+    public void installWithOptions(File apkFile, List<? extends InstallOption> options) throws IOException, JadbException {
         List<String> optionsAsStr = new ArrayList<>(options.size());
 
-        for(InstallOptions installOptions: options) {
-            optionsAsStr.add(installOptions.getStringRepresentation());
+        for(InstallOption installOption : options) {
+            optionsAsStr.add(installOption.getStringRepresentation());
         }
         install(apkFile, optionsAsStr);
     }
@@ -92,9 +92,9 @@ public class PackageManager {
         InputStream s = device.executeShell("monkey", "-p", name.toString(), "-c", "android.intent.category.LAUNCHER", "1");
     }
 
-    //<editor-fold desc="InstallOptions">
-    public static class InstallOptions {
-        InstallOptions(String ... varargs) {
+    //<editor-fold desc="InstallOption">
+    public static class InstallOption {
+        InstallOption(String ... varargs) {
             for(String str: varargs) {
                 stringBuilder.append(str).append(" ");
             }
@@ -107,34 +107,34 @@ public class PackageManager {
         }
     }
 
-    public static final InstallOptions WITH_FORWARD_LOCK = new InstallOptions("-l");
+    public static final InstallOption WITH_FORWARD_LOCK = new InstallOption("-l");
 
-    public static final InstallOptions REINSTALL_KEEPING_DATA =
-            new InstallOptions("-r");
+    public static final InstallOption REINSTALL_KEEPING_DATA =
+            new InstallOption("-r");
 
-    public static final InstallOptions ALLOW_TEST_APK =
-            new InstallOptions("-t");
+    public static final InstallOption ALLOW_TEST_APK =
+            new InstallOption("-t");
 
-    public static InstallOptions WITH_INSTALLER_PACKAGE_NAME(String name)
+    public static InstallOption WITH_INSTALLER_PACKAGE_NAME(String name)
     {
-        return new InstallOptions("-t", name);
+        return new InstallOption("-t", name);
     }
 
-    public static InstallOptions ON_SHARED_MASS_STORAGE(String name) {
-        return new InstallOptions("-s", name);
+    public static InstallOption ON_SHARED_MASS_STORAGE(String name) {
+        return new InstallOption("-s", name);
     }
 
-    public static InstallOptions ON_INTERNAL_SYSTEM_MEMORY(String name) {
-        return new InstallOptions("-f", name);
+    public static InstallOption ON_INTERNAL_SYSTEM_MEMORY(String name) {
+        return new InstallOption("-f", name);
     }
 
-    public static final InstallOptions ALLOW_VERSION_DOWNGRADE =
-            new InstallOptions("-d");
+    public static final InstallOption ALLOW_VERSION_DOWNGRADE =
+            new InstallOption("-d");
 
     /**
      * This option is sSupported only from Android 6.X+
      */
-    public static final InstallOptions GRANT_ALL_PERMISSIONS = new InstallOptions("-g");
+    public static final InstallOption GRANT_ALL_PERMISSIONS = new InstallOption("-g");
 
     //</editor-fold>
 }
