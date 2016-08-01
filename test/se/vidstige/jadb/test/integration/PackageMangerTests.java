@@ -57,7 +57,7 @@ public class PackageMangerTests {
     @Test
     public void testInstallWithOptionsUninstallCycle() throws Exception {
         pm.install(miniApk);
-        pm.installWithOptions(miniApk, Arrays.asList(new PackageManager.REINSTALL_KEEPING_DATA(), new PackageManager.ALLOW_VERSION_DOWNGRADE()));
+        pm.installWithOptions(miniApk, Arrays.asList(PackageManager.REINSTALL_KEEPING_DATA, PackageManager.ALLOW_VERSION_DOWNGRADE));
         pm.uninstall(new Package("b.a"));
     }
 }
