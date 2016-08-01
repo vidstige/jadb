@@ -21,14 +21,23 @@ public class AdbServerLauncher {
         if (android_home == null || android_home.equals("")) {
             return "adb";
         }
-
         return android_home + "/platform-tools/adb";
     }
 
     public void launch() throws IOException, InterruptedException {
-        Process p = runtime.exec(new String[]{findAdbExecutable(), "start-server"});
+        executeAdb("start-server");
+    }
+
+    public void kill() throws IOException, InterruptedException {
+        executeAdb("kill-server");
+    }
+
+    private void executeAdb(String command) throws IOException, InterruptedException {
+        Process p = runtime.exec(new String[]{findAdbExecutable(), command});
         p.waitFor();
         int exitValue = p.exitValue();
-        if (exitValue != 0) throw new IOException("adb exited with exit code: " + exitValue);
+        if (exitValue != 0) {
+            throw new IOException("adb " + command + " failed with exit code" + exitValue);
+        }
     }
 }

@@ -25,6 +25,20 @@ public class JadbConnection implements ITransportFactory {
         return new Transport(new Socket(host, port));
     }
 
+    public void connect(String ip, int port) throws IOException, JadbException {
+        Transport main = this.createTransport();
+        main.send("host:connect:" + ip + ":" + port);
+        main.verifyResponse();
+        main.close();
+    }
+
+    public void disconnect(String ip, int port) throws IOException, JadbException {
+        Transport main = this.createTransport();
+        main.send("host:disconnect:" + ip + ":" + port);
+        main.verifyResponse();
+        main.close();
+    }
+
     public void getHostVersion() throws IOException, JadbException {
         Transport main = createTransport();
         main.send("host:version");

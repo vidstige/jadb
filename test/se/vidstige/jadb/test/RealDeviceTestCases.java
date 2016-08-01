@@ -23,10 +23,14 @@ public class RealDeviceTestCases {
     @BeforeClass
     public static void tryToStartAdbServer() {
         try {
+            new AdbServerLauncher().kill();
+        } catch (IOException | InterruptedException e) {
+            System.out.println("Could not kill adb-server");
+        }
+
+        try {
             new AdbServerLauncher().launch();
-        } catch (IOException e) {
-            System.out.println("Could not start adb-server");
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             System.out.println("Could not start adb-server");
         }
     }
@@ -50,6 +54,15 @@ public class RealDeviceTestCases {
     public void testGetDevices() throws Exception {
         List<JadbDevice> actual = jadb.getDevices();
         //Assert.assertEquals("emulator-5554", actual.get(0).getSerial());
+    }
+
+    @Test
+    public void testGetState() throws Exception {
+        List<JadbDevice> actual = jadb.getDevices();
+        for (JadbDevice j : actual) {
+            String state = j.getState();
+            System.out.println(state);
+        }
     }
 
     @Test
