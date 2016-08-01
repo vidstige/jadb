@@ -40,6 +40,12 @@ public class JadbDevice {
         return serial;
     }
 
+    public String getState() throws IOException, JadbException {
+        Transport transport = this.getTransport();
+        this.send(transport, "host-serial:" + this.serial + ":get-state");
+        return transport.readString();
+    }
+
     public InputStream executeShell(String command, String... args) throws IOException, JadbException {
         Transport transport = getTransport();
         StringBuilder shellLine = new StringBuilder(command);
