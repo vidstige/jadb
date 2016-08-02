@@ -10,6 +10,8 @@ public abstract class SocketServer implements Runnable {
     private final int port;
     private ServerSocket socket;
     private Thread thread;
+
+    private boolean isStarted = false;
     private final Object lockObject = new Object();
 
     protected SocketServer(int port) {
@@ -21,7 +23,9 @@ public abstract class SocketServer implements Runnable {
         thread.setDaemon(true);
         thread.start();
         synchronized (lockObject) {
-            lockObject.wait();
+            if (!isStarted) {
+                lockObject.wait();
+            }
         }
     }
 
@@ -37,6 +41,7 @@ public abstract class SocketServer implements Runnable {
 
             synchronized (lockObject) {
                 lockObject.notify();
+                isStarted = true;
             }
 
             while (true) {
