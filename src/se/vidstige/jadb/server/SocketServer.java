@@ -22,11 +22,7 @@ public abstract class SocketServer implements Runnable {
         thread = new Thread(this, "Fake Adb Server");
         thread.setDaemon(true);
         thread.start();
-        synchronized (lockObject) {
-            if (!isStarted) {
-                lockObject.wait();
-            }
-        }
+        serverReady();
     }
 
     public int getPort() {
@@ -39,10 +35,7 @@ public abstract class SocketServer implements Runnable {
             socket = new ServerSocket(port);
             socket.setReuseAddress(true);
 
-            synchronized (lockObject) {
-                lockObject.notify();
-                isStarted = true;
-            }
+            waitForServer();
 
             while (true) {
                 Socket c = socket.accept();
@@ -51,6 +44,21 @@ public abstract class SocketServer implements Runnable {
                 clientThread.start();
             }
         } catch (IOException e) {
+        }
+    }
+
+    private void serverReady() throws InterruptedException {
+        synchronized (lockObject) {
+            if (!isStarted) {
+                lockObject.wait();
+            }
+        }
+    }
+
+    private void waitForServer() {
+        synchronized (lockObject) {
+            lockObject.notify();
+            isStarted = true;
         }
     }
 
