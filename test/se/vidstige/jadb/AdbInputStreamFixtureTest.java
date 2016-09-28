@@ -1,9 +1,7 @@
-package se.vidstige.jadb.test.unit;
+package se.vidstige.jadb;
 
 import org.junit.Assert;
 import org.junit.Test;
-import se.vidstige.jadb.AdbFilterInputStream;
-import se.vidstige.jadb.Stream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

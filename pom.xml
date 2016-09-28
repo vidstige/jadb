@@ -110,7 +110,7 @@
                         <exclude>**/*Test.java</exclude>
                         <!--Mocks and data-->
                         <exclude>**/data/*</exclude>
-                        <exclude>**/utils/*</exclude>
+                        <exclude>**/fakes/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

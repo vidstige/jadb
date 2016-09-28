@@ -1,9 +1,8 @@
-package se.vidstige.jadb.test.unit;
+package se.vidstige.jadb;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import se.vidstige.jadb.AdbServerLauncher;
 import se.vidstige.jadb.fakes.FakeSubprocess;
 
 import java.io.IOException;
