@@ -1,4 +1,4 @@
-package se.vidstige.jadb.test.unit;
+package se.vidstige.jadb;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -8,7 +8,7 @@ import se.vidstige.jadb.JadbConnection;
 import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
-import se.vidstige.jadb.test.fakes.FakeAdbServer;
+import se.vidstige.jadb.fakes.FakeAdbServer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,7 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class MockedTestCases {
+public class MockedTestCasesTest {
 
     private FakeAdbServer server;
     private JadbConnection connection;

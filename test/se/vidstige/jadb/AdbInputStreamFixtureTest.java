@@ -1,16 +1,14 @@
-package se.vidstige.jadb.test.unit;
+package se.vidstige.jadb;
 
 import org.junit.Assert;
 import org.junit.Test;
-import se.vidstige.jadb.AdbFilterInputStream;
-import se.vidstige.jadb.Stream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class AdbInputStreamFixture {
+public class AdbInputStreamFixtureTest {
 
     private byte[] passthrough(byte[] input) throws IOException {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(input);

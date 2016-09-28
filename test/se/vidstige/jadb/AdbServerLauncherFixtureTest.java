@@ -1,15 +1,14 @@
-package se.vidstige.jadb.test.unit;
+package se.vidstige.jadb;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import se.vidstige.jadb.AdbServerLauncher;
-import se.vidstige.jadb.test.fakes.FakeSubprocess;
+import se.vidstige.jadb.fakes.FakeSubprocess;
 
 import java.io.IOException;
 import java.util.*;
 
-public class AdbServerLauncherFixture {
+public class AdbServerLauncherFixtureTest {
 
     private FakeSubprocess subprocess;
     private Map<String, String> environment = new HashMap<>();
