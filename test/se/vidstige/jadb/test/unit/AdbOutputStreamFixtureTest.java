@@ -8,7 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class AdbOutputStreamFixture {
+public class AdbOutputStreamFixtureTest {
 
     private byte[] passthrough(byte[] input) throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();

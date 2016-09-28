@@ -1,4 +1,4 @@
-package se.vidstige.jadb.test.fakes;
+package se.vidstige.jadb.fakes;
 
 import java.io.InputStream;
 import java.io.OutputStream;

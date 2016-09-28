@@ -1,18 +1,16 @@
-package se.vidstige.jadb.test.integration;
+package se.vidstige.jadb.managers;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import se.vidstige.jadb.JadbConnection;
-import se.vidstige.jadb.managers.Package;
-import se.vidstige.jadb.managers.PackageManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class PackageMangerTests {
+public class PackageMangerTestsIT {
     private static JadbConnection jadb;
     private PackageManager pm;
     private final File miniApk = new File("test/data/Tiniest Smallest APK ever.apk");

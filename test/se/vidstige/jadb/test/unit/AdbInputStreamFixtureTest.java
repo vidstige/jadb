@@ -10,7 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class AdbInputStreamFixture {
+public class AdbInputStreamFixtureTest {
 
     private byte[] passthrough(byte[] input) throws IOException {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(input);

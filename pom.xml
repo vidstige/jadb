@@ -92,8 +92,8 @@
                         <include>**/*.java</include>
                     </includes>
                     <excludes>
-                        <!--Integration tests -->
-                        <exclude>se.vidstige.jadb.test.integration.*</exclude>
+                        <!--Exclude integration tests -->
+                        <exclude>**/*IT.java</exclude>
                         <!--Mocks and data-->
                         <exclude>**/data/*</exclude>
                         <exclude>**/fakes/*</exclude>
@@ -105,15 +105,12 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>2.19.1</version>
                 <configuration>
-                    <includes>
-                        <include>**/*.java</include>
-                    </includes>
                     <excludes>
-                        <!--Integration tests -->
-                        <exclude>se.vidstige.jadb.test.unit.*</exclude>
+                        <!--Exclude unit tests -->
+                        <exclude>**/*Test.java</exclude>
                         <!--Mocks and data-->
                         <exclude>**/data/*</exclude>
-                        <exclude>**/fakes/*</exclude>
+                        <exclude>**/utils/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

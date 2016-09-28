@@ -1,4 +1,4 @@
-package se.vidstige.jadb.test.integration;
+package se.vidstige.jadb;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-public class RealDeviceTestCases {
+public class RealDeviceTestCasesIT {
 
     private JadbConnection jadb;
 

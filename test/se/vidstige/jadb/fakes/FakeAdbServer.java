@@ -1,4 +1,4 @@
-package se.vidstige.jadb.test.fakes;
+package se.vidstige.jadb.fakes;
 
 import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
