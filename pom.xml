@@ -45,6 +45,20 @@
         <sourceDirectory>src</sourceDirectory>
         <testSourceDirectory>test</testSourceDirectory>
         <plugins>
+            <!-- Version plugin is a plugin which can:
+                  * Create report about all new versions for both code dependencies and maven plugins themselves
+                  * Update them automatically (mvn versions:use-latest-versions and so on)
+
+                 Usage - most commonly used patterns:
+                  * `mvn versions:help` - will show all available tasks for this plugin with short description
+                  * `mvn versions:dependency-updates-report` produces a report of those project dependencies which have newer versions available.
+                     Will be in 'target\site' folder
+                  * `mvn versions:plugin-updates-report` produces a report of those plugins which have newer versions available.
+                     Will be in 'target\site' folder
+                  * `mvn versions:use-latest-versions` searches the pom for all versions which have been a newer version and replaces them with the latest version.
+
+                 For more info see official [documentation](http://www.mojohaus.org/versions-maven-plugin/)
+            -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
