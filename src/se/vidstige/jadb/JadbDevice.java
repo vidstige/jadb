@@ -80,7 +80,7 @@ public class JadbDevice {
     }
 
     //@VisibleForTesting
-    Map<String, String> parseProp(BufferedReader bufferedReader) throws IOException {
+    private Map<String, String> parseProp(BufferedReader bufferedReader) throws IOException {
         final Pattern pattern = Pattern.compile("^\\[(.*)\\]:.\\[(.*)\\]");
 
         HashMap<String, String> result = new HashMap<>();
