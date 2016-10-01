@@ -17,7 +17,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Map;
 
 public class MockedTestCases {
 
@@ -81,7 +80,7 @@ public class MockedTestCases {
     @Test
     public void testExecuteShell() throws Exception {
         server.add("serial-123");
-        server.expectShell("serial-123", "ls -l");
+        server.expectShell("serial-123", "ls -l").returns("total 0");
         JadbDevice device = connection.getDevices().get(0);
         device.executeShell("ls", "-l");
     }
@@ -92,15 +91,6 @@ public class MockedTestCases {
         server.expectShell("serial-123", "ls 'space file'");
         JadbDevice device = connection.getDevices().get(0);
         device.executeShell("ls", "space file");
-    }
-
-    @Test
-    public void testGetProps() throws Exception {
-        server.add("serial-123");
-        server.expectShell("serial-123", "getprop").returns("[] = nope\nx\n(");
-        JadbDevice device = connection.getDevices().get(0);
-        Map<String, String> x = device.getprop();
-        Assert.assertEquals(0, x.size());
     }
 
     private long parseDate(String date) throws ParseException {
