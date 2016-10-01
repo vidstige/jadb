@@ -81,8 +81,11 @@ class AdbProtocolHandler implements Runnable {
                         sync.send("FAIL", e.getMessage());
                     }
                 } else if (command.startsWith("shell:")) {
-                    shell(command.substring("shell:".length()));
+                    String shellCommand = command.substring("shell:".length());
                     output.writeBytes("OKAY");
+                    shell(shellCommand, output, input);
+                    output.close();
+                    return;
                 } else {
                     throw new ProtocolException("Unknown command: " + command);
                 }
@@ -94,8 +97,8 @@ class AdbProtocolHandler implements Runnable {
         }
     }
 
-    private void shell(String command) throws IOException {
-        selected.shell(command);
+    private void shell(String command, DataOutputStream stdout, DataInput stdin) throws IOException {
+        selected.shell(command, stdout, stdin);
     }
 
     private int readInt(DataInput input) throws IOException {
