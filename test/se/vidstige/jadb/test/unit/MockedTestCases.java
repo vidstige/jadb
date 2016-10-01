@@ -80,7 +80,7 @@ public class MockedTestCases {
     @Test
     public void testExecuteShell() throws Exception {
         server.add("serial-123");
-        server.expectShell("serial-123", "ls -l");
+        server.expectShell("serial-123", "ls -l").returns("total 0");
         JadbDevice device = connection.getDevices().get(0);
         device.executeShell("ls", "-l");
     }

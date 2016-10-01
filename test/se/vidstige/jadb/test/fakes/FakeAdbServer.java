@@ -7,6 +7,8 @@ import se.vidstige.jadb.server.AdbResponder;
 import se.vidstige.jadb.server.AdbServer;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ProtocolException;
 import java.nio.charset.Charset;
@@ -76,8 +78,8 @@ public class FakeAdbServer implements AdbResponder {
         return findBySerial(serial).expectPull(path);
     }
 
-    public void expectShell(String serial, String commands) {
-        findBySerial(serial).expectShell(commands);
+    public DeviceResponder.ShellExpectation expectShell(String serial, String commands) {
+        return findBySerial(serial).expectShell(commands);
     }
 
     @Override
@@ -131,11 +133,11 @@ public class FakeAdbServer implements AdbResponder {
         }
 
         @Override
-        public void shell(String command) throws IOException {
+        public void shell(String command, DataOutputStream stdout, DataInput stdin) throws IOException {
             for (ShellExpectation se : shellExpectations) {
                 if (se.matches(command)) {
                     shellExpectations.remove(se);
-                    se.throwIfFail();
+                    se.writeOutputTo(stdout);
                     return;
                 }
             }
@@ -192,6 +194,7 @@ public class FakeAdbServer implements AdbResponder {
 
         public class ShellExpectation {
             private final String command;
+            private byte[] stdout;
 
             public ShellExpectation(String command) {
                 this.command = command;
@@ -201,8 +204,12 @@ public class FakeAdbServer implements AdbResponder {
                 return command.equals(this.command);
             }
 
-            public void throwIfFail() {
+            public void returns(String stdout) {
+                this.stdout = stdout.getBytes(Charset.forName("utf-8"));
+            }
 
+            public void writeOutputTo(DataOutputStream stdout) throws IOException {
+                stdout.write(this.stdout);
             }
         }
 
@@ -220,7 +227,7 @@ public class FakeAdbServer implements AdbResponder {
 
         public ShellExpectation expectShell(String command) {
             ShellExpectation expectation = new ShellExpectation(command);
-            shellExpectations.add(new ShellExpectation(command));
+            shellExpectations.add(expectation);
             return expectation;
         }
     }
