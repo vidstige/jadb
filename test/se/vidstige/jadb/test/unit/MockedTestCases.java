@@ -95,15 +95,6 @@ public class MockedTestCases {
         device.executeShell("ls", "space file");
     }
 
-    @Test
-    public void testGetProps() throws Exception {
-        server.add("serial-123");
-        server.expectShell("serial-123", "getprop").returns("[] = nope\nx\n(");
-        JadbDevice device = connection.getDevices().get(0);
-        Map<String, String> x = new PropertyManager(device).getprop();
-        Assert.assertEquals(0, x.size());
-    }
-
     private long parseDate(String date) throws ParseException {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         return dateFormat.parse(date).getTime();
