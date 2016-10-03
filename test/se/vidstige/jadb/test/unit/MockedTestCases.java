@@ -8,6 +8,7 @@ import se.vidstige.jadb.JadbConnection;
 import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
+import se.vidstige.jadb.managers.PropertyManager;
 import se.vidstige.jadb.test.fakes.FakeAdbServer;
 
 import java.io.ByteArrayInputStream;
@@ -99,7 +100,7 @@ public class MockedTestCases {
         server.add("serial-123");
         server.expectShell("serial-123", "getprop").returns("[] = nope\nx\n(");
         JadbDevice device = connection.getDevices().get(0);
-        Map<String, String> x = device.getprop();
+        Map<String, String> x = new PropertyManager(device).getprop();
         Assert.assertEquals(0, x.size());
     }
 

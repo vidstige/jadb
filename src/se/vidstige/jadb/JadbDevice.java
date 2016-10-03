@@ -74,37 +74,6 @@ public class JadbDevice {
         }
     }
 
-    public Map<String, String> getprop() throws IOException, JadbException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(executeShell("getprop")));
-        return parseProp(bufferedReader);
-    }
-
-    //@VisibleForTesting
-    private Map<String, String> parseProp(BufferedReader bufferedReader) throws IOException {
-        final Pattern pattern = Pattern.compile("^\\[(.*)\\]:.\\[(.*)\\]");
-
-        HashMap<String, String> result = new HashMap<>();
-
-        String line;
-        Matcher matcher = pattern.matcher("");
-
-        while ((line = bufferedReader.readLine()) != null) {
-            matcher.reset(line);
-
-            if(matcher.find()) {
-                if(matcher.groupCount() < 2) {
-                    System.err.println("Property line: " + line +" does not match patter. Ignoring");
-                    continue;
-                }
-                String key = matcher.group(1);
-                String value = matcher.group(2);
-                result.put(key, value);
-            }
-        }
-
-        return result;
-    }
-
     public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
         Transport transport = getTransport();
         SyncTransport sync = transport.startSync();
