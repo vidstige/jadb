@@ -8,6 +8,7 @@ import se.vidstige.jadb.JadbConnection;
 import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
+import se.vidstige.jadb.managers.PropertyManager;
 import se.vidstige.jadb.test.fakes.FakeAdbServer;
 
 import java.io.ByteArrayInputStream;
@@ -17,6 +18,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 
 public class MockedTestCases {
 
