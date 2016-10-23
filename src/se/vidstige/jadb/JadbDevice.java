@@ -38,9 +38,9 @@ public class JadbDevice {
 
     private State convertState(String type) {
         switch(type) {
-            case "device": return State.Online;
-            case "ofline": return State.Offline;
-            default:       return State.Unknown;
+            case "device":  return State.Online;
+            case "offline": return State.Offline;
+            default:        return State.Unknown;
         }
     }
 
