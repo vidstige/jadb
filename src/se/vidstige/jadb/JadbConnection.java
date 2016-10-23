@@ -48,23 +48,23 @@ public class JadbConnection implements ITransportFactory {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try
-                {
+                try {
                     devices.send("host:track-devices");
                     devices.verifyResponse();
                     boolean r = false;
                     do {
                         List<JadbDevice> list = parseDevices(devices.readString());
                         r = listener.detect(list);
-                    } while(r);
-                } catch(SocketException e) {
+                    } while (r);
+                } catch (SocketException e) {
                     // socket closed from another thread
-                } catch(Exception e) {
+                } catch (Exception e) {
                     Thread t = Thread.currentThread();
                     t.getUncaughtExceptionHandler().uncaughtException(t, e);
                 }
             }
         }).start();
+
         return new DeviceDetectionHandler(devices);
     }
 
