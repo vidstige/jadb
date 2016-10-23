@@ -11,12 +11,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class JadbDevice {
+    public enum State {
+        Unknown,
+        Online,
+        Offline
+    };
+
     private final String serial;
     private final ITransportFactory transportFactory;
+    private State state = State.Unknown;
 
     JadbDevice(String serial, String type, ITransportFactory tFactory) {
         this.serial = serial;
         this.transportFactory = tFactory;
+        state = convertState(type);
     }
 
     static JadbDevice createAny(JadbConnection connection) {
@@ -26,6 +34,14 @@ public class JadbDevice {
     private JadbDevice(ITransportFactory tFactory) {
         serial = null;
         this.transportFactory = tFactory;
+    }
+
+    private State convertState(String type) {
+        switch(type) {
+            case "device": return State.Online;
+            case "ofline": return State.Offline;
+            default:       return State.Unknown;
+        }
     }
 
     private Transport getTransport() throws IOException, JadbException {
@@ -42,6 +58,10 @@ public class JadbDevice {
 
     public String getSerial() {
         return serial;
+    }
+
+    public State getState() {
+        return state;
     }
 
     public InputStream executeShell(String command, String... args) throws IOException, JadbException {
