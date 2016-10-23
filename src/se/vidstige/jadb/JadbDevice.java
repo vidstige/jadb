@@ -70,7 +70,9 @@ public class JadbDevice {
             transport.verifyResponse();
         }
 
-        return convertState(transport.readString());
+        State state = convertState(transport.readString());
+        transport.close();
+        return state;
     }
 
     public InputStream executeShell(String command, String... args) throws IOException, JadbException {
