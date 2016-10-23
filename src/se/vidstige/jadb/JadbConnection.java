@@ -54,8 +54,8 @@ public class JadbConnection implements ITransportFactory {
                     devices.verifyResponse();
                     boolean r = false;
                     do {
-                       List<JadbDevice> list = parseDevices(devices.readString());
-                       r = listener.detect(list);
+                        List<JadbDevice> list = parseDevices(devices.readString());
+                        r = listener.detect(list);
                     } while(r);
                 } catch(SocketException e) {
                     // socket closed from another thread
