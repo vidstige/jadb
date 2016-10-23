@@ -44,16 +44,16 @@ public class JadbConnection implements ITransportFactory {
     }
 
     public DeviceDetectionHandler watchDevices(final DeviceDetectionListener listener) throws IOException, JadbException {
-        final Transport devices = createTransport();
+        final Transport transport = createTransport();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    devices.send("host:track-devices");
-                    devices.verifyResponse();
+                    transport.send("host:track-devices");
+                    transport.verifyResponse();
                     boolean r = false;
                     do {
-                        List<JadbDevice> list = parseDevices(devices.readString());
+                        List<JadbDevice> list = parseDevices(transport.readString());
                         r = listener.detect(list);
                     } while (r);
                 } catch (SocketException e) {
@@ -65,7 +65,7 @@ public class JadbConnection implements ITransportFactory {
             }
         }).start();
 
-        return new DeviceDetectionHandler(devices);
+        return new DeviceDetectionHandler(transport);
     }
 
     private List<JadbDevice> parseDevices(String body) {
