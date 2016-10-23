@@ -13,18 +13,17 @@ import java.util.regex.Pattern;
 public class JadbDevice {
     public enum State {
         Unknown,
-        Online,
-        Offline
+        Offline,
+        Device,
+        BootLoader
     };
 
     private final String serial;
     private final ITransportFactory transportFactory;
-    private State state = State.Unknown;
 
     JadbDevice(String serial, String type, ITransportFactory tFactory) {
         this.serial = serial;
         this.transportFactory = tFactory;
-        state = convertState(type);
     }
 
     static JadbDevice createAny(JadbConnection connection) {
@@ -37,10 +36,11 @@ public class JadbDevice {
     }
 
     private State convertState(String type) {
-        switch(type) {
-            case "device":  return State.Online;
-            case "offline": return State.Offline;
-            default:        return State.Unknown;
+        switch (type) {
+            case "device":     return State.Device;
+            case "offline":    return State.Offline;
+            case "bootloader": return State.BootLoader;
+            default:           return State.Unknown;
         }
     }
 
@@ -60,8 +60,17 @@ public class JadbDevice {
         return serial;
     }
 
-    public State getState() {
-        return state;
+    public State getState() throws IOException, JadbException {
+        Transport transport = transportFactory.createTransport();
+        if (serial == null) {
+            transport.send("host:get-state");
+            transport.verifyResponse();
+        } else {
+            transport.send("host-serial:" + serial + ":get-state");
+            transport.verifyResponse();
+        }
+
+        return convertState(transport.readString());
     }
 
     public InputStream executeShell(String command, String... args) throws IOException, JadbException {
