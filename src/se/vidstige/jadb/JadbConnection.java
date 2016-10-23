@@ -2,6 +2,7 @@ package se.vidstige.jadb;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,33 @@ public class JadbConnection implements ITransportFactory {
         devices.send("host:devices");
         devices.verifyResponse();
         String body = devices.readString();
+        devices.close();
         return parseDevices(body);
+    }
+
+    public DeviceDetectionHandler getDevices(final DeviceDetectionListener listener) throws IOException, JadbException {
+        final Transport devices = createTransport();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try
+                {
+                    devices.send("host:track-devices");
+                    devices.verifyResponse();
+                    boolean r = false;
+                    do {
+                       List<JadbDevice> list = parseDevices(devices.readString());
+                       r = listener.detect(list);
+                    } while(r);
+                } catch(SocketException e) {
+                    // socket closed from another thread
+                } catch(Exception e) {
+                    Thread t = Thread.currentThread();
+                    t.getUncaughtExceptionHandler().uncaughtException(t, e);
+                }
+            }
+        }).start();
+        return new DeviceDetectionHandler(devices);
     }
 
     private List<JadbDevice> parseDevices(String body) {
