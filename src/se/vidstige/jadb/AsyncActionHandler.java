@@ -3,9 +3,9 @@ package se.vidstige.jadb;
 import java.util.List;
 import java.io.IOException;
 
-public class DeviceDetectionHandler {
+public class AsyncActionHandler {
     private Transport transport;
-    public DeviceDetectionHandler(Transport transport) {
+    public AsyncActionHandler(Transport transport) {
         this.transport = transport;
     };
 

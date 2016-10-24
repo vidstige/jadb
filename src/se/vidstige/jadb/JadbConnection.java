@@ -43,7 +43,7 @@ public class JadbConnection implements ITransportFactory {
         return parseDevices(body);
     }
 
-    public DeviceDetectionHandler watchDevices(final DeviceDetectionListener listener) throws IOException, JadbException {
+    public AsyncActionHandler watchDevices(final DeviceDetectionListener listener) throws IOException, JadbException {
         final Transport transport = createTransport();
         new Thread(new Runnable() {
             @Override
@@ -65,7 +65,7 @@ public class JadbConnection implements ITransportFactory {
             }
         }).start();
 
-        return new DeviceDetectionHandler(transport);
+        return new AsyncActionHandler(transport);
     }
 
     private List<JadbDevice> parseDevices(String body) {
