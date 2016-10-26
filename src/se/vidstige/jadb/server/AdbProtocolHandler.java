@@ -86,6 +86,31 @@ class AdbProtocolHandler implements Runnable {
                     shell(shellCommand, output, input);
                     output.close();
                     return;
+                } else if ("host:get-state".equals(command)) {
+                    // TODO: Check so that exactly one device is selected.
+                    AdbDeviceResponder device = responder.getDevices().get(0);
+                    output.writeBytes("OKAY");
+                    send(output, device.getType());
+                } else if (command.startsWith("host-serial:")) {
+                    String[] strs = command.split(":",0);
+                    if (strs.length != 3) {
+                        throw new ProtocolException("Invalid command: " + command);
+                    }
+
+                    String serial = strs[1];
+                    boolean found = false;
+                    output.writeBytes("OKAY");
+                    for (AdbDeviceResponder d : responder.getDevices()) {
+                        if (d.getSerial().equals(serial)) {
+                            send(output, d.getType());
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if (!found) {
+                        send(output, "unknown");
+                    }
                 } else {
                     throw new ProtocolException("Unknown command: " + command);
                 }
