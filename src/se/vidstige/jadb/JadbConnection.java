@@ -43,32 +43,14 @@ public class JadbConnection implements ITransportFactory {
         return parseDevices(body);
     }
 
-    public AsyncActionHandler watchDevices(final DeviceDetectionListener listener) throws IOException, JadbException {
-        final Transport transport = createTransport();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    transport.send("host:track-devices");
-                    transport.verifyResponse();
-                    boolean r = false;
-                    do {
-                        List<JadbDevice> list = parseDevices(transport.readString());
-                        r = listener.detect(list);
-                    } while (r);
-                } catch (SocketException e) {
-                    // socket closed from another thread
-                } catch (Exception e) {
-                    Thread t = Thread.currentThread();
-                    t.getUncaughtExceptionHandler().uncaughtException(t, e);
-                }
-            }
-        }).start();
-
-        return new AsyncActionHandler(transport);
+    public DeviceWatcher createDeviceWatcher(DeviceDetectionListener listener) throws IOException, JadbException {
+        Transport transport = createTransport();
+        transport.send("host:track-devices");
+        transport.verifyResponse();
+        return new DeviceWatcher(transport, listener, this);
     }
 
-    private List<JadbDevice> parseDevices(String body) {
+    public List<JadbDevice> parseDevices(String body) {
         String[] lines = body.split("\n");
         ArrayList<JadbDevice> devices = new ArrayList<JadbDevice>(lines.length);
         for (String line : lines) {
