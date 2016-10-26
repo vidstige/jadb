@@ -47,7 +47,11 @@ public class FakeAdbServer implements AdbResponder {
     }
 
     public void add(String serial) {
-        devices.add(new DeviceResponder(serial));
+        devices.add(new DeviceResponder(serial, "device"));
+    }
+
+    public void add(String serial, String type) {
+        devices.add(new DeviceResponder(serial, type));
     }
 
     public void verifyExpectations() {
@@ -89,11 +93,13 @@ public class FakeAdbServer implements AdbResponder {
 
     private class DeviceResponder implements AdbDeviceResponder {
         private final String serial;
+        private final String type;
         private List<FileExpectation> fileExpectations = new ArrayList<FileExpectation>();
         private List<ShellExpectation> shellExpectations = new ArrayList<ShellExpectation>();
 
-        private DeviceResponder(String serial) {
+        private DeviceResponder(String serial, String type) {
             this.serial = serial;
+            this.type = type;
         }
 
         @Override
@@ -103,7 +109,7 @@ public class FakeAdbServer implements AdbResponder {
 
         @Override
         public String getType() {
-            return "device";
+            return type;
         }
 
         @Override

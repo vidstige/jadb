@@ -46,6 +46,19 @@ public class MockedTestCases {
     }
 
     @Test
+    public void testGetDeviceState() throws Exception {
+        server.add("serial-1", "offline");
+        server.add("serial-2", "device");
+        server.add("serial-3", "unknown");
+        server.add("serial-4", "foobar");
+        List<JadbDevice> devices = connection.getDevices();
+        Assert.assertEquals(JadbDevice.State.Offline, devices.get(0).getState());
+        Assert.assertEquals(JadbDevice.State.Device, devices.get(1).getState());
+        Assert.assertEquals(JadbDevice.State.Unknown, devices.get(2).getState());
+        Assert.assertEquals(JadbDevice.State.Unknown, devices.get(3).getState());
+    }
+
+    @Test
     public void testListNoDevices() throws Exception {
         List<JadbDevice> devices = connection.getDevices();
         Assert.assertEquals(0, devices.size());
