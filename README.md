@@ -12,20 +12,26 @@ This projects aims at providing an up to date implementation of the ADB protocol
 ## Example ##
 Usage cannot be simpler. Just create a `JadbConnection` and off you go.
 
-    JadbConnection jadb = new JadbConnection();
-    List<JadbDevice> devices = jadb.getDevices();
+```java
+JadbConnection jadb = new JadbConnection();
+List<JadbDevice> devices = jadb.getDevices();
+```
 
 Make sure the adb server is running. You can start it by running `adb` once from the command line.
 
 It's very easy to send and receive files from your android device, for example as below.
 
-    JadbDevice device = ...
-    device.pull(new RemoteFile("/path/to/file.txt"), new File("file.txt"));
+```java
+JadbDevice device = ...
+device.pull(new RemoteFile("/path/to/file.txt"), new File("file.txt"));
+```
 
 Some high level operations such as installing and uninstalling packages are also available.
 
-    JadbDevice device = ...
-    new PackageManager(device).install(new File("/path/to/my.apk"));
+```java
+JadbDevice device = ...
+new PackageManager(device).install(new File("/path/to/my.apk"));
+```
 
 ## Protocol Description ##
 
