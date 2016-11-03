@@ -4,11 +4,7 @@ import se.vidstige.jadb.managers.Bash;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class JadbDevice {
     public enum State {
@@ -75,7 +71,20 @@ public class JadbDevice {
         return state;
     }
 
-    public InputStream executeShell(String command, String... args) throws IOException, JadbException {
+    /** Execute a shell command with raw output.
+     *
+     * This function differs from executeShell in that no buffering and newline filtering is performed.
+     *
+     * Especially the buffering may be an issue if the output of an ongoing command should be displayed,
+     * e.g. the output of running logcat.
+     *
+     * @param command main command.
+     * @param args arguments to the commands
+     * @return combined stdout/stderr stream.
+     * @throws IOException
+     * @throws JadbException
+     */
+    public InputStream executeShellRaw(String command, String... args) throws IOException, JadbException {
         Transport transport = getTransport();
         StringBuilder shellLine = new StringBuilder(command);
         for (String arg : args) {
@@ -83,7 +92,20 @@ public class JadbDevice {
             shellLine.append(Bash.quote(arg));
         }
         send(transport, "shell:" + shellLine.toString());
-        return new AdbFilterInputStream(new BufferedInputStream(transport.getInputStream()));
+        return transport.getInputStream();
+    }
+
+    /** Execute a shell command.
+     *
+     * @param command main command.
+     * @param args arguments to the commands
+     * @return combined stdout/stderr stream.
+     * @throws IOException
+     * @throws JadbException
+     */
+    public InputStream executeShell(String command, String... args) throws IOException, JadbException {
+        InputStream inputStream = executeShellRaw(command, args);
+    	return new AdbFilterInputStream(new BufferedInputStream(inputStream));
     }
 
     /**
@@ -101,7 +123,12 @@ public class JadbDevice {
         }
         send(transport, "shell:" + shellLine.toString());
         if (output != null) {
-            transport.readResponseTo(new AdbFilterOutputStream(output));
+        	AdbFilterOutputStream out = new AdbFilterOutputStream(output);
+        	try {
+        		transport.readResponseTo(out);
+        	} finally {
+        		out.close();
+        	}
         }
     }
 
