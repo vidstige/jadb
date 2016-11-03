@@ -1,6 +1,5 @@
 package se.vidstige.jadb;
 
-import java.util.List;
 import java.io.IOException;
 
 public class DeviceWatcher implements Runnable {

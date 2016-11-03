@@ -90,6 +90,7 @@ public class PackageManager {
 
     public void launch(Package name) throws IOException, JadbException {
         InputStream s = device.executeShell("monkey", "-p", name.toString(), "-c", "android.intent.category.LAUNCHER", "1");
+        s.close();
     }
 
     //<editor-fold desc="InstallOption">
@@ -132,7 +133,7 @@ public class PackageManager {
             new InstallOption("-d");
 
     /**
-     * This option is sSupported only from Android 6.X+
+     * This option is supported only from Android 6.X+
      */
     public static final InstallOption GRANT_ALL_PERMISSIONS = new InstallOption("-g");
 

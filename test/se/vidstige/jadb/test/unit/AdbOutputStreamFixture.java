@@ -13,8 +13,12 @@ public class AdbOutputStreamFixture {
     private byte[] passthrough(byte[] input) throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         OutputStream sut = new AdbFilterOutputStream(output);
-        sut.write(input);
-        sut.flush();
+        try {
+	        sut.write(input);
+	        sut.flush();
+        } finally {
+        	sut.close();
+        }
         return output.toByteArray();
     }
 
