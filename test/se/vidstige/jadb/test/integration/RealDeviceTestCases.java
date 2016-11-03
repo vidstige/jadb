@@ -1,5 +1,6 @@
 package se.vidstige.jadb.test.integration;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -49,6 +50,7 @@ public class RealDeviceTestCases {
     @Test
     public void testGetDevices() throws Exception {
         List<JadbDevice> actual = jadb.getDevices();
+        Assert.assertNotNull(actual);
         //Assert.assertEquals("emulator-5554", actual.get(0).getSerial());
     }
 
@@ -92,7 +94,8 @@ public class RealDeviceTestCases {
         any.pull(new RemoteFile("/file/does/not/exist"), temporaryFolder.newFile("xyz"));
     }
 
-    @Test
+    @SuppressWarnings("deprecation")
+	@Test
     public void testShellExecuteTwice() throws Exception {
         JadbDevice any = jadb.getAnyDevice();
         any.executeShell(System.out, "ls /");
