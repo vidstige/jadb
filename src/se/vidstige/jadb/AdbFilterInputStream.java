@@ -31,6 +31,11 @@ public class AdbFilterInputStream extends FilterInputStream {
             if (b == -1) return n == 0 ? -1 : n;
             buffer[offset + n] = (byte) b;
             n++;
+
+            // Return as soon as no more data is available (and at least one byte was read)
+            if (in.available() <= 0) {
+                return n;
+            }
         }
         return n;
     }

@@ -71,20 +71,15 @@ public class JadbDevice {
         return state;
     }
 
-    /** Execute a shell command with raw output.
+    /** Execute a shell command.
      *
-     * This function differs from executeShell in that no buffering and newline filtering is performed.
-     *
-     * Especially the buffering may be an issue if the output of an ongoing command should be displayed,
-     * e.g. the output of running logcat.
-     *
-     * @param command main command.
-     * @param args arguments to the commands
+     * @param command main command to run. E.g. "ls"
+     * @param args arguments to the command.
      * @return combined stdout/stderr stream.
      * @throws IOException
      * @throws JadbException
      */
-    public InputStream executeShellRaw(String command, String... args) throws IOException, JadbException {
+    public InputStream executeShell(String command, String... args) throws IOException, JadbException {
         Transport transport = getTransport();
         StringBuilder shellLine = new StringBuilder(command);
         for (String arg : args) {
@@ -92,20 +87,7 @@ public class JadbDevice {
             shellLine.append(Bash.quote(arg));
         }
         send(transport, "shell:" + shellLine.toString());
-        return transport.getInputStream();
-    }
-
-    /** Execute a shell command.
-     *
-     * @param command main command.
-     * @param args arguments to the commands
-     * @return combined stdout/stderr stream.
-     * @throws IOException
-     * @throws JadbException
-     */
-    public InputStream executeShell(String command, String... args) throws IOException, JadbException {
-        InputStream inputStream = executeShellRaw(command, args);
-    	return new AdbFilterInputStream(new BufferedInputStream(inputStream));
+        return new AdbFilterInputStream(new BufferedInputStream(transport.getInputStream()));
     }
 
     /**
