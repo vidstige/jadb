@@ -1,3 +1,6 @@
+# Used to store github access token for releasing
+/access_token
+
 ################
 #   IntelliJ   #
 ################
