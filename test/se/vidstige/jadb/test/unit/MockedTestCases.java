@@ -106,7 +106,7 @@ public class MockedTestCases {
     @Test
     public void testExecuteShellQuotesSpace() throws Exception {
         server.add("serial-123");
-        server.expectShell("serial-123", "ls 'space file'");
+        server.expectShell("serial-123", "ls 'space file'").returns("space file");
         JadbDevice device = connection.getDevices().get(0);
         device.executeShell("ls", "space file");
     }
