@@ -12,11 +12,11 @@ public class JadbConnection implements ITransportFactory {
 
     private static final int DEFAULTPORT = 5037;
 
-    public JadbConnection() throws IOException {
+    public JadbConnection() {
         this("localhost", DEFAULTPORT);
     }
 
-    public JadbConnection(String host, int port) throws IOException {
+    public JadbConnection(String host, int port) {
         this.host = host;
         this.port = port;
     }
@@ -25,16 +25,17 @@ public class JadbConnection implements ITransportFactory {
         return new Transport(new Socket(host, port));
     }
 
-    public void getHostVersion() throws IOException, JadbException {
+    public String getHostVersion() throws IOException, JadbException {
         Transport main = createTransport();
         main.send("host:version");
         main.verifyResponse();
+        String version = main.readString();
         main.close();
+        return version;
     }
 
     public List<JadbDevice> getDevices() throws IOException, JadbException {
         Transport devices = createTransport();
-
         devices.send("host:devices");
         devices.verifyResponse();
         String body = devices.readString();
