@@ -37,6 +37,11 @@ public class MockedTestCases {
     }
 
     @Test
+    public void testGetHostVersion() throws Exception {
+        Assert.assertEquals("001f", connection.getHostVersion());
+    }
+
+    @Test
     public void testListDevices() throws Exception {
         server.add("serial-123");
         List<JadbDevice> devices = connection.getDevices();
