@@ -68,6 +68,21 @@ project name and tag ignoring actual values from pom.xml. So you need to write:
 </dependency>
 ```
 
+## Troubleshooting
+If you cannot connect to your device check the following.
+
+- Your adb server is running by issuing `adb start-server`
+- You can see the device using adb `adb devices`
+
+If you see the device in `adb` but not in `jadb` please file an issue on https://github.com/vidstige/jadb/.
+
+### Workaround for Unix Sockets Adb Server
+
+Install `socat` and issue the following to forward port 5037 to the unix domain socket.
+```bash
+socat TCP-LISTEN:5037,reuseaddr,fork UNIX-CONNECT:/tmp/5037
+```
+
 ## Contributing ##
 This project would not be where it is, if it where not for the helpful [contributors](https://github.com/vidstige/jadb/graphs/contributors)
 supporting jadb with pull requests, issue reports, and great ideas. If _you_ would like to
