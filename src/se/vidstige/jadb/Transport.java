@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.Charset;
 
-class Transport {
+public class Transport {
 
     private final OutputStream outputStream;
     private final InputStream inputStream;
