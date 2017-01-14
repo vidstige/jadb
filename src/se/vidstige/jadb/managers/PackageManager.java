@@ -63,10 +63,12 @@ public class PackageManager {
         String result = Stream.readAll(s, Charset.forName("UTF-8"));
         remove(remote);
         verifyOperation("install", apkFile.getName(), result);
+        s.close();
     }
 
     public void install(File apkFile) throws IOException, JadbException {
         install(apkFile, new ArrayList<String>(0));
+
     }
 
     public void installWithOptions(File apkFile, List<? extends InstallOption> options) throws IOException, JadbException {
@@ -86,6 +88,7 @@ public class PackageManager {
         InputStream s = device.executeShell("pm", "uninstall", name.toString());
         String result = Stream.readAll(s, Charset.forName("UTF-8"));
         verifyOperation("uninstall", name.toString(), result);
+        s.close();
     }
 
     public void launch(Package name) throws IOException, JadbException {

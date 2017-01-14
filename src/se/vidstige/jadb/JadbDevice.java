@@ -87,7 +87,7 @@ public class JadbDevice {
             shellLine.append(Bash.quote(arg));
         }
         send(transport, "shell:" + shellLine.toString());
-        return new AdbFilterInputStream(new BufferedInputStream(transport.getInputStream()));
+        return new AdbFilterInputStream(transport);
     }
 
     /**
@@ -129,6 +129,24 @@ public class JadbDevice {
     private int getMode(File file) {
         //noinspection OctalInteger
         return 0664;
+    }
+
+    public void simulateUsbUnplug() throws IOException, JadbException {
+        InputStream stream = executeShell("dumpsys", "battery", "unplug");
+        int i;
+        do{
+            i = stream.read();
+        } while(i != -1);
+        stream.close();
+    }
+
+    public void resetUsbPlug() throws IOException, JadbException {
+        InputStream stream = executeShell("dumpsys", "battery", "reset");
+        int i;
+        do{
+            i = stream.read();
+        } while(i != -1);
+        stream.close();
     }
 
     public void push(InputStream source, long lastModified, int mode, RemoteFile remote) throws IOException, JadbException {

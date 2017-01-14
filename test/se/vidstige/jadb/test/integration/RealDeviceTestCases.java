@@ -7,6 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import se.vidstige.jadb.*;
+import se.vidstige.jadb.managers.KeyEvent;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -113,5 +114,24 @@ public class RealDeviceTestCases {
         }  finally {
             if (outputStream != null) outputStream.close();
         }
+    }
+
+    @Test
+    public void testInputScreenOnOff() throws Exception{
+        JadbDevice any = jadb.getAnyDevice();
+        KeyEvent.Builder keyEventBuilder = new KeyEvent.Builder(any);
+        keyEventBuilder.addKey(KeyEvent.KEYCODE_POWER).build().execute();
+    }
+
+    @Test
+    public void testUsbDisconnect() throws Exception{
+        JadbDevice any = jadb.getAnyDevice();
+        any.simulateUsbUnplug();
+    }
+
+    @Test
+    public void testUsbReset() throws Exception{
+        JadbDevice any = jadb.getAnyDevice();
+        any.resetUsbPlug();
     }
 }
