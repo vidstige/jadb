@@ -467,68 +467,84 @@ public class Intent {
         mDataUri = uri;
     }
 
-    public void putNullExtra(String key){
+    public Intent putNullExtra(String key){
         addToMap(key, null);
+        return this;
     }
 
-    public void putExtra(String key, String val){
+    public Intent putExtra(String key, String val){
         addToMap(key, val);
+        return this;
     }
 
-    public void putExtra(String key, Boolean val){
+    public Intent putExtra(String key, Boolean val){
         addToMap(key, val);
+        return this;
     }
 
-    public void putExtra(String key, Integer val){
+    public Intent putExtra(String key, Integer val){
         addToMap(key, val);
+        return this;
     }
 
-    public void putExtra(String key, Long val){
+    public Intent putExtra(String key, Long val){
         addToMap(key, val);
+        return this;
     }
 
-    public void putExtra(String key, Float val){
+    public Intent putExtra(String key, Float val){
         addToMap(key, val);
+        return this;
     }
 
-    public void putExtra(String key, URI val){
+    public Intent putExtra(String key, URI val){
         addToMap(key, val);
+        return this;
     }
 
-    public void putExtra(String key, Component val){
+    public Intent putExtra(String key, Component val){
         addToMap(key, val);
+        return this;
     }
 
-    public void putExtra(String key, Integer... vals){
+    public Intent putExtra(String key, Integer... vals){
         addToMap(key, vals);
+        return this;
     }
 
-    public void putIntegerListExtra(String key, List<Integer> val){
+    public Intent putIntegerListExtra(String key, List<Integer> val){
         addToMap(key, val);
+        return this;
     }
 
-    public void putExtra(String key, Long... val){
+    public Intent putExtra(String key, Long... val){
         addToMap(key, val);
+        return this;
     }
 
-    public void putLongListExtra(String key, List<Long> val){
+    public Intent putLongListExtra(String key, List<Long> val){
         addToMap(key, val);
+        return this;
     }
 
-    public void putExtra(String key, Float... val){
+    public Intent putExtra(String key, Float... val){
         addToMap(key, val);
+        return this;
     }
 
-    public void putFloatListExtra(String key, List<Float> val){
+    public Intent putFloatListExtra(String key, List<Float> val){
         addToMap(key, val);
+        return this;
     }
 
-    public void putExtra(String key, String... val){
+    public Intent putExtra(String key, String... val){
         addToMap(key, val);
+        return this;
     }
 
-    public void putStringListExtra(String key, List<String> val){
+    public Intent putStringListExtra(String key, List<String> val){
         addToMap(key, val);
+        return this;
     }
 
     void generate(List<String> args){
