@@ -27,7 +27,7 @@ public class PropertyManager {
     }
 
     private Map<String, String> parseProp(BufferedReader bufferedReader) throws IOException {
-        final Pattern pattern = Pattern.compile("^\\[([a-zA-Z0-9_.-]*)\\]:.\\[([a-zA-Z0-9_.-]*)\\]");
+        final Pattern pattern = Pattern.compile("^\\[([a-zA-Z0-9_.-]*)\\]:.\\[([^\\[\\]]*)\\]");
 
         HashMap<String, String> result = new HashMap<>();
 
