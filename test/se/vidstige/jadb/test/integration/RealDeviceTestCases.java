@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import se.vidstige.jadb.*;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -98,8 +99,10 @@ public class RealDeviceTestCases {
 	@Test
     public void testShellExecuteTwice() throws Exception {
         JadbDevice any = jadb.getAnyDevice();
-        any.executeShell(System.out, "ls /");
-        any.executeShell(System.out, "ls", "-la", "/");
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        any.executeShell(bout, "ls /");
+        any.executeShell(bout, "ls", "-la", "/");
+        System.out.write(bout.toByteArray());
     }
 
     @Test
