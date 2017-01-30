@@ -23,14 +23,9 @@ public class PropertyManager {
     }
 
     public Map<String, String> getprop() throws IOException, JadbException {
-        BufferedReader bufferedReader = null;
-        try {
-            bufferedReader = new BufferedReader(new InputStreamReader(device.executeShell("getprop")));
+        try (BufferedReader bufferedReader =
+                     new BufferedReader(new InputStreamReader(device.executeShell("getprop")))) {
             return parseProp(bufferedReader);
-        } finally {
-            if (bufferedReader != null) {
-                bufferedReader.close();
-            }
         }
     }
 
