@@ -114,6 +114,25 @@ public class JadbDevice {
         }
     }
 
+    /** Execute a shell command with raw binary output.
+     *
+     * @param command main command to run, e.g. "screencap"
+     * @param args arguments to the command, e.g. "-p".
+     * @return combined stdout/stderr stream.
+     * @throws IOException
+     * @throws JadbException
+     */
+    public InputStream executeShellRaw(String command, String... args) throws IOException, JadbException {
+        Transport transport = getTransport();
+        StringBuilder shellLine = new StringBuilder(command);
+        for (String arg : args) {
+            shellLine.append(" ");
+            shellLine.append(Bash.quote(arg));
+        }
+        send(transport, "exec:" + shellLine.toString());
+        return new BufferedInputStream(transport.getInputStream());
+    }
+
     public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
         Transport transport = getTransport();
         SyncTransport sync = transport.startSync();
