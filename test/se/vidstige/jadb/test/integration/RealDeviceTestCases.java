@@ -11,6 +11,7 @@ import se.vidstige.jadb.managers.BatteryManager;
 import se.vidstige.jadb.managers.KeyInputManager;
 
 import java.io.*;
+
 import java.util.List;
 
 public class RealDeviceTestCases {
@@ -97,8 +98,10 @@ public class RealDeviceTestCases {
 	@Test
     public void testShellExecuteTwice() throws Exception {
         JadbDevice any = jadb.getAnyDevice();
-        any.executeShell(System.out, "ls /");
-        any.executeShell(System.out, "ls", "-la", "/");
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        any.executeShell(bout, "ls /");
+        any.executeShell(bout, "ls", "-la", "/");
+        System.out.write(bout.toByteArray());
     }
 
     @Test

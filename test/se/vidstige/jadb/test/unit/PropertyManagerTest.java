@@ -56,6 +56,38 @@ public class PropertyManagerTest {
     }
 
     @Test
+    public void testGetPropsValueHasSpecialCharacters() throws Exception {
+        /* Some example properties from Nexus 9:
+        [ro.product.model]: [Nexus 9]
+        [ro.product.cpu.abilist]: [arm64-v8a,armeabi-v7a,armeabi]
+        [ro.retaildemo.video_path]: [/data/preloads/demo/retail_demo.mp4]
+        [ro.url.legal]: [http://www.google.com/intl/%s/mobile/android/basic/phone-legal.html]
+        [ro.vendor.build.date]: [Tue Nov 1 18:21:23 UTC 2016]
+        */
+        //Arrange
+        Map<String, String> expected = new HashMap<>();
+        expected.put("ro.product.model", "Nexus 9");
+        expected.put("ro.product.cpu.abilist", "arm64-v8a,armeabi-v7a,armeabi");
+        expected.put("ro.retaildemo.video_path", "/data/preloads/demo/retail_demo.mp4");
+        expected.put("ro.url.legal", "http://www.google.com/intl/%s/mobile/android/basic/phone-legal.html");
+        expected.put("ro.vendor.build.date", "Tue Nov 1 18:21:23 UTC 2016");
+
+        String response = "[ro.product.model]: [Nexus 9]\n" +
+                "[ro.product.cpu.abilist]: [arm64-v8a,armeabi-v7a,armeabi]\n" +
+                "[ro.retaildemo.video_path]: [/data/preloads/demo/retail_demo.mp4]\n" +
+                "[ro.url.legal]: [http://www.google.com/intl/%s/mobile/android/basic/phone-legal.html]\n" +
+                "[ro.vendor.build.date]: [Tue Nov 1 18:21:23 UTC 2016]";
+
+        server.expectShell(DEVICE_SERIAL, "getprop").returns(response);
+
+        //Act
+        Map<String, String> actual = new PropertyManager(device).getprop();
+
+        //Assert
+        assertEquals(expected, actual);
+    }
+
+    @Test
     public void testGetPropsMalformedIgnoredString() throws Exception {
         //Arrange
         Map<String, String> expected = new HashMap<>();
