@@ -435,7 +435,7 @@ public class Intent {
     private Package mPackage;
     private Component mComponent;
 
-    private Intent(){
+    private Intent() {
         mAction = null;
         mCategory = null;
         mDataUri = null;
@@ -446,113 +446,113 @@ public class Intent {
         mComponent = null;
     }
 
-    public Intent(String action){
+    public Intent(String action) {
         this();
         mAction = action;
     }
 
-    public Intent(String action, String category){
+    public Intent(String action, String category) {
         this(action);
         mCategory = category;
     }
 
-    public Intent(Package pkg, String component){
+    public Intent(Package pkg, String component) {
         this();
         mPackage = pkg;
         mComponent = new Component(mPackage, component);
     }
 
-    public Intent(URI uri){
+    public Intent(URI uri) {
         this();
         mDataUri = uri;
     }
 
-    public Intent putNullExtra(String key){
+    public Intent putNullExtra(String key) {
         addToMap(key, null);
         return this;
     }
 
-    public Intent putExtra(String key, String val){
+    public Intent putExtra(String key, String val) {
         addToMap(key, val);
         return this;
     }
 
-    public Intent putExtra(String key, Boolean val){
+    public Intent putExtra(String key, Boolean val) {
         addToMap(key, val);
         return this;
     }
 
-    public Intent putExtra(String key, Integer val){
+    public Intent putExtra(String key, Integer val) {
         addToMap(key, val);
         return this;
     }
 
-    public Intent putExtra(String key, Long val){
+    public Intent putExtra(String key, Long val) {
         addToMap(key, val);
         return this;
     }
 
-    public Intent putExtra(String key, Float val){
+    public Intent putExtra(String key, Float val) {
         addToMap(key, val);
         return this;
     }
 
-    public Intent putExtra(String key, URI val){
+    public Intent putExtra(String key, URI val) {
         addToMap(key, val);
         return this;
     }
 
-    public Intent putExtra(String key, Component val){
+    public Intent putExtra(String key, Component val) {
         addToMap(key, val);
         return this;
     }
 
-    public Intent putExtra(String key, Integer... vals){
+    public Intent putExtra(String key, Integer... vals) {
         addToMap(key, vals);
         return this;
     }
 
-    public Intent putIntegerListExtra(String key, List<Integer> val){
+    public Intent putIntegerListExtra(String key, List<Integer> val) {
         addToMap(key, val);
         return this;
     }
 
-    public Intent putExtra(String key, Long... val){
+    public Intent putExtra(String key, Long... val) {
         addToMap(key, val);
         return this;
     }
 
-    public Intent putLongListExtra(String key, List<Long> val){
+    public Intent putLongListExtra(String key, List<Long> val) {
         addToMap(key, val);
         return this;
     }
 
-    public Intent putExtra(String key, Float... val){
+    public Intent putExtra(String key, Float... val) {
         addToMap(key, val);
         return this;
     }
 
-    public Intent putFloatListExtra(String key, List<Float> val){
+    public Intent putFloatListExtra(String key, List<Float> val) {
         addToMap(key, val);
         return this;
     }
 
-    public Intent putExtra(String key, String... val){
+    public Intent putExtra(String key, String... val) {
         addToMap(key, val);
         return this;
     }
 
-    public Intent putStringListExtra(String key, List<String> val){
+    public Intent putStringListExtra(String key, List<String> val) {
         addToMap(key, val);
         return this;
     }
 
-    void generate(List<String> args){
+    void generate(List<String> args) {
         if (mAction != null) {
             args.add("-a");
             args.add(mAction);
         }
-        if(mCategory != null){
+        if(mCategory != null) {
             args.add("-c");
             args.add(mCategory);
         }
@@ -560,106 +560,106 @@ public class Intent {
             args.add("-d");
             args.add(mDataUri.toString());
         }
-        if(mMimeType != null){
+        if(mMimeType != null) {
             args.add("-t");
             args.add(mMimeType);
         }
         parseExtras(args);
         parseFlags(args);
-        if(mAction == null && mCategory == null){
-            if(mComponent != null){
+        if(mAction == null && mCategory == null) {
+            if(mComponent != null) {
                 args.add(mComponent.generateComponent());
             }
-            else{
+            else {
                 args.add(mPackage.toString());
             }
         }
     }
 
-    private void addToMap(String key, Object val){
+    private void addToMap(String key, Object val) {
         mExtras.put(key, val);
     }
 
-    private void parseExtras(List<String> extras){
-        for(Map.Entry<String, Object> entry : mExtras.entrySet()){
+    private void parseExtras(List<String> extras) {
+        for(Map.Entry<String, Object> entry : mExtras.entrySet()) {
             String key = entry.getKey();
             Object val = entry.getValue();
-            if(val == null){
+            if(val == null) {
                 extras.add("--esn");
                 extras.add(key);
             }
-            else if(val instanceof String){
+            else if(val instanceof String) {
                 extras.add("--es");
                 extras.add(key);
                 extras.add(val.toString());
             }
-            else if(val instanceof Boolean){
+            else if(val instanceof Boolean) {
                 extras.add("--ez");
                 extras.add(key);
                 extras.add(val.toString());
             }
-            else if(val instanceof Integer){
+            else if(val instanceof Integer) {
                 extras.add("--ei");
                 extras.add(key);
                 extras.add(val.toString());
             }
-            else if(val instanceof Long){
+            else if(val instanceof Long) {
                 extras.add("--el");
                 extras.add(key);
                 extras.add(val.toString());
             }
-            else if(val instanceof Float){
+            else if(val instanceof Float) {
                 extras.add("--ef");
                 extras.add(key);
                 extras.add(val.toString());
             }
-            else if(val instanceof Component){
+            else if(val instanceof Component) {
                 extras.add("--ecn");
                 extras.add(key);
                 extras.add(val.toString());
             }
-            else if(val instanceof Integer[]){
+            else if(val instanceof Integer[]) {
                 extras.add("--eia");
                 extras.add(key);
                 Integer[] ints = (Integer[])val;
                 StringBuilder builder = new StringBuilder(ints[0].toString());
-                for(int i = 1; i < ints.length; i++){
+                for(int i = 1; i < ints.length; i++) {
                     builder.append(",").append(ints[i]);
                 }
                 extras.add(builder.toString());
             }
-            else if(val instanceof Long[]){
+            else if(val instanceof Long[]) {
                 extras.add("--ela");
                 extras.add(key);
                 Long[] longs = (Long[])val;
                 StringBuilder builder = new StringBuilder(longs[0].toString());
-                for(int i = 1; i < longs.length; i++){
+                for(int i = 1; i < longs.length; i++) {
                     builder.append(",").append(longs[i].toString());
                 }
                 extras.add(builder.toString());
             }
-            else if(val instanceof Float[]){
+            else if(val instanceof Float[]) {
                 extras.add("--efa");
                 extras.add(key);
                 Float[] floats = (Float[])val;
                 StringBuilder builder = new StringBuilder(floats[0].toString());
-                for(int i = 1; i < floats.length; i++){
+                for(int i = 1; i < floats.length; i++) {
                     builder.append(",").append(floats[i].toString());
                 }
                 extras.add(builder.toString());
             }
-            else if(val instanceof String[]){
+            else if(val instanceof String[]) {
                 extras.add("--efa");
                 extras.add(key);
                 String[] strings = (String[])val;
                 StringBuilder builder = new StringBuilder(strings[0]);
-                for(int i = 1; i < strings.length; i++){
-                    //TODO escaple commas
+                for(int i = 1; i < strings.length; i++) {
+                    //TODO escape commas
                     builder.append(",").append(strings[i]);
                 }
                 extras.add(builder.toString());
             }
-            else if(val instanceof List){
+            else if(val instanceof List) {
                 String flag = null;
                 List vals = (List)val;
                 Object o = vals.get(0);
@@ -673,8 +673,8 @@ public class Intent {
                     flag = "--efal";
                 }
                 StringBuilder builder = new StringBuilder(o.toString());
-                for(Object obj : (List)val){
-                    //TODO escaple commas
+                for(Object obj : (List)val) {
+                    //TODO escape commas
                     builder.append(",").append(obj.toString());
                 }
                 extras.add(flag);
@@ -684,7 +684,7 @@ public class Intent {
         }
     }
 
-    private void parseFlags(List<String> flags){
+    private void parseFlags(List<String> flags) {
         if((mFlags & FLAG_GRANT_READ_URI_PERMISSION) != 0) {
             flags.add("--grant-read-uri-permission");
         }

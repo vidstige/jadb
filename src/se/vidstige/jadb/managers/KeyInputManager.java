@@ -2,9 +2,11 @@ package se.vidstige.jadb.managers;
 
 import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbException;
+import se.vidstige.jadb.Stream;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 
@@ -29,7 +31,7 @@ import java.util.LinkedList;
  * Author: pablobaxter.
  */
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class KeyEvent extends InputEvent {
+public class KeyInputManager {
 
     /**
      * Key code constant: Unknown key code.
@@ -1328,56 +1330,36 @@ public class KeyEvent extends InputEvent {
 
     private static final int LAST_KEYCODE = KEYCODE_SYSTEM_NAVIGATION_RIGHT;
 
+    private final JadbDevice device;
     private boolean longPress;
-    private JadbDevice device;
     private LinkedList<String> args;
 
-    private KeyEvent(JadbDevice d){
-        device = d;
+    public KeyInputManager(JadbDevice device) {
+        this.device = device;
         longPress = false;
         args = new LinkedList<>();
     }
 
-    private void longPress() {
+    public void longPress(int... keys) throws IOException, JadbException {
         longPress = true;
+        press(keys);
     }
 
-    private void addKey(String key) {
-        args.add(key);
+    public void press(int... keys) throws IOException, JadbException {
+        for(int k : keys) {
+            args.add(String.valueOf(k));
+        }
+        execute();
     }
 
-    public static class Builder {
-
-        private KeyEvent mKeyEvent;
-
-        public Builder(JadbDevice d) {
-            mKeyEvent = new KeyEvent(d);
-        }
-
-        public Builder longPress(){
-            mKeyEvent.longPress();
-            return this;
-        }
-
-        public Builder addKey(int key){
-            mKeyEvent.addKey(String.valueOf(key));
-            return this;
-        }
-
-        public KeyEvent build(){
-            return mKeyEvent;
-        }
-    }
-
-    public void execute() throws IOException, JadbException {
-        if(longPress){
+    private void execute() throws IOException, JadbException {
+        if(longPress) {
             args.addFirst("--longpress");
         }
         args.addFirst("keyevent");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(device.executeShell("input", args.toArray(new String[args.size()]))));
-        String line;
-        while((line = reader.readLine()) != null){
-            System.out.println(line);
+        try (InputStream stream = device.executeShell("input", args.toArray(new String[args.size()]))) {
+            Stream.flushRead(stream);
+            stream.close();
         }
     }
 }

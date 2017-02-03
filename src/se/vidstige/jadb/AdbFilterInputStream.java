@@ -7,14 +7,14 @@ import java.io.InputStream;
 
 public class AdbFilterInputStream extends FilterInputStream {
 
-    private Transport mTransport;
+    private Transport transport;
 
     AdbFilterInputStream(Transport transport) {
         this(transport.getInputStream());
-        mTransport = transport;
+        this.transport = transport;
     }
 
-    public AdbFilterInputStream(InputStream inputStream){
+    public AdbFilterInputStream(InputStream inputStream) {
         super(new BufferedInputStream(inputStream));
     }
 
@@ -57,6 +57,6 @@ public class AdbFilterInputStream extends FilterInputStream {
     @Override
     public void close() throws IOException {
         super.close();
-        mTransport.close();
+        transport.close();
     }
 }

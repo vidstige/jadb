@@ -2,6 +2,7 @@ package se.vidstige.jadb.managers;
 
 import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbException;
+import se.vidstige.jadb.Stream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,16 +24,14 @@ public class ActivityManager {
         List<String> args = new ArrayList<>();
         args.add("broadcast");
         intent.generate(args);
-        if(permission != null){
+        if(permission != null) {
             args.add("--receiver-permission");
             args.add(permission);
         }
-        InputStream stream = device.executeShell("am", args.toArray(new String[args.size()]));
-        int i;
-        do{
-            i = stream.read();
-        } while (i != -1);
-        stream.close();
+        try (InputStream stream = device.executeShell("am", args.toArray(new String[args.size()]))) {
+            Stream.flushRead(stream);
+            stream.close();
+        }
     }
 
     public void broadcastIntent(Intent intent) throws IOException, JadbException {

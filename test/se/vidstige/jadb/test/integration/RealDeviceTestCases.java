@@ -7,12 +7,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import se.vidstige.jadb.*;
-import se.vidstige.jadb.managers.KeyEvent;
+import se.vidstige.jadb.managers.BatteryManager;
+import se.vidstige.jadb.managers.KeyInputManager;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.List;
 
 public class RealDeviceTestCases {
@@ -119,19 +117,21 @@ public class RealDeviceTestCases {
     @Test
     public void testInputScreenOnOff() throws Exception{
         JadbDevice any = jadb.getAnyDevice();
-        KeyEvent.Builder keyEventBuilder = new KeyEvent.Builder(any);
-        keyEventBuilder.addKey(KeyEvent.KEYCODE_POWER).build().execute();
+        KeyInputManager keyInputManager = new KeyInputManager(any);
+        keyInputManager.press(KeyInputManager.KEYCODE_POWER);
     }
 
     @Test
     public void testUsbDisconnect() throws Exception{
         JadbDevice any = jadb.getAnyDevice();
-        any.simulateUsbUnplug();
+        BatteryManager batteryManager = new BatteryManager(any);
+        batteryManager.simulateUsbUnplug();
     }
 
     @Test
     public void testUsbReset() throws Exception{
         JadbDevice any = jadb.getAnyDevice();
-        any.resetUsbPlug();
+        BatteryManager batteryManager = new BatteryManager(any);
+        batteryManager.resetUsbPlug();
     }
 }

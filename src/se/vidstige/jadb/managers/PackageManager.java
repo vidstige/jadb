@@ -48,14 +48,15 @@ public class PackageManager {
     }
 
     public void remove(RemoteFile file) throws IOException, JadbException {
-        InputStream s = device.executeShell("rm", "-f", Bash.quote(file.getPath()));
-        Stream.flushRead(s);
-        s.close();
+        try (InputStream stream = device.executeShell("rm", "-f", Bash.quote(file.getPath()))) {
+            Stream.flushRead(stream);
+            stream.close();
+        }
     }
 
-    private void install(String apkName, InputStream is, List<String> extraArguments) throws IOException, JadbException {
-        RemoteFile remote = new RemoteFile("/sdcard/tmp/" + apkName);
-        device.push(is, System.currentTimeMillis(), device.getMode(null), remote);
+    private void install(File apkFile, List<String> extraArguments) throws IOException, JadbException {
+        RemoteFile remote = new RemoteFile("/sdcard/tmp/" + apkFile.getName());
+        device.push(apkFile, remote);
         ArrayList<String> arguments = new ArrayList<>();
         arguments.add("install");
         arguments.addAll(extraArguments);
@@ -63,17 +64,12 @@ public class PackageManager {
         InputStream s = device.executeShell("pm", arguments.toArray(new String[arguments.size()]));
         String result = Stream.readAll(s, Charset.forName("UTF-8"));
         remove(remote);
-        verifyOperation("install", apkName, result);
-        is.close();
+        verifyOperation("install", apkFile.getName(), result);
         s.close();
     }
 
-    public void install(String apkFileName, InputStream is) throws IOException, JadbException {
-        install(apkFileName, is, new ArrayList<String>(0));
-    }
-
     public void install(File apkFile) throws IOException, JadbException {
-        install(apkFile.getName(), new FileInputStream(apkFile), new ArrayList<String>(0));
+        install(apkFile, new ArrayList<String>(0));
 
     }
 
@@ -83,7 +79,7 @@ public class PackageManager {
         for(InstallOption installOption : options) {
             optionsAsStr.add(installOption.getStringRepresentation());
         }
-        install(apkFile.getName(), new FileInputStream(apkFile), optionsAsStr);
+        install(apkFile, optionsAsStr);
     }
 
     public void forceInstall(File apkFile) throws IOException, JadbException {
@@ -98,9 +94,10 @@ public class PackageManager {
     }
 
     public void launch(Package name) throws IOException, JadbException {
-        InputStream s = device.executeShell("monkey", "-p", name.toString(), "-c", "android.intent.category.LAUNCHER", "1");
-        Stream.flushRead(s);
-        s.close();
+        try (InputStream stream = device.executeShell("monkey", "-p", name.toString(), "-c", "android.intent.category.LAUNCHER", "1")) {
+            Stream.flushRead(stream);
+            stream.close();
+        }
     }
 
     //<editor-fold desc="InstallOption">

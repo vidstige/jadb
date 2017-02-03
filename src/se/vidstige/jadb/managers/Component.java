@@ -5,32 +5,32 @@ package se.vidstige.jadb.managers;
  */
 public class Component {
     
-    private Package mPackage;
-    private String mComponent;
+    private Package pkg;
+    private String component;
     
-    public Component(String pkg, String component){
+    public Component(String pkg, String component) {
         this(new Package(pkg), component);
     }
     
-    public Component(Package pkg, String component){
-        mPackage = pkg;
-        mComponent = component;
+    public Component(Package pkg, String component) {
+        this.pkg = pkg;
+        this.component = component;
     }
     
-    Package getPackage(){
-        return mPackage;
+    Package getPackage() {
+        return pkg;
     }
     
-    String getComponent(){
-        return mComponent;
+    String getComponent() {
+        return component;
     }
 
-    String generateComponent(){
-        return mPackage + "/" + mComponent;
+    String generateComponent() {
+        return pkg + "/" + component;
     }
     
     @Override
-    public String toString(){
-        return mComponent;
+    public String toString() {
+        return component;
     }
 }

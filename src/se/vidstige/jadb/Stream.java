@@ -23,8 +23,8 @@ public class Stream {
 
     public static void flushRead(InputStream is) throws IOException {
         int v;
-        do{
+        do {
             v = is.read();
-        } while(v >=0);
+        } while(v >= 0);
     }
 }
