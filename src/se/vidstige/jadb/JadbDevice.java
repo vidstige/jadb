@@ -134,7 +134,7 @@ public class JadbDevice {
     public void simulateUsbUnplug() throws IOException, JadbException {
         InputStream stream = executeShell("dumpsys", "battery", "unplug");
         int i;
-        do{
+        do {
             i = stream.read();
         } while(i != -1);
         stream.close();
