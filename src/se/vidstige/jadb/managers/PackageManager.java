@@ -50,7 +50,6 @@ public class PackageManager {
     public void remove(RemoteFile file) throws IOException, JadbException {
         try (InputStream stream = device.executeShell("rm", "-f", Bash.quote(file.getPath()))) {
             Stream.flushRead(stream);
-            stream.close();
         }
     }
 
@@ -96,7 +95,6 @@ public class PackageManager {
     public void launch(Package name) throws IOException, JadbException {
         try (InputStream stream = device.executeShell("monkey", "-p", name.toString(), "-c", "android.intent.category.LAUNCHER", "1")) {
             Stream.flushRead(stream);
-            stream.close();
         }
     }
 

@@ -30,7 +30,6 @@ public class ActivityManager {
         }
         try (InputStream stream = device.executeShell("am", args.toArray(new String[args.size()]))) {
             Stream.flushRead(stream);
-            stream.close();
         }
     }
 

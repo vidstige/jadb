@@ -21,14 +21,12 @@ public class BatteryManager {
     public void simulateUsbUnplug() throws IOException, JadbException {
         try (InputStream stream = device.executeShell("dumpsys", "battery", "unplug")) {
             Stream.flushRead(stream);
-            stream.close();
         }
     }
 
     public void resetUsbPlug() throws IOException, JadbException {
         try (InputStream stream = device.executeShell("dumpsys", "battery", "reset")) {
             Stream.flushRead(stream);
-            stream.close();
         }
     }
 
