@@ -23,7 +23,7 @@ public class KeyEvent extends InputEvent {
     protected String[] buildArgs() {
         ArrayList<String> args = new ArrayList<>();
         args.add("keyevent");
-        if(longPress) {
+        if (longPress) {
            args.add("--longpress");
         }
         args.add(key.toString());

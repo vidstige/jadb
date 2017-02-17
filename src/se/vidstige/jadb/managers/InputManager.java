@@ -22,7 +22,7 @@ public class InputManager {
         try (InputStream is = device.executeShell("input", event.buildArgs())) {
             Stream.flushRead(is);
         } catch (IOException e) {
-            throw new JadbException(e.getMessage());
+            throw new JadbException(e);
         }
     }
 }

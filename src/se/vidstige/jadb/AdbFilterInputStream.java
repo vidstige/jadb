@@ -7,11 +7,8 @@ import java.io.InputStream;
 
 public class AdbFilterInputStream extends FilterInputStream {
 
-    private Transport transport;
-
     AdbFilterInputStream(Transport transport) {
         this(transport.getInputStream());
-        this.transport = transport;
     }
 
     public AdbFilterInputStream(InputStream inputStream) {
@@ -57,6 +54,5 @@ public class AdbFilterInputStream extends FilterInputStream {
     @Override
     public void close() throws IOException {
         super.close();
-        transport.close();
     }
 }

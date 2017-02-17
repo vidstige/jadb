@@ -22,8 +22,6 @@ import java.util.Map;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- *
- * Author: pablobaxter.
  */
 public class Intent {
 
@@ -426,45 +424,45 @@ public class Intent {
      */
     public static final int FLAG_RECEIVER_REPLACE_PENDING = 0x20000000;
 
-    private String mAction;
-    private String mCategory;
-    private URI mDataUri;
-    private String mMimeType;
-    private Map<String, Object> mExtras;
-    private int mFlags;
-    private Package mPackage;
-    private Component mComponent;
+    private String action;
+    private String category;
+    private URI dataUri;
+    private String mimeType;
+    private Map<String, Object> extras;
+    private int flags;
+    private Package androidPackage;
+    private Component component;
 
     private Intent() {
-        mAction = null;
-        mCategory = null;
-        mDataUri = null;
-        mMimeType = null;
-        mExtras = new HashMap<>();
-        mFlags = 0;
-        mPackage = null;
-        mComponent = null;
+        action = null;
+        category = null;
+        dataUri = null;
+        mimeType = null;
+        extras = new HashMap<>();
+        flags = 0;
+        androidPackage = null;
+        component = null;
     }
 
     public Intent(String action) {
         this();
-        mAction = action;
+        this.action = action;
     }
 
     public Intent(String action, String category) {
         this(action);
-        mCategory = category;
+        this.category = category;
     }
 
     public Intent(Package pkg, String component) {
         this();
-        mPackage = pkg;
-        mComponent = new Component(mPackage, component);
+        androidPackage = pkg;
+        this.component = new Component(androidPackage, component);
     }
 
     public Intent(URI uri) {
         this();
-        mDataUri = uri;
+        dataUri = uri;
     }
 
     public Intent putNullExtra(String key) {
@@ -548,118 +546,118 @@ public class Intent {
     }
 
     void generate(List<String> args) {
-        if (mAction != null) {
+        if (action != null) {
             args.add("-a");
-            args.add(mAction);
+            args.add(action);
         }
-        if(mCategory != null) {
+        if (category != null) {
             args.add("-c");
-            args.add(mCategory);
+            args.add(category);
         }
-        if(mDataUri != null) {
+        if (dataUri != null) {
             args.add("-d");
-            args.add(mDataUri.toString());
+            args.add(dataUri.toString());
         }
-        if(mMimeType != null) {
+        if (mimeType != null) {
             args.add("-t");
-            args.add(mMimeType);
+            args.add(mimeType);
         }
         parseExtras(args);
         parseFlags(args);
-        if(mAction == null && mCategory == null) {
-            if(mComponent != null) {
-                args.add(mComponent.generateComponent());
+        if (action == null && category == null) {
+            if (component != null) {
+                args.add(component.generateComponent());
             }
             else {
-                args.add(mPackage.toString());
+                args.add(androidPackage.toString());
             }
         }
     }
 
     private void addToMap(String key, Object val) {
-        mExtras.put(key, val);
+        extras.put(key, val);
     }
 
-    private void parseExtras(List<String> extras) {
-        for(Map.Entry<String, Object> entry : mExtras.entrySet()) {
+    private void parseExtras(List<String> xtras) {
+        for (Map.Entry<String, Object> entry : extras.entrySet()) {
             String key = entry.getKey();
             Object val = entry.getValue();
-            if(val == null) {
-                extras.add("--esn");
-                extras.add(key);
+            if (val == null) {
+                xtras.add("--esn");
+                xtras.add(key);
             }
-            else if(val instanceof String) {
-                extras.add("--es");
-                extras.add(key);
-                extras.add(val.toString());
+            else if (val instanceof String) {
+                xtras.add("--es");
+                xtras.add(key);
+                xtras.add(val.toString());
             }
-            else if(val instanceof Boolean) {
-                extras.add("--ez");
-                extras.add(key);
-                extras.add(val.toString());
+            else if (val instanceof Boolean) {
+                xtras.add("--ez");
+                xtras.add(key);
+                xtras.add(val.toString());
             }
-            else if(val instanceof Integer) {
-                extras.add("--ei");
-                extras.add(key);
-                extras.add(val.toString());
+            else if (val instanceof Integer) {
+                xtras.add("--ei");
+                xtras.add(key);
+                xtras.add(val.toString());
             }
-            else if(val instanceof Long) {
-                extras.add("--el");
-                extras.add(key);
-                extras.add(val.toString());
+            else if (val instanceof Long) {
+                xtras.add("--el");
+                xtras.add(key);
+                xtras.add(val.toString());
             }
-            else if(val instanceof Float) {
-                extras.add("--ef");
-                extras.add(key);
-                extras.add(val.toString());
+            else if (val instanceof Float) {
+                xtras.add("--ef");
+                xtras.add(key);
+                xtras.add(val.toString());
             }
-            else if(val instanceof Component) {
-                extras.add("--ecn");
-                extras.add(key);
-                extras.add(val.toString());
+            else if (val instanceof Component) {
+                xtras.add("--ecn");
+                xtras.add(key);
+                xtras.add(val.toString());
             }
-            else if(val instanceof Integer[]) {
-                extras.add("--eia");
-                extras.add(key);
+            else if (val instanceof Integer[]) {
+                xtras.add("--eia");
+                xtras.add(key);
                 Integer[] ints = (Integer[])val;
                 StringBuilder builder = new StringBuilder(ints[0].toString());
-                for(int i = 1; i < ints.length; i++) {
+                for (int i = 1; i < ints.length; i++) {
                     builder.append(",").append(ints[i]);
                 }
-                extras.add(builder.toString());
+                xtras.add(builder.toString());
             }
-            else if(val instanceof Long[]) {
-                extras.add("--ela");
-                extras.add(key);
+            else if (val instanceof Long[]) {
+                xtras.add("--ela");
+                xtras.add(key);
                 Long[] longs = (Long[])val;
                 StringBuilder builder = new StringBuilder(longs[0].toString());
-                for(int i = 1; i < longs.length; i++) {
+                for (int i = 1; i < longs.length; i++) {
                     builder.append(",").append(longs[i].toString());
                 }
-                extras.add(builder.toString());
+                xtras.add(builder.toString());
             }
-            else if(val instanceof Float[]) {
-                extras.add("--efa");
-                extras.add(key);
+            else if (val instanceof Float[]) {
+                xtras.add("--efa");
+                xtras.add(key);
                 Float[] floats = (Float[])val;
                 StringBuilder builder = new StringBuilder(floats[0].toString());
-                for(int i = 1; i < floats.length; i++) {
+                for (int i = 1; i < floats.length; i++) {
                     builder.append(",").append(floats[i].toString());
                 }
-                extras.add(builder.toString());
+                xtras.add(builder.toString());
             }
-            else if(val instanceof String[]) {
-                extras.add("--efa");
-                extras.add(key);
+            else if (val instanceof String[]) {
+                xtras.add("--efa");
+                xtras.add(key);
                 String[] strings = (String[])val;
                 StringBuilder builder = new StringBuilder(strings[0]);
-                for(int i = 1; i < strings.length; i++) {
+                for (int i = 1; i < strings.length; i++) {
                     //TODO escape commas
                     builder.append(",").append(strings[i]);
                 }
-                extras.add(builder.toString());
+                xtras.add(builder.toString());
             }
-            else if(val instanceof List) {
+            else if (val instanceof List) {
                 String flag = null;
                 List vals = (List)val;
                 Object o = vals.get(0);
@@ -673,89 +671,89 @@ public class Intent {
                     flag = "--efal";
                 }
                 StringBuilder builder = new StringBuilder(o.toString());
-                for(Object obj : (List)val) {
+                for (Object obj : (List)val) {
                     //TODO escape commas
                     builder.append(",").append(obj.toString());
                 }
-                extras.add(flag);
-                extras.add(key);
-                extras.add(builder.toString());
+                xtras.add(flag);
+                xtras.add(key);
+                xtras.add(builder.toString());
             }
         }
     }
 
-    private void parseFlags(List<String> flags) {
-        if((mFlags & FLAG_GRANT_READ_URI_PERMISSION) != 0) {
-            flags.add("--grant-read-uri-permission");
+    private void parseFlags(List<String> f) {
+        if ((flags & FLAG_GRANT_READ_URI_PERMISSION) != 0) {
+            f.add("--grant-read-uri-permission");
         }
-        if((mFlags & FLAG_GRANT_WRITE_URI_PERMISSION) != 0) {
-            flags.add("--grant-write-uri-permission");
+        if ((flags & FLAG_GRANT_WRITE_URI_PERMISSION) != 0) {
+            f.add("--grant-write-uri-permission");
         }
-        if((mFlags & FLAG_GRANT_PERSISTABLE_URI_PERMISSION) != 0) {
-            flags.add("--grant-persistable-uri-permission");
+        if ((flags & FLAG_GRANT_PERSISTABLE_URI_PERMISSION) != 0) {
+            f.add("--grant-persistable-uri-permission");
         }
-        if((mFlags & FLAG_GRANT_PREFIX_URI_PERMISSION) != 0) {
-            flags.add("--grant-prefix-uri-permission");
+        if ((flags & FLAG_GRANT_PREFIX_URI_PERMISSION) != 0) {
+            f.add("--grant-prefix-uri-permission");
         }
-        if((mFlags & FLAG_EXCLUDE_STOPPED_PACKAGES) != 0) {
-            flags.add("--exclude-stopped-packages");
+        if ((flags & FLAG_EXCLUDE_STOPPED_PACKAGES) != 0) {
+            f.add("--exclude-stopped-packages");
         }
-        if((mFlags & FLAG_INCLUDE_STOPPED_PACKAGES) != 0) {
-            flags.add("--include-stopped-packages");
+        if ((flags & FLAG_INCLUDE_STOPPED_PACKAGES) != 0) {
+            f.add("--include-stopped-packages");
         }
-        if((mFlags & FLAG_DEBUG_LOG_RESOLUTION) != 0) {
-            flags.add("--debug-log-resolution");
+        if ((flags & FLAG_DEBUG_LOG_RESOLUTION) != 0) {
+            f.add("--debug-log-resolution");
         }
-        if((mFlags & FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
-            flags.add("--activity-brought-to-front");
+        if ((flags & FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
+            f.add("--activity-brought-to-front");
         }
-        if((mFlags & FLAG_ACTIVITY_CLEAR_TOP) != 0) {
-            flags.add("--activity-clear-top");
+        if ((flags & FLAG_ACTIVITY_CLEAR_TOP) != 0) {
+            f.add("--activity-clear-top");
         }
-        if((mFlags & FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET) != 0) {
-            flags.add("--activity-clear-when-task-reset");
+        if ((flags & FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET) != 0) {
+            f.add("--activity-clear-when-task-reset");
         }
-        if((mFlags & FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS) != 0) {
-            flags.add("--activity-exclude-from-recents");
+        if ((flags & FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS) != 0) {
+            f.add("--activity-exclude-from-recents");
         }
-        if((mFlags & FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0) {
-            flags.add("--activity-launched-from-history");
+        if ((flags & FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0) {
+            f.add("--activity-launched-from-history");
         }
-        if((mFlags & FLAG_ACTIVITY_MULTIPLE_TASK) != 0) {
-            flags.add("--activity-multiple-task");
+        if ((flags & FLAG_ACTIVITY_MULTIPLE_TASK) != 0) {
+            f.add("--activity-multiple-task");
         }
-        if((mFlags & FLAG_ACTIVITY_NO_ANIMATION) != 0) {
-            flags.add("--activity-no-animation");
+        if ((flags & FLAG_ACTIVITY_NO_ANIMATION) != 0) {
+            f.add("--activity-no-animation");
         }
-        if((mFlags & FLAG_ACTIVITY_NO_HISTORY) != 0) {
-            flags.add("--activity-no-history");
+        if ((flags & FLAG_ACTIVITY_NO_HISTORY) != 0) {
+            f.add("--activity-no-history");
         }
-        if((mFlags & FLAG_ACTIVITY_NO_USER_ACTION) != 0) {
-            flags.add("--activity-no-user-action");
+        if ((flags & FLAG_ACTIVITY_NO_USER_ACTION) != 0) {
+            f.add("--activity-no-user-action");
         }
-        if((mFlags & FLAG_ACTIVITY_PREVIOUS_IS_TOP) != 0) {
-            flags.add("--activity-previous-is-top");
+        if ((flags & FLAG_ACTIVITY_PREVIOUS_IS_TOP) != 0) {
+            f.add("--activity-previous-is-top");
         }
-        if((mFlags & FLAG_ACTIVITY_REORDER_TO_FRONT) != 0) {
-            flags.add("--activity-reorder-to-front");
+        if ((flags & FLAG_ACTIVITY_REORDER_TO_FRONT) != 0) {
+            f.add("--activity-reorder-to-front");
         }
-        if((mFlags & FLAG_ACTIVITY_RESET_TASK_IF_NEEDED) != 0) {
-            flags.add("--activity-reset-task-if-needed");
+        if ((flags & FLAG_ACTIVITY_RESET_TASK_IF_NEEDED) != 0) {
+            f.add("--activity-reset-task-if-needed");
         }
-        if((mFlags & FLAG_ACTIVITY_SINGLE_TOP) != 0) {
-            flags.add("--activity-single-top");
+        if ((flags & FLAG_ACTIVITY_SINGLE_TOP) != 0) {
+            f.add("--activity-single-top");
         }
-        if((mFlags & FLAG_ACTIVITY_CLEAR_TASK) != 0) {
-            flags.add("--activity-clear-task");
+        if ((flags & FLAG_ACTIVITY_CLEAR_TASK) != 0) {
+            f.add("--activity-clear-task");
         }
-        if((mFlags & FLAG_ACTIVITY_TASK_ON_HOME) != 0) {
-            flags.add("--activity-task-on-home");
+        if ((flags & FLAG_ACTIVITY_TASK_ON_HOME) != 0) {
+            f.add("--activity-task-on-home");
         }
-        if((mFlags & FLAG_RECEIVER_REGISTERED_ONLY) != 0) {
-            flags.add("--receiver-registered-only");
+        if ((flags & FLAG_RECEIVER_REGISTERED_ONLY) != 0) {
+            f.add("--receiver-registered-only");
         }
-        if((mFlags & FLAG_RECEIVER_REPLACE_PENDING) != 0) {
-            flags.add("--receiver-replace-pending");
+        if ((flags & FLAG_RECEIVER_REPLACE_PENDING) != 0) {
+            f.add("--receiver-replace-pending");
         }
     }
 }

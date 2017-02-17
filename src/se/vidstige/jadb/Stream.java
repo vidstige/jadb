@@ -25,6 +25,6 @@ public class Stream {
         int v;
         do {
             v = is.read();
-        } while(v >= 0);
+        } while (v >= 0);
     }
 }

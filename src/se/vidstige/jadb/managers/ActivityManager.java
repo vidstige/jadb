@@ -24,7 +24,7 @@ public class ActivityManager {
         List<String> args = new ArrayList<>();
         args.add("broadcast");
         intent.generate(args);
-        if(permission != null) {
+        if (permission != null) {
             args.add("--receiver-permission");
             args.add(permission);
         }

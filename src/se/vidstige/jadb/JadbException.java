@@ -2,6 +2,10 @@ package se.vidstige.jadb;
 
 public class JadbException extends Exception {
 
+    public JadbException(Throwable throwable) {
+        super(throwable);
+    }
+
     public JadbException(String message) {
         super(message);
     }
