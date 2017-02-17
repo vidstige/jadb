@@ -8,7 +8,9 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import se.vidstige.jadb.*;
 import se.vidstige.jadb.managers.BatteryManager;
-import se.vidstige.jadb.managers.KeyInputManager;
+import se.vidstige.jadb.managers.InputManager;
+import se.vidstige.jadb.managers.KeyCode;
+import se.vidstige.jadb.managers.KeyEvent;
 
 import java.io.*;
 
@@ -120,8 +122,8 @@ public class RealDeviceTestCases {
     @Test
     public void testInputScreenOnOff() throws Exception{
         JadbDevice any = jadb.getAnyDevice();
-        KeyInputManager keyInputManager = new KeyInputManager(any);
-        keyInputManager.press(KeyInputManager.KEYCODE_POWER);
+        InputManager inputManager = new InputManager(any);
+        inputManager.sendEvent(KeyEvent.press(KeyCode.KEYCODE_POWER));
     }
 
     @Test
