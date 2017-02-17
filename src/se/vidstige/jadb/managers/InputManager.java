@@ -21,7 +21,6 @@ public class InputManager {
     public void sendEvent(InputEvent event) throws JadbException {
         try (InputStream is = device.executeShell("input", event.buildArgs())) {
             Stream.flushRead(is);
-            is.close();
         } catch (IOException e) {
             throw new JadbException(e.getMessage());
         }

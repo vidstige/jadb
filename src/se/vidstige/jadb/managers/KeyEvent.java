@@ -1,5 +1,7 @@
 package se.vidstige.jadb.managers;
 
+import java.util.ArrayList;
+
 /**
  * Author: pablobaxter.
  */
@@ -19,16 +21,13 @@ public class KeyEvent extends InputEvent {
 
     @Override
     protected String[] buildArgs() {
-        String[] args = new String[longPress ? 3 : 2];
-        args[0] = "keyevent";
+        ArrayList<String> args = new ArrayList<>();
+        args.add("keyevent");
         if(longPress) {
-            args[1] = "--longpress";
-            args[2] = key.toString();
+           args.add("--longpress");
         }
-        else {
-            args[1] = key.toString();
-        }
-        return args;
+        args.add(key.toString());
+        return args.toArray(new String[args.size()]);
     }
 
     public static KeyEvent press(KeyCode key) {
