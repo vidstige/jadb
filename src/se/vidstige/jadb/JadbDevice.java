@@ -71,7 +71,9 @@ public class JadbDevice {
         return state;
     }
 
-    /** Execute a shell command.
+    /** <p>Execute a shell command.</p>
+     *
+     * <p>For Lollipop and later see: {@link #execute(String, String...)}</p>
      *
      * @param command main command to run. E.g. "ls"
      * @param args arguments to the command.
@@ -81,11 +83,7 @@ public class JadbDevice {
      */
     public InputStream executeShell(String command, String... args) throws IOException, JadbException {
         Transport transport = getTransport();
-        StringBuilder shellLine = new StringBuilder(command);
-        for (String arg : args) {
-            shellLine.append(" ");
-            shellLine.append(Bash.quote(arg));
-        }
+        StringBuilder shellLine = buildCmdLine(command, args);
         send(transport, "shell:" + shellLine.toString());
         return new AdbFilterInputStream(new BufferedInputStream(transport.getInputStream()));
     }
@@ -98,11 +96,7 @@ public class JadbDevice {
     @Deprecated
     public void executeShell(OutputStream output, String command, String... args) throws IOException, JadbException {
         Transport transport = getTransport();
-        StringBuilder shellLine = new StringBuilder(command);
-        for (String arg : args) {
-            shellLine.append(" ");
-            shellLine.append(Bash.quote(arg));
-        }
+        StringBuilder shellLine = buildCmdLine(command, args);
         send(transport, "shell:" + shellLine.toString());
         if (output != null) {
         	AdbFilterOutputStream out = new AdbFilterOutputStream(output);
@@ -114,7 +108,11 @@ public class JadbDevice {
         }
     }
 
-    /** Execute a shell command with raw binary output.
+    /** <p>Execute a command with raw binary output.</p>
+     *
+     * <p>Support for this command was added in Lollipop (Android 5.0), and is the recommended way to transmit binary
+     * data with that version or later. For earlier versions of Android, use
+     * {@link #executeShell(String, String...)}.</p>
      *
      * @param command main command to run, e.g. "screencap"
      * @param args arguments to the command, e.g. "-p".
@@ -122,15 +120,27 @@ public class JadbDevice {
      * @throws IOException
      * @throws JadbException
      */
-    public InputStream executeShellRaw(String command, String... args) throws IOException, JadbException {
+    public InputStream execute(String command, String... args) throws IOException, JadbException {
         Transport transport = getTransport();
+        StringBuilder shellLine = buildCmdLine(command, args);
+        send(transport, "exec:" + shellLine.toString());
+        return new BufferedInputStream(transport.getInputStream());
+    }
+
+    /**
+     * Builds a command line string from the command and its arguments.
+     *
+     * @param command the command.
+     * @param args the list of arguments.
+     * @return the command line.
+     */
+    private StringBuilder buildCmdLine(String command, String... args) {
         StringBuilder shellLine = new StringBuilder(command);
         for (String arg : args) {
             shellLine.append(" ");
             shellLine.append(Bash.quote(arg));
         }
-        send(transport, "exec:" + shellLine.toString());
-        return new BufferedInputStream(transport.getInputStream());
+        return shellLine;
     }
 
     public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
