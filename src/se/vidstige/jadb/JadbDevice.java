@@ -85,7 +85,7 @@ public class JadbDevice {
         Transport transport = getTransport();
         StringBuilder shellLine = buildCmdLine(command, args);
         send(transport, "shell:" + shellLine.toString());
-        return new AdbFilterInputStream(new BufferedInputStream(transport.getInputStream()));
+        return new AdbFilterInputStream(transport);
     }
 
     /**

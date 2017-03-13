@@ -13,7 +13,7 @@ public class RemoteFile {
     public long getLastModified() { throw new UnsupportedOperationException(); }
     public boolean isDirectory() { throw new UnsupportedOperationException(); }
 
-    public String getPath() { return path;}
+    public String getPath() { return path; }
 
     @Override
     public boolean equals(Object o) {

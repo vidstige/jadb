@@ -1,12 +1,18 @@
 package se.vidstige.jadb;
 
+import java.io.BufferedInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 public class AdbFilterInputStream extends FilterInputStream {
+
+    AdbFilterInputStream(Transport transport) {
+        this(transport.getInputStream());
+    }
+
     public AdbFilterInputStream(InputStream inputStream) {
-        super(inputStream);
+        super(new BufferedInputStream(inputStream));
     }
 
     @Override
@@ -43,5 +49,10 @@ public class AdbFilterInputStream extends FilterInputStream {
     @Override
     public int read(byte[] buffer) throws IOException {
         return read(buffer, 0, buffer.length);
+    }
+
+    @Override
+    public void close() throws IOException {
+        super.close();
     }
 }

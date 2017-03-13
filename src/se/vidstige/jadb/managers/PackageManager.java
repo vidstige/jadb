@@ -48,8 +48,9 @@ public class PackageManager {
     }
 
     public void remove(RemoteFile file) throws IOException, JadbException {
-        InputStream s = device.executeShell("rm", "-f", Bash.quote(file.getPath()));
-        Stream.readAll(s, Charset.forName("UTF-8"));
+        try (InputStream stream = device.executeShell("rm", "-f", Bash.quote(file.getPath()))) {
+            Stream.flushRead(stream);
+        }
     }
 
     private void install(File apkFile, List<String> extraArguments) throws IOException, JadbException {
@@ -63,10 +64,12 @@ public class PackageManager {
         String result = Stream.readAll(s, Charset.forName("UTF-8"));
         remove(remote);
         verifyOperation("install", apkFile.getName(), result);
+        s.close();
     }
 
     public void install(File apkFile) throws IOException, JadbException {
         install(apkFile, new ArrayList<String>(0));
+
     }
 
     public void installWithOptions(File apkFile, List<? extends InstallOption> options) throws IOException, JadbException {
@@ -86,11 +89,13 @@ public class PackageManager {
         InputStream s = device.executeShell("pm", "uninstall", name.toString());
         String result = Stream.readAll(s, Charset.forName("UTF-8"));
         verifyOperation("uninstall", name.toString(), result);
+        s.close();
     }
 
     public void launch(Package name) throws IOException, JadbException {
-        InputStream s = device.executeShell("monkey", "-p", name.toString(), "-c", "android.intent.category.LAUNCHER", "1");
-        s.close();
+        try (InputStream stream = device.executeShell("monkey", "-p", name.toString(), "-c", "android.intent.category.LAUNCHER", "1")) {
+            Stream.flushRead(stream);
+        }
     }
 
     //<editor-fold desc="InstallOption">

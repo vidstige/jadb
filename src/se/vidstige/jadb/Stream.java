@@ -20,4 +20,11 @@ public class Stream {
         Stream.copy(input, tmp);
         return new String(tmp.toByteArray(), charset);
     }
+
+    public static void flushRead(InputStream is) throws IOException {
+        int v;
+        do {
+            v = is.read();
+        } while (v >= 0);
+    }
 }
