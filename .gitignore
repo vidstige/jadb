@@ -4,39 +4,34 @@
 ################
 #   IntelliJ   #
 ################
-/.idea/workspace.xml
-/.idea/tasks.xml
-
+/.idea/
+*.iml
 
 #############
 #   Maven   #
 #############
-.idea/workspace.xml
-.idea/libraries
-out/
-target/
-
+/target/
+/out/
 
 #################
 ## Eclipse
 #################
-
 *.pydevproject
 #.project
 .metadata
-bin/
-tmp/
+/bin/
+/tmp/
 *.tmp
 *.bak
 *.swp
 *~.nib
 local.properties
 #.classpath
-.settings/
+/.settings/
 .loadpath
 
 # External tool builders
-.externalToolBuilders/
+/.externalToolBuilders/
 
 # Locally stored "Eclipse launch configurations"
 *.launch
@@ -51,7 +46,6 @@ local.properties
 #####################
 ## Windows detritus #
 #####################
-
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
@@ -60,7 +54,7 @@ ehthumbs.db
 Desktop.ini
 
 # Recycle Bin used on file shares
-$RECYCLE.BIN/
+/$RECYCLE.BIN/
 
 #################
 ## Mac detritus #

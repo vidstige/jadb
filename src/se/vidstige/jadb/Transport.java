@@ -7,10 +7,12 @@ import java.nio.charset.Charset;
 class Transport {
 
     private final OutputStream outputStream;
+    private final OutputStreamWriter writer;
     private final InputStream inputStream;
 
     private Transport(OutputStream outputStream, InputStream inputStream) {
         this.outputStream = outputStream;
+        this.writer = new OutputStreamWriter(outputStream);
         this.inputStream = inputStream;
     }
 
@@ -52,7 +54,6 @@ class Transport {
     }
 
     public void send(String command) throws IOException {
-        OutputStreamWriter writer = new OutputStreamWriter(outputStream);
         writer.write(getCommandLength(command));
         writer.write(command);
         writer.flush();
@@ -66,6 +67,7 @@ class Transport {
 
     public void close() throws IOException {
         inputStream.close();
+        writer.close();
         outputStream.close();
     }
 }
