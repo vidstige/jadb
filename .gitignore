@@ -6,13 +6,15 @@
 ################
 /.idea/workspace.xml
 /.idea/tasks.xml
+/.idea/libraries
+jadb.iml
+/.idea/compiler.xml
+/.idea/uiDesigner.xml
 
 
 #############
 #   Maven   #
 #############
-.idea/workspace.xml
-.idea/libraries
 out/
 target/
 
