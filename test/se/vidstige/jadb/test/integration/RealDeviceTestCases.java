@@ -7,6 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import se.vidstige.jadb.*;
+import se.vidstige.jadb.entities.TcpAddressEntity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -116,5 +117,11 @@ public class RealDeviceTestCases {
         }  finally {
             if (outputStream != null) outputStream.close();
         }
+    }
+
+
+    @Test
+    public void testConnectionToTcpDevice() throws IOException, JadbException, ConnectionToRemoteDeviceException {
+        TcpAddressEntity tcpAddressEntity = jadb.connectToTcpDevice(new TcpAddressEntity("127.0.0.1", 10001));
     }
 }
