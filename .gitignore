@@ -4,15 +4,13 @@
 ################
 #   IntelliJ   #
 ################
-/.idea/workspace.xml
-/.idea/tasks.xml
+/.idea/*
+jadb.iml
 
 
 #############
 #   Maven   #
 #############
-.idea/workspace.xml
-.idea/libraries
 out/
 target/
 

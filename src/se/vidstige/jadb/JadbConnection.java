@@ -1,6 +1,8 @@
 package se.vidstige.jadb;
 
+
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,26 @@ public class JadbConnection implements ITransportFactory {
         String version = main.readString();
         main.close();
         return version;
+    }
+
+    public InetSocketAddress connectToTcpDevice(InetSocketAddress inetSocketAddress)
+            throws IOException, JadbException, ConnectionToRemoteDeviceException {
+        Transport transport = createTransport();
+        try {
+            return new HostConnectToRemoteTcpDevice(transport).connect(inetSocketAddress);
+        } finally {
+            transport.close();
+        }
+    }
+
+    public InetSocketAddress disconnectFromTcpDevice(InetSocketAddress tcpAddressEntity)
+            throws IOException, JadbException, ConnectionToRemoteDeviceException {
+        Transport transport = createTransport();
+        try {
+            return new HostDisconnectFromRemoteTcpDevice(transport).disconnect(tcpAddressEntity);
+        } finally {
+            transport.close();
+        }
     }
 
     public List<JadbDevice> getDevices() throws IOException, JadbException {
