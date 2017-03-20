@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class FakeAdbServer implements AdbResponder {
     private final AdbServer server;
-    private List<DeviceResponder> devices = new ArrayList<DeviceResponder>();
+    private final List<DeviceResponder> devices = new ArrayList<DeviceResponder>();
 
     public FakeAdbServer(int port) {
         server = new AdbServer(this, port);
