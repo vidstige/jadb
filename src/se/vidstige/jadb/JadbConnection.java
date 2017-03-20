@@ -46,11 +46,11 @@ public class JadbConnection implements ITransportFactory {
         }
     }
 
-    public TcpAddressEntity connectFromTcpDevice(TcpAddressEntity tcpAddressEntity)
+    public TcpAddressEntity disconnectFromTcpDevice(TcpAddressEntity tcpAddressEntity)
             throws IOException, JadbException, ConnectionToRemoteDeviceException {
         Transport transport = createTransport();
         try {
-            return new HostConnectToRemoteTcpDevice(transport).connect(tcpAddressEntity);
+            return new HostDisconnectFromRemoteTcpDevice(transport).disconnect(tcpAddressEntity);
         } finally {
             transport.close();
         }

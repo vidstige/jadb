@@ -4,24 +4,24 @@ import se.vidstige.jadb.entities.TcpAddressEntity;
 
 import java.io.IOException;
 
-class HostConnectToRemoteTcpDevice {
+public class HostDisconnectFromRemoteTcpDevice {
     private final Transport transport;
     private final ResponseValidator responseValidator;
 
-    HostConnectToRemoteTcpDevice(Transport transport) {
+    public HostDisconnectFromRemoteTcpDevice(Transport transport) {
         this.transport = transport;
         this.responseValidator = new ResponseValidatorImp();
     }
 
     //Visible for testing
-    HostConnectToRemoteTcpDevice(Transport transport, ResponseValidator responseValidator) {
+    HostDisconnectFromRemoteTcpDevice(Transport transport, ResponseValidator responseValidator) {
         this.transport = transport;
         this.responseValidator = responseValidator;
     }
 
-    TcpAddressEntity connect(TcpAddressEntity tcpAddressEntity)
+    public TcpAddressEntity disconnect(TcpAddressEntity tcpAddressEntity)
             throws IOException, JadbException, ConnectionToRemoteDeviceException {
-        transport.send(String.format("host:connect:%s:%d", tcpAddressEntity.getHost(), tcpAddressEntity.getPort()));
+        transport.send(String.format("host:disconnect:%s:%d", tcpAddressEntity.getHost(), tcpAddressEntity.getPort()));
         verifyTransportLevel();
         verifyProtocolLevel();
 
@@ -43,11 +43,11 @@ class HostConnectToRemoteTcpDevice {
     }
 
     final static class ResponseValidatorImp implements ResponseValidator {
-        private final static String SUCCESSFULLY_CONNECTED = "connected to";
-        private final static String ALREADY_CONNECTED = "already connected to";
+        private final static String SUCCESSFULLY_DISCONNECTED = "disconnected";
+        private final static String ALREADY_DISCONNECTED = "error: no such device";
 
 
-        ResponseValidatorImp() {
+        public ResponseValidatorImp() {
         }
 
         public void validate(String response) throws ConnectionToRemoteDeviceException {
@@ -57,11 +57,11 @@ class HostConnectToRemoteTcpDevice {
         }
 
         private boolean checkIfConnectedSuccessfully(String response)  {
-            return response.startsWith(SUCCESSFULLY_CONNECTED);
+            return response.startsWith(SUCCESSFULLY_DISCONNECTED);
         }
 
         private boolean checkIfAlreadyConnected(String response)  {
-            return response.startsWith(ALREADY_CONNECTED);
+            return response.startsWith(ALREADY_DISCONNECTED);
         }
 
         private String extractError(String response) {

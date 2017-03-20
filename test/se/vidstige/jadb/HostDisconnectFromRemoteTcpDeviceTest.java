@@ -5,25 +5,25 @@ import se.vidstige.jadb.entities.TcpAddressEntity;
 
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class HostConnectToRemoteTcpDeviceTest {
+public class HostDisconnectFromRemoteTcpDeviceTest {
 
     @Test
     public void testNormalConnection() throws ConnectionToRemoteDeviceException, IOException, JadbException {
         //Prepare
         Transport transport = mock(Transport.class);
-        when(transport.readString()).thenReturn("connected to host:1");
+        when(transport.readString()).thenReturn("disconnected host:1");
 
         TcpAddressEntity tcpAddressEntity = new TcpAddressEntity("host", 1);
 
         //Do
-        HostConnectToRemoteTcpDevice hostConnectToRemoteTcpDevice = new HostConnectToRemoteTcpDevice(transport);
-        TcpAddressEntity resultTcpAddressEntity = hostConnectToRemoteTcpDevice.connect(tcpAddressEntity);
+        HostDisconnectFromRemoteTcpDevice hostConnectToRemoteTcpDevice = new HostDisconnectFromRemoteTcpDevice(transport);
+        TcpAddressEntity resultTcpAddressEntity = hostConnectToRemoteTcpDevice.disconnect(tcpAddressEntity);
 
         //Validate
         assertEquals(resultTcpAddressEntity, tcpAddressEntity);
@@ -38,37 +38,37 @@ public class HostConnectToRemoteTcpDeviceTest {
         TcpAddressEntity tcpAddressEntity = new TcpAddressEntity("host", 1);
 
         //Do
-        HostConnectToRemoteTcpDevice hostConnectToRemoteTcpDevice = new HostConnectToRemoteTcpDevice(transport);
-        hostConnectToRemoteTcpDevice.connect(tcpAddressEntity);
+        HostDisconnectFromRemoteTcpDevice hostConnectToRemoteTcpDevice = new HostDisconnectFromRemoteTcpDevice(transport);
+        hostConnectToRemoteTcpDevice.disconnect(tcpAddressEntity);
     }
 
     @Test(expected = ConnectionToRemoteDeviceException.class)
     public void testProtocolException() throws ConnectionToRemoteDeviceException, IOException, JadbException {
         //Prepare
         Transport transport = mock(Transport.class);
-        when(transport.readString()).thenReturn("connected to host:1");
+        when(transport.readString()).thenReturn("any string");
         HostConnectToRemoteTcpDevice.ResponseValidator responseValidator = mock(HostConnectToRemoteTcpDevice.ResponseValidator.class);
         doThrow(new ConnectionToRemoteDeviceException("Fake exception")).when(responseValidator).validate(anyString());
 
         TcpAddressEntity tcpAddressEntity = new TcpAddressEntity("host", 1);
 
         //Do
-        HostConnectToRemoteTcpDevice hostConnectToRemoteTcpDevice = new HostConnectToRemoteTcpDevice(transport, responseValidator);
-        hostConnectToRemoteTcpDevice.connect(tcpAddressEntity);
+        HostDisconnectFromRemoteTcpDevice hostConnectToRemoteTcpDevice = new HostDisconnectFromRemoteTcpDevice(transport);
+        hostConnectToRemoteTcpDevice.disconnect(tcpAddressEntity);
     }
 
     @Test
     public void testProtocolResponseValidatorSuccessfullyConnected() throws ConnectionToRemoteDeviceException, IOException, JadbException {
-       new HostConnectToRemoteTcpDevice.ResponseValidatorImp().validate("connected to host:1");
+       new HostDisconnectFromRemoteTcpDevice.ResponseValidatorImp().validate("disconnected 127.0.0.1:10001");
     }
 
     @Test
     public void testProtocolResponseValidatorAlreadyConnected() throws ConnectionToRemoteDeviceException, IOException, JadbException {
-        new HostConnectToRemoteTcpDevice.ResponseValidatorImp().validate("already connected to host:1");
+        new HostDisconnectFromRemoteTcpDevice.ResponseValidatorImp().validate("error: no such device '127.0.0.1:10001'");
     }
 
     @Test(expected = ConnectionToRemoteDeviceException.class)
     public void testProtocolResponseValidatorErrorInValidate() throws ConnectionToRemoteDeviceException, IOException, JadbException {
-        new HostConnectToRemoteTcpDevice.ResponseValidatorImp().validate("some error occurred");
+        new HostDisconnectFromRemoteTcpDevice.ResponseValidatorImp().validate("some error occurred");
     }
 }

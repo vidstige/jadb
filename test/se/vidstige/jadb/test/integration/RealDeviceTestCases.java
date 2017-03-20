@@ -123,13 +123,39 @@ public class RealDeviceTestCases {
         }
     }
 
-
+    /**
+     * This test requires emulator running on non-standard tcp port - this may be achieve by executing such command:
+     * ${ANDROID_HOME}/emulator -verbose -avd ${NAME} -ports 10000,10001
+     *
+     * @throws IOException
+     * @throws JadbException
+     * @throws ConnectionToRemoteDeviceException
+     */
     @Test
     public void testConnectionToTcpDevice() throws IOException, JadbException, ConnectionToRemoteDeviceException {
-        TcpAddressEntity tcpAddressEntity = jadb.connectToTcpDevice(new TcpAddressEntity("127.0.0.1", 10001));
+        jadb.connectToTcpDevice(new TcpAddressEntity("127.0.0.1", 10001));
         List<JadbDevice> devices = jadb.getDevices();
 
         assertNotNull(devices);
         assertFalse(devices.isEmpty());
+    }
+
+    /**
+     * @see #testConnectionToTcpDevice()
+     *
+     * @throws IOException
+     * @throws JadbException
+     * @throws ConnectionToRemoteDeviceException
+     */
+    @Test
+    public void testDisconnectionToTcpDevice() throws IOException, JadbException, ConnectionToRemoteDeviceException {
+        testConnectionToTcpDevice();
+
+        jadb.disconnectFromTcpDevice(new TcpAddressEntity("127.0.0.1", 10001));
+        jadb.getDevices();
+
+        List<JadbDevice> devices = jadb.getDevices();
+        assertNotNull(devices);
+        assertTrue(devices.isEmpty());
     }
 }
