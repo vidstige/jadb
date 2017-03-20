@@ -16,6 +16,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 public class RealDeviceTestCases {
 
     private JadbConnection jadb;
@@ -123,5 +127,9 @@ public class RealDeviceTestCases {
     @Test
     public void testConnectionToTcpDevice() throws IOException, JadbException, ConnectionToRemoteDeviceException {
         TcpAddressEntity tcpAddressEntity = jadb.connectToTcpDevice(new TcpAddressEntity("127.0.0.1", 10001));
+        List<JadbDevice> devices = jadb.getDevices();
+
+        assertNotNull(devices);
+        assertFalse(devices.isEmpty());
     }
 }

@@ -30,6 +30,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.target>1.7</maven.compiler.target>
         <maven.compiler.source>1.7</maven.compiler.source>
+        <mockito-core.version>2.7.17</mockito-core.version>
     </properties>
 
     <dependencies>
@@ -40,11 +41,11 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito-core.version}</version>
         </dependency>
     </dependencies>
 
@@ -121,7 +122,7 @@
                         <include>**/*.java</include>
                     </includes>
                     <excludes>
-                        <!--Integration tests -->
+                        <!--Exclude integration tests -->
                         <exclude>se.vidstige.jadb.test.integration.*</exclude>
                         <!--Mocks and data-->
                         <exclude>**/data/*</exclude>
@@ -138,8 +139,8 @@
                         <include>**/*.java</include>
                     </includes>
                     <excludes>
-                        <!--Integration tests -->
-                        <exclude>se.vidstige.jadb.test.unit.*</exclude>
+                        <!--Include only integration tests -->
+                        <include>se.vidstige.jadb.test.integration.*</include>
                         <!--Mocks and data-->
                         <exclude>**/data/*</exclude>
                         <exclude>**/fakes/*</exclude>
