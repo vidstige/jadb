@@ -8,7 +8,7 @@ public class HostDisconnectFromRemoteTcpDevice {
     private final Transport transport;
     private final ResponseValidator responseValidator;
 
-    public HostDisconnectFromRemoteTcpDevice(Transport transport) {
+    HostDisconnectFromRemoteTcpDevice(Transport transport) {
         this.transport = transport;
         this.responseValidator = new ResponseValidatorImp();
     }
@@ -19,7 +19,7 @@ public class HostDisconnectFromRemoteTcpDevice {
         this.responseValidator = responseValidator;
     }
 
-    public TcpAddressEntity disconnect(TcpAddressEntity tcpAddressEntity)
+    TcpAddressEntity disconnect(TcpAddressEntity tcpAddressEntity)
             throws IOException, JadbException, ConnectionToRemoteDeviceException {
         transport.send(String.format("host:disconnect:%s:%d", tcpAddressEntity.getHost(), tcpAddressEntity.getPort()));
         verifyTransportLevel();
@@ -47,26 +47,26 @@ public class HostDisconnectFromRemoteTcpDevice {
         private final static String ALREADY_DISCONNECTED = "error: no such device";
 
 
-        public ResponseValidatorImp() {
+        ResponseValidatorImp() {
         }
 
         public void validate(String response) throws ConnectionToRemoteDeviceException {
-            if(!checkIfConnectedSuccessfully(response) && !checkIfAlreadyConnected(response)) {
+            if (!checkIfConnectedSuccessfully(response) && !checkIfAlreadyConnected(response)) {
                 throw new ConnectionToRemoteDeviceException(extractError(response));
             }
         }
 
-        private boolean checkIfConnectedSuccessfully(String response)  {
+        private boolean checkIfConnectedSuccessfully(String response) {
             return response.startsWith(SUCCESSFULLY_DISCONNECTED);
         }
 
-        private boolean checkIfAlreadyConnected(String response)  {
+        private boolean checkIfAlreadyConnected(String response) {
             return response.startsWith(ALREADY_DISCONNECTED);
         }
 
         private String extractError(String response) {
             int lastColon = response.lastIndexOf(":");
-            if(lastColon != -1) {
+            if (lastColon != -1) {
                 return response.substring(lastColon, response.length());
             } else {
                 return response;

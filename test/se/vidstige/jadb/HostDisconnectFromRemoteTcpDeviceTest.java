@@ -47,19 +47,19 @@ public class HostDisconnectFromRemoteTcpDeviceTest {
         //Prepare
         Transport transport = mock(Transport.class);
         when(transport.readString()).thenReturn("any string");
-        HostConnectToRemoteTcpDevice.ResponseValidator responseValidator = mock(HostConnectToRemoteTcpDevice.ResponseValidator.class);
+        HostDisconnectFromRemoteTcpDevice.ResponseValidator responseValidator = mock(HostDisconnectFromRemoteTcpDevice.ResponseValidator.class);
         doThrow(new ConnectionToRemoteDeviceException("Fake exception")).when(responseValidator).validate(anyString());
 
         TcpAddressEntity tcpAddressEntity = new TcpAddressEntity("host", 1);
 
         //Do
-        HostDisconnectFromRemoteTcpDevice hostConnectToRemoteTcpDevice = new HostDisconnectFromRemoteTcpDevice(transport);
+        HostDisconnectFromRemoteTcpDevice hostConnectToRemoteTcpDevice = new HostDisconnectFromRemoteTcpDevice(transport, responseValidator);
         hostConnectToRemoteTcpDevice.disconnect(tcpAddressEntity);
     }
 
     @Test
     public void testProtocolResponseValidatorSuccessfullyConnected() throws ConnectionToRemoteDeviceException, IOException, JadbException {
-       new HostDisconnectFromRemoteTcpDevice.ResponseValidatorImp().validate("disconnected 127.0.0.1:10001");
+        new HostDisconnectFromRemoteTcpDevice.ResponseValidatorImp().validate("disconnected 127.0.0.1:10001");
     }
 
     @Test

@@ -51,22 +51,22 @@ class HostConnectToRemoteTcpDevice {
         }
 
         public void validate(String response) throws ConnectionToRemoteDeviceException {
-            if(!checkIfConnectedSuccessfully(response) && !checkIfAlreadyConnected(response)) {
+            if (!checkIfConnectedSuccessfully(response) && !checkIfAlreadyConnected(response)) {
                 throw new ConnectionToRemoteDeviceException(extractError(response));
             }
         }
 
-        private boolean checkIfConnectedSuccessfully(String response)  {
+        private boolean checkIfConnectedSuccessfully(String response) {
             return response.startsWith(SUCCESSFULLY_CONNECTED);
         }
 
-        private boolean checkIfAlreadyConnected(String response)  {
+        private boolean checkIfAlreadyConnected(String response) {
             return response.startsWith(ALREADY_CONNECTED);
         }
 
         private String extractError(String response) {
             int lastColon = response.lastIndexOf(":");
-            if(lastColon != -1) {
+            if (lastColon != -1) {
                 return response.substring(lastColon, response.length());
             } else {
                 return response;
