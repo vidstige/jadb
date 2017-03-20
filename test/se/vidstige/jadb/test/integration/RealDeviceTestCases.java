@@ -7,13 +7,13 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import se.vidstige.jadb.*;
-import se.vidstige.jadb.entities.TcpAddressEntity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetSocketAddress;
 import java.util.List;
 
 import static org.junit.Assert.assertFalse;
@@ -133,7 +133,7 @@ public class RealDeviceTestCases {
      */
     @Test
     public void testConnectionToTcpDevice() throws IOException, JadbException, ConnectionToRemoteDeviceException {
-        jadb.connectToTcpDevice(new TcpAddressEntity("127.0.0.1", 10001));
+        jadb.connectToTcpDevice(new InetSocketAddress("127.0.0.1", 10001));
         List<JadbDevice> devices = jadb.getDevices();
 
         assertNotNull(devices);
@@ -151,7 +151,7 @@ public class RealDeviceTestCases {
     public void testDisconnectionToTcpDevice() throws IOException, JadbException, ConnectionToRemoteDeviceException {
         testConnectionToTcpDevice();
 
-        jadb.disconnectFromTcpDevice(new TcpAddressEntity("127.0.0.1", 10001));
+        jadb.disconnectFromTcpDevice(new InetSocketAddress("127.0.0.1", 10001));
         jadb.getDevices();
 
         List<JadbDevice> devices = jadb.getDevices();

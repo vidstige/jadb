@@ -1,9 +1,9 @@
 package se.vidstige.jadb;
 
 import org.junit.Test;
-import se.vidstige.jadb.entities.TcpAddressEntity;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -19,14 +19,14 @@ public class HostConnectToRemoteTcpDeviceTest {
         Transport transport = mock(Transport.class);
         when(transport.readString()).thenReturn("connected to host:1");
 
-        TcpAddressEntity tcpAddressEntity = new TcpAddressEntity("host", 1);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress("host", 1);
 
         //Do
         HostConnectToRemoteTcpDevice hostConnectToRemoteTcpDevice = new HostConnectToRemoteTcpDevice(transport);
-        TcpAddressEntity resultTcpAddressEntity = hostConnectToRemoteTcpDevice.connect(tcpAddressEntity);
+        InetSocketAddress resultTcpAddressEntity = hostConnectToRemoteTcpDevice.connect(inetSocketAddress);
 
         //Validate
-        assertEquals(resultTcpAddressEntity, tcpAddressEntity);
+        assertEquals(resultTcpAddressEntity, inetSocketAddress);
     }
 
     @Test(expected = JadbException.class)
@@ -35,7 +35,7 @@ public class HostConnectToRemoteTcpDeviceTest {
         Transport transport = mock(Transport.class);
         doThrow(new JadbException("Fake exception")).when(transport).verifyResponse();
 
-        TcpAddressEntity tcpAddressEntity = new TcpAddressEntity("host", 1);
+        InetSocketAddress tcpAddressEntity = new InetSocketAddress("host", 1);
 
         //Do
         HostConnectToRemoteTcpDevice hostConnectToRemoteTcpDevice = new HostConnectToRemoteTcpDevice(transport);
@@ -50,7 +50,7 @@ public class HostConnectToRemoteTcpDeviceTest {
         HostConnectToRemoteTcpDevice.ResponseValidator responseValidator = mock(HostConnectToRemoteTcpDevice.ResponseValidator.class);
         doThrow(new ConnectionToRemoteDeviceException("Fake exception")).when(responseValidator).validate(anyString());
 
-        TcpAddressEntity tcpAddressEntity = new TcpAddressEntity("host", 1);
+        InetSocketAddress tcpAddressEntity = new InetSocketAddress("host", 1);
 
         //Do
         HostConnectToRemoteTcpDevice hostConnectToRemoteTcpDevice = new HostConnectToRemoteTcpDevice(transport, responseValidator);

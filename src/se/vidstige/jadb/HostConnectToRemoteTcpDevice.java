@@ -1,8 +1,7 @@
 package se.vidstige.jadb;
 
-import se.vidstige.jadb.entities.TcpAddressEntity;
-
 import java.io.IOException;
+import java.net.InetSocketAddress;
 
 class HostConnectToRemoteTcpDevice {
     private final Transport transport;
@@ -19,13 +18,13 @@ class HostConnectToRemoteTcpDevice {
         this.responseValidator = responseValidator;
     }
 
-    TcpAddressEntity connect(TcpAddressEntity tcpAddressEntity)
+    InetSocketAddress connect(InetSocketAddress inetSocketAddress)
             throws IOException, JadbException, ConnectionToRemoteDeviceException {
-        transport.send(String.format("host:connect:%s:%d", tcpAddressEntity.getHost(), tcpAddressEntity.getPort()));
+        transport.send(String.format("host:connect:%s:%d", inetSocketAddress.getHostString(), inetSocketAddress.getPort()));
         verifyTransportLevel();
         verifyProtocolLevel();
 
-        return tcpAddressEntity;
+        return inetSocketAddress;
     }
 
     private void verifyTransportLevel() throws IOException, JadbException {

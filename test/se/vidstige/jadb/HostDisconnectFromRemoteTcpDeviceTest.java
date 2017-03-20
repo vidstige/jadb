@@ -1,9 +1,9 @@
 package se.vidstige.jadb;
 
 import org.junit.Test;
-import se.vidstige.jadb.entities.TcpAddressEntity;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -19,14 +19,14 @@ public class HostDisconnectFromRemoteTcpDeviceTest {
         Transport transport = mock(Transport.class);
         when(transport.readString()).thenReturn("disconnected host:1");
 
-        TcpAddressEntity tcpAddressEntity = new TcpAddressEntity("host", 1);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress("host", 1);
 
         //Do
         HostDisconnectFromRemoteTcpDevice hostConnectToRemoteTcpDevice = new HostDisconnectFromRemoteTcpDevice(transport);
-        TcpAddressEntity resultTcpAddressEntity = hostConnectToRemoteTcpDevice.disconnect(tcpAddressEntity);
+        InetSocketAddress resultInetSocketAddress = hostConnectToRemoteTcpDevice.disconnect(inetSocketAddress);
 
         //Validate
-        assertEquals(resultTcpAddressEntity, tcpAddressEntity);
+        assertEquals(inetSocketAddress, resultInetSocketAddress);
     }
 
     @Test(expected = JadbException.class)
@@ -35,11 +35,11 @@ public class HostDisconnectFromRemoteTcpDeviceTest {
         Transport transport = mock(Transport.class);
         doThrow(new JadbException("Fake exception")).when(transport).verifyResponse();
 
-        TcpAddressEntity tcpAddressEntity = new TcpAddressEntity("host", 1);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress("host", 1);
 
         //Do
         HostDisconnectFromRemoteTcpDevice hostConnectToRemoteTcpDevice = new HostDisconnectFromRemoteTcpDevice(transport);
-        hostConnectToRemoteTcpDevice.disconnect(tcpAddressEntity);
+        hostConnectToRemoteTcpDevice.disconnect(inetSocketAddress);
     }
 
     @Test(expected = ConnectionToRemoteDeviceException.class)
@@ -50,11 +50,11 @@ public class HostDisconnectFromRemoteTcpDeviceTest {
         HostDisconnectFromRemoteTcpDevice.ResponseValidator responseValidator = mock(HostDisconnectFromRemoteTcpDevice.ResponseValidator.class);
         doThrow(new ConnectionToRemoteDeviceException("Fake exception")).when(responseValidator).validate(anyString());
 
-        TcpAddressEntity tcpAddressEntity = new TcpAddressEntity("host", 1);
+        InetSocketAddress inetSocketAddress = new InetSocketAddress("host", 1);
 
         //Do
         HostDisconnectFromRemoteTcpDevice hostConnectToRemoteTcpDevice = new HostDisconnectFromRemoteTcpDevice(transport, responseValidator);
-        hostConnectToRemoteTcpDevice.disconnect(tcpAddressEntity);
+        hostConnectToRemoteTcpDevice.disconnect(inetSocketAddress);
     }
 
     @Test

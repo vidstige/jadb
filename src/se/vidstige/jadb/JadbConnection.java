@@ -1,8 +1,8 @@
 package se.vidstige.jadb;
 
-import se.vidstige.jadb.entities.TcpAddressEntity;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,17 +36,17 @@ public class JadbConnection implements ITransportFactory {
         return version;
     }
 
-    public TcpAddressEntity connectToTcpDevice(TcpAddressEntity tcpAddressEntity)
+    public InetSocketAddress connectToTcpDevice(InetSocketAddress inetSocketAddress)
             throws IOException, JadbException, ConnectionToRemoteDeviceException {
         Transport transport = createTransport();
         try {
-            return new HostConnectToRemoteTcpDevice(transport).connect(tcpAddressEntity);
+            return new HostConnectToRemoteTcpDevice(transport).connect(inetSocketAddress);
         } finally {
             transport.close();
         }
     }
 
-    public TcpAddressEntity disconnectFromTcpDevice(TcpAddressEntity tcpAddressEntity)
+    public InetSocketAddress disconnectFromTcpDevice(InetSocketAddress tcpAddressEntity)
             throws IOException, JadbException, ConnectionToRemoteDeviceException {
         Transport transport = createTransport();
         try {
