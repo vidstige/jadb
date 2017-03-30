@@ -10,9 +10,25 @@ public class AdbServerLauncher {
     private final String executable;
     private Subprocess subprocess;
 
+    /**
+     * Creates a new launcher loading ADB from the environment.
+     * 
+     * @param subprocess the sub-process.
+     * @param environment the environment to use to locate the ADB executable.
+     */
     public AdbServerLauncher(Subprocess subprocess, Map<String, String> environment) {
+        this(subprocess, findAdbExecutable(environment));
+    }
+
+    /**
+     * Creates a new launcher with the specified ADB.
+     *
+     * @param subprocess the sub-process.
+     * @param executable the location of the ADB executable.
+     */
+    public AdbServerLauncher(Subprocess subprocess, String executable) {
         this.subprocess = subprocess;
-        this.executable = findAdbExecutable(environment);
+        this.executable = executable;
     }
 
     private static String findAdbExecutable(Map<String, String> environment) {
