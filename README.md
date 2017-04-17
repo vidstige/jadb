@@ -1,4 +1,4 @@
-#JADB#
+# JADB #
 ADB client implemented in pure Java.
 
 The Android Debug Bridge or ADB for short it a client-server architecture used to install android apps from an IDE or command line and to debug apps, etc.
