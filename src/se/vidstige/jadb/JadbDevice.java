@@ -11,6 +11,7 @@ public class JadbDevice {
         Unknown,
         Offline,
         Device,
+        Recovery,
         BootLoader
     };
 
@@ -36,6 +37,7 @@ public class JadbDevice {
             case "device":     return State.Device;
             case "offline":    return State.Offline;
             case "bootloader": return State.BootLoader;
+            case "recovery":   return State.Recovery;
             default:           return State.Unknown;
         }
     }
