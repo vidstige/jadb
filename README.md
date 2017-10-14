@@ -9,7 +9,7 @@ This projects aims at providing an up to date implementation of the ADB protocol
 
 [![Build Status](https://travis-ci.org/vidstige/jadb.svg?branch=master)](https://travis-ci.org/vidstige/jadb)
 [![](https://jitpack.io/v/vidstige/jadb.svg)](https://jitpack.io/#vidstige/jadb)
-[![http://www.firsttimersonly.com/](http://img.shields.io/badge/first--timers--only-friendly-green.svg?style=flat&colorB=FF69B4)
+[![](http://img.shields.io/badge/first--timers--only-friendly-green.svg?style=flat&colorB=FF69B4)](http://www.firsttimersonly.com/)
 
 
 ## Example ##
