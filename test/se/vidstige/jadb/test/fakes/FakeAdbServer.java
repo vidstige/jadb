@@ -152,6 +152,7 @@ public class FakeAdbServer implements AdbResponder {
 
         public void verifyExpectations() {
             org.junit.Assert.assertEquals(0, fileExpectations.size());
+            org.junit.Assert.assertEquals(0, shellExpectations.size());
         }
 
         private class FileExpectation implements ExpectationBuilder {
