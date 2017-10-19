@@ -38,10 +38,12 @@ new PackageManager(device).install(new File("/path/to/my.apk"));
 
 ## Protocol Description ##
 
-An overview of the protocol can be found here: [Overview](https://github.com/cgjones/android-system-core/blob/master/adb/OVERVIEW.TXT)
+An overview of the protocol can be found here: [Overview](https://android.googlesource.com/platform/system/adb/+/master/OVERVIEW.TXT)
 
 A list of the available commands that a ADB Server may accept can be found here:
-[Services](https://github.com/cgjones/android-system-core/blob/master/adb/SERVICES.TXT)
+[Services](https://android.googlesource.com/platform/system/adb/+/master/SERVICES.TXT)
+
+The description for the protocol for transfering files can be found here: [SYNC.TXT](https://android.googlesource.com/platform/system/adb/+/master/SYNC.TXT).
 
 
 ## Using JADB in your application ##
