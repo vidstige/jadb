@@ -92,7 +92,7 @@ supporting jadb with pull requests, issue reports, and great ideas. If _you_ wou
 contribute, please read through [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Authors ##
-Samuel Carlsson <samuel.carlsson@gmai.com>
+Samuel Carlsson <samuel.carlsson@gmail.com>
 
 See [contributors](https://github.com/vidstige/jadb/graphs/contributors) for a full list.
 
