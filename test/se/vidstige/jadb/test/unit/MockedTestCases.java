@@ -104,11 +104,17 @@ public class MockedTestCases {
     }
 
     @Test
-    public void testExecuteShellQuotesSpace() throws Exception {
+    public void testExecuteShellQuotesWhitespace() throws Exception {
         server.add("serial-123");
         server.expectShell("serial-123", "ls 'space file'").returns("space file");
+        server.expectShell("serial-123", "echo 'tab\tstring'").returns("tab\tstring");
+        server.expectShell("serial-123", "echo 'newline1\nstring'").returns("newline1\nstring");
+        server.expectShell("serial-123", "echo 'newline2\r\nstring'").returns("newline2\r\nstring");
         JadbDevice device = connection.getDevices().get(0);
         device.executeShell("ls", "space file");
+        device.executeShell("echo", "tab\tstring");
+        device.executeShell("echo", "newline1\nstring");
+        device.executeShell("echo", "newline2\r\nstring");
     }
 
     private long parseDate(String date) throws ParseException {

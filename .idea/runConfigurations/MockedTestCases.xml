@@ -3,9 +3,9 @@
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
     <module name="jadb" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-    <option name="ALTERNATIVE_JRE_PATH" value="" />
-    <option name="PACKAGE_NAME" value="se.vidstige.jadb.test" />
-    <option name="MAIN_CLASS_NAME" value="se.vidstige.jadb.test.MockedTestCases" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <option name="PACKAGE_NAME" value="se.vidstige.jadb.test.unit" />
+    <option name="MAIN_CLASS_NAME" value="se.vidstige.jadb.test.unit.MockedTestCases" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="class" />
     <option name="VM_PARAMETERS" value="-ea" />
