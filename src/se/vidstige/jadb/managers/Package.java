@@ -14,7 +14,16 @@ public class Package {
     public String toString() { return name; }
 
     @Override
-    public boolean equals(Object o) { return name.equals(o); }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Package that = (Package) o;
+
+        if (!name.equals(that.name)) return false;
+
+        return true;
+        }
 
     @Override
     public int hashCode() { return name.hashCode(); }
