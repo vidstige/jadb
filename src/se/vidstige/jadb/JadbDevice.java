@@ -24,7 +24,7 @@ public class JadbDevice {
     }
 
     static JadbDevice createAny(JadbConnection connection) {
-        return new JadbDevice(connection);
+        return new JadbDevice(connection.getTransportFactory());
     }
 
     private JadbDevice(ITransportFactory tFactory) {

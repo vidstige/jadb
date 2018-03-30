@@ -3,32 +3,31 @@ package se.vidstige.jadb;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JadbConnection implements ITransportFactory {
+public class JadbConnection {
 
-    private final String host;
-    private final int port;
-
-    private static final int DEFAULTPORT = 5037;
+    private final ITransportFactory transportFactory;
 
     public JadbConnection() {
-        this("localhost", DEFAULTPORT);
+        this(new SocketTransportFactory());
+    }
+
+    public JadbConnection(ITransportFactory transportFactory) {
+        this.transportFactory = transportFactory;
     }
 
     public JadbConnection(String host, int port) {
-        this.host = host;
-        this.port = port;
+        transportFactory = new SocketTransportFactory(host,port);
     }
 
-    public Transport createTransport() throws IOException {
-        return new Transport(new Socket(host, port));
+    final ITransportFactory getTransportFactory() {
+        return transportFactory;
     }
 
     public String getHostVersion() throws IOException, JadbException {
-        Transport main = createTransport();
+        Transport main = transportFactory.createTransport();
         main.send("host:version");
         main.verifyResponse();
         String version = main.readString();
@@ -38,7 +37,7 @@ public class JadbConnection implements ITransportFactory {
 
     public InetSocketAddress connectToTcpDevice(InetSocketAddress inetSocketAddress)
             throws IOException, JadbException, ConnectionToRemoteDeviceException {
-        Transport transport = createTransport();
+        Transport transport = transportFactory.createTransport();
         try {
             return new HostConnectToRemoteTcpDevice(transport).connect(inetSocketAddress);
         } finally {
@@ -48,7 +47,7 @@ public class JadbConnection implements ITransportFactory {
 
     public InetSocketAddress disconnectFromTcpDevice(InetSocketAddress tcpAddressEntity)
             throws IOException, JadbException, ConnectionToRemoteDeviceException {
-        Transport transport = createTransport();
+        Transport transport = transportFactory.createTransport();
         try {
             return new HostDisconnectFromRemoteTcpDevice(transport).disconnect(tcpAddressEntity);
         } finally {
@@ -57,7 +56,7 @@ public class JadbConnection implements ITransportFactory {
     }
 
     public List<JadbDevice> getDevices() throws IOException, JadbException {
-        Transport devices = createTransport();
+        Transport devices = transportFactory.createTransport();
         devices.send("host:devices");
         devices.verifyResponse();
         String body = devices.readString();
@@ -66,7 +65,7 @@ public class JadbConnection implements ITransportFactory {
     }
 
     public DeviceWatcher createDeviceWatcher(DeviceDetectionListener listener) throws IOException, JadbException {
-        Transport transport = createTransport();
+        Transport transport = transportFactory.createTransport();
         transport.send("host:track-devices");
         transport.verifyResponse();
         return new DeviceWatcher(transport, listener, this);
@@ -78,7 +77,7 @@ public class JadbConnection implements ITransportFactory {
         for (String line : lines) {
             String[] parts = line.split("\t");
             if (parts.length > 1) {
-                devices.add(new JadbDevice(parts[0], parts[1], this));
+                devices.add(new JadbDevice(parts[0], parts[1], transportFactory));
             }
         }
         return devices;
