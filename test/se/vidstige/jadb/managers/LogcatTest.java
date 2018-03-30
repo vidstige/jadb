@@ -58,9 +58,11 @@ public class LogcatTest {
             System.out.println("Unable to open logcat");
         }
         
-        InputStream result = instance.getStream();
-        assertNotNull(result);
-        
+        try{
+            InputStream result = instance.getStream();
+            assertNotNull(result);
+        }catch (JadbException e){
+        }
     }
 
     /**
@@ -88,14 +90,17 @@ public class LogcatTest {
             System.out.println("Unable to open logcat");
         }
         assertTrue(instance.isClosed());
-        InputStream is = instance.getStream();
-        assertFalse(instance.isClosed());
-        try {
-            is.close();
-        } catch (IOException ex) {
-            Logger.getLogger(LogcatTest.class.getName()).log(Level.SEVERE, null, ex);
+        try{
+            InputStream is = instance.getStream();
+            assertFalse(instance.isClosed());
+            try {
+                is.close();
+            } catch (IOException ex) {
+                Logger.getLogger(LogcatTest.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            assertTrue(instance.isClosed());
+        }catch (JadbException e){
         }
-        assertTrue(instance.isClosed());
         
     }
 
@@ -106,17 +111,19 @@ public class LogcatTest {
         if (instance == null){
             System.out.println("Unable to open logcat");
         }
-        BufferedReader result = instance.getReader();
-        assertNotNull(result);
-        assertFalse(instance.isClosed());
-        
-        Thread.sleep(1000);
-        
         try{
-            String line = result.readLine();
-            for (int i = 0 ; i < 1000 && line != null ; i++)
-                System.out.println(line = result.readLine());
-        }catch (Exception e){}
+            BufferedReader result = instance.getReader();
+            assertNotNull(result);
+            assertFalse(instance.isClosed());
+
+            Thread.sleep(1000);
+
+            try{
+                String line = result.readLine();
+                for (int i = 0 ; i < 1000 && line != null ; i++)
+                    System.out.println(line = result.readLine());
+            }catch (Exception e){}
+        }catch (JadbException e){
+        }
     }
-    
 }
