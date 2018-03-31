@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JadbConnection implements ITransportFactory {
+public class JadbConnection {
 
     private final String host;
     private final int port;

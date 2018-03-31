@@ -16,20 +16,20 @@ public class JadbDevice {
     };
 
     private final String serial;
-    private final ITransportFactory transportFactory;
+    private final JadbConnection connection;
 
-    JadbDevice(String serial, String type, ITransportFactory tFactory) {
+    JadbDevice(String serial, String type, JadbConnection conn) {
         this.serial = serial;
-        this.transportFactory = tFactory;
+        this.connection = conn;
     }
 
     static JadbDevice createAny(JadbConnection connection) {
         return new JadbDevice(connection);
     }
 
-    private JadbDevice(ITransportFactory tFactory) {
+    private JadbDevice(JadbConnection conn) {
         serial = null;
-        this.transportFactory = tFactory;
+        this.connection = conn;
     }
 
     private State convertState(String type) {
@@ -43,7 +43,7 @@ public class JadbDevice {
     }
 
     private Transport getTransport() throws IOException, JadbException {
-        Transport transport = transportFactory.createTransport();
+        Transport transport = connection.createTransport();
         if (serial == null) {
             transport.send("host:transport-any");
             transport.verifyResponse();
@@ -59,7 +59,7 @@ public class JadbDevice {
     }
 
     public State getState() throws IOException, JadbException {
-        Transport transport = transportFactory.createTransport();
+        Transport transport = connection.createTransport();
         if (serial == null) {
             transport.send("host:get-state");
             transport.verifyResponse();
