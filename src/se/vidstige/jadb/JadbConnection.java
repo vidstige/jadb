@@ -23,7 +23,7 @@ public class JadbConnection {
         this.port = port;
     }
 
-    public Transport createTransport() throws IOException {
+    Transport createTransport() throws IOException {
         return new Transport(new Socket(host, port));
     }
 
