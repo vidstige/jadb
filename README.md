@@ -70,7 +70,7 @@ project name and tag ignoring actual values from pom.xml. So you need to write:
 <dependency>
     <groupId>com.github.vidstige</groupId>
     <artifactId>jadb</artifactId>
-    <version>v1.0.1</version>
+    <version>v1.1.0</version>
 </dependency>
 ```
 
