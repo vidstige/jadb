@@ -40,7 +40,7 @@ public class PropertyManager {
 
             if (matcher.find()) {
                 if (matcher.groupCount() < 2) {
-                    System.err.println("Property line: " + line + " does not match patter. Ignoring");
+                    System.err.println("Property line: " + line + " does not match pattern. Ignoring");
                     continue;
                 }
                 String key = matcher.group(1);
