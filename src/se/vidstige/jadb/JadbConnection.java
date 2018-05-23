@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JadbConnection implements ITransportFactory {
+public class JadbConnection {
 
     private final String host;
     private final int port;
@@ -23,7 +23,7 @@ public class JadbConnection implements ITransportFactory {
         this.port = port;
     }
 
-    public Transport createTransport() throws IOException {
+    Transport createTransport() throws IOException {
         return new Transport(new Socket(host, port));
     }
 

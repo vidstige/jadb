@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.Charset;
 
-class Transport {
+class Transport implements AutoCloseable{
 
     private final OutputStream outputStream;
     private final InputStream inputStream;
