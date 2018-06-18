@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-public class PackageMangerTests {
+public class PackageManagerTests {
     private static JadbConnection jadb;
     private PackageManager pm;
     private final File miniApk = new File("test/data/Tiniest Smallest APK ever.apk");
