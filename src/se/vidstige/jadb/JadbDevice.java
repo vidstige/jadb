@@ -181,16 +181,25 @@ public class JadbDevice {
 
     public void pull(RemoteFile remote, OutputStream destination) throws IOException, JadbException {
         Transport transport = getTransport();
-        SyncTransport sync = transport.startSync();
-        sync.send("RECV", remote.getPath());
-
-        sync.readChunksTo(destination);
+        try {
+        	SyncTransport sync = transport.startSync();
+        	sync.send("RECV", remote.getPath());
+        	sync.readChunksTo(destination);
+        }catch (Exception e) {
+        	if(transport != null) transport.close();
+        	throw e;
+		} 
     }
 
     public void pull(RemoteFile remote, File local) throws IOException, JadbException {
-        FileOutputStream fileStream = new FileOutputStream(local);
-        pull(remote, fileStream);
-        fileStream.close();
+        FileOutputStream fileStream = null;
+		try {
+			fileStream = new FileOutputStream(local);
+			pull(remote, fileStream);
+		} finally {
+			if (fileStream != null)
+				fileStream.close();
+		}
     }
 
     private void send(Transport transport, String command) throws IOException, JadbException {
