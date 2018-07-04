@@ -53,24 +53,13 @@ class AdbProtocolHandler implements Runnable {
 
         try {
             if ("host:version".equals(command)) {
-                output.writeBytes("OKAY");
-                send(output, String.format("%04x", responder.getVersion()));
+                hostVersion(output);
             } else if ("host:transport-any".equals(command)) {
-                // TODO: Check so that exactly one device is selected.
-                selected = responder.getDevices().get(0);
-                output.writeBytes("OKAY");
+                hostTransportAny(output);
             } else if ("host:devices".equals(command)) {
-                ByteArrayOutputStream tmp = new ByteArrayOutputStream();
-                DataOutputStream writer = new DataOutputStream(tmp);
-                for (AdbDeviceResponder d : responder.getDevices()) {
-                    writer.writeBytes(d.getSerial() + "\t" + d.getType() + "\n");
-                }
-                output.writeBytes("OKAY");
-                send(output, new String(tmp.toByteArray(), StandardCharsets.UTF_8));
+                hostDevices(output);
             } else if (command.startsWith("host:transport:")) {
-                String serial = command.substring("host:transport:".length());
-                selected = findDevice(serial);
-                output.writeBytes("OKAY");
+                hostTransport(output, command);
             } else if ("sync:".equals(command)) {
                 output.writeBytes("OKAY");
                 try {
@@ -80,35 +69,12 @@ class AdbProtocolHandler implements Runnable {
                     sync.send("FAIL", e.getMessage());
                 }
             } else if (command.startsWith("shell:")) {
-                String shellCommand = command.substring("shell:".length());
-                output.writeBytes("OKAY");
-                shell(shellCommand, output, input);
+                shell(input, output, command);
                 return false;
             } else if ("host:get-state".equals(command)) {
-                // TODO: Check so that exactly one device is selected.
-                AdbDeviceResponder device = responder.getDevices().get(0);
-                output.writeBytes("OKAY");
-                send(output, device.getType());
+                hostGetState(output);
             } else if (command.startsWith("host-serial:")) {
-                String[] strs = command.split(":",0);
-                if (strs.length != 3) {
-                    throw new ProtocolException("Invalid command: " + command);
-                }
-
-                String serial = strs[1];
-                boolean found = false;
-                output.writeBytes("OKAY");
-                for (AdbDeviceResponder d : responder.getDevices()) {
-                    if (d.getSerial().equals(serial)) {
-                        send(output, d.getType());
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    send(output, "unknown");
-                }
+                hostSerial(output, command);
             } else {
                 throw new ProtocolException("Unknown command: " + command);
             }
@@ -118,6 +84,68 @@ class AdbProtocolHandler implements Runnable {
         }
         output.flush();
         return true;
+    }
+
+    private void hostSerial(DataOutputStream output, String command) throws IOException {
+        String[] strs = command.split(":",0);
+        if (strs.length != 3) {
+            throw new ProtocolException("Invalid command: " + command);
+        }
+
+        String serial = strs[1];
+        boolean found = false;
+        output.writeBytes("OKAY");
+        for (AdbDeviceResponder d : responder.getDevices()) {
+            if (d.getSerial().equals(serial)) {
+                send(output, d.getType());
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            send(output, "unknown");
+        }
+    }
+
+    private void hostGetState(DataOutputStream output) throws IOException {
+        // TODO: Check so that exactly one device is selected.
+        AdbDeviceResponder device = responder.getDevices().get(0);
+        output.writeBytes("OKAY");
+        send(output, device.getType());
+    }
+
+    private void shell(DataInput input, DataOutputStream output, String command) throws IOException {
+        String shellCommand = command.substring("shell:".length());
+        output.writeBytes("OKAY");
+        shell(shellCommand, output, input);
+    }
+
+    private void hostTransport(DataOutputStream output, String command) throws IOException {
+        String serial = command.substring("host:transport:".length());
+        selected = findDevice(serial);
+        output.writeBytes("OKAY");
+    }
+
+    private void hostDevices(DataOutputStream output) throws IOException {
+        ByteArrayOutputStream tmp = new ByteArrayOutputStream();
+        DataOutputStream writer = new DataOutputStream(tmp);
+        for (AdbDeviceResponder d : responder.getDevices()) {
+            writer.writeBytes(d.getSerial() + "\t" + d.getType() + "\n");
+        }
+        output.writeBytes("OKAY");
+        send(output, new String(tmp.toByteArray(), StandardCharsets.UTF_8));
+    }
+
+    private void hostTransportAny(DataOutputStream output) throws IOException {
+        // TODO: Check so that exactly one device is selected.
+        selected = responder.getDevices().get(0);
+        output.writeBytes("OKAY");
+    }
+
+    private void hostVersion(DataOutputStream output) throws IOException {
+        output.writeBytes("OKAY");
+        send(output, String.format("%04x", responder.getVersion()));
     }
 
     private void shell(String command, DataOutputStream stdout, DataInput stdin) throws IOException {
@@ -147,27 +175,35 @@ class AdbProtocolHandler implements Runnable {
         String id = readString(input, 4);
         int length = readInt(input);
         if ("SEND".equals(id)) {
-            String remotePath = readString(input, length);
-            int idx = remotePath.lastIndexOf(',');
-            String path = remotePath;
-            int mode = 0666;
-            if (idx > 0) {
-                path = remotePath.substring(0, idx);
-                mode = Integer.parseInt(remotePath.substring(idx + 1));
-            }
-            SyncTransport transport = getSyncTransport(output, input);
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            transport.readChunksTo(buffer);
-            selected.filePushed(new RemoteFile(path), mode, buffer);
-            transport.sendStatus("OKAY", 0); // 0 = ignored
+            syncSend(output, input, length);
         } else if ("RECV".equals(id)) {
-            String remotePath = readString(input, length);
-            SyncTransport transport = getSyncTransport(output, input);
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            selected.filePulled(new RemoteFile(remotePath), buffer);
-            transport.sendStream(new ByteArrayInputStream(buffer.toByteArray()));
-            transport.sendStatus("DONE", 0); // ignored
+            syncRecv(output, input, length);
         } else throw new JadbException("Unknown sync id " + id);
+    }
+
+    private void syncRecv(DataOutput output, DataInput input, int length) throws IOException, JadbException {
+        String remotePath = readString(input, length);
+        SyncTransport transport = getSyncTransport(output, input);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        selected.filePulled(new RemoteFile(remotePath), buffer);
+        transport.sendStream(new ByteArrayInputStream(buffer.toByteArray()));
+        transport.sendStatus("DONE", 0); // ignored
+    }
+
+    private void syncSend(DataOutput output, DataInput input, int length) throws IOException, JadbException {
+        String remotePath = readString(input, length);
+        int idx = remotePath.lastIndexOf(',');
+        String path = remotePath;
+        int mode = 0666;
+        if (idx > 0) {
+            path = remotePath.substring(0, idx);
+            mode = Integer.parseInt(remotePath.substring(idx + 1));
+        }
+        SyncTransport transport = getSyncTransport(output, input);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        transport.readChunksTo(buffer);
+        selected.filePushed(new RemoteFile(path), mode, buffer);
+        transport.sendStatus("OKAY", 0); // 0 = ignored
     }
 
     private String getCommandLength(String command) {
