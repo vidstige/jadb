@@ -40,86 +40,91 @@ class AdbProtocolHandler implements Runnable {
         DataInput input = new DataInputStream(socket.getInputStream());
         DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 
-        while (true) {
-            byte[] buffer = new byte[4];
-            input.readFully(buffer);
-            String encodedLength = new String(buffer, StandardCharsets.UTF_8);
-            int length = Integer.parseInt(encodedLength, 16);
-
-            buffer = new byte[length];
-            input.readFully(buffer);
-            String command = new String(buffer, StandardCharsets.UTF_8);
-
-            responder.onCommand(command);
-
-            try {
-                if ("host:version".equals(command)) {
-                    output.writeBytes("OKAY");
-                    send(output, String.format("%04x", responder.getVersion()));
-                } else if ("host:transport-any".equals(command)) {
-                    // TODO: Check so that exactly one device is selected.
-                    selected = responder.getDevices().get(0);
-                    output.writeBytes("OKAY");
-                } else if ("host:devices".equals(command)) {
-                    ByteArrayOutputStream tmp = new ByteArrayOutputStream();
-                    DataOutputStream writer = new DataOutputStream(tmp);
-                    for (AdbDeviceResponder d : responder.getDevices()) {
-                        writer.writeBytes(d.getSerial() + "\t" + d.getType() + "\n");
-                    }
-                    output.writeBytes("OKAY");
-                    send(output, new String(tmp.toByteArray(), StandardCharsets.UTF_8));
-                } else if (command.startsWith("host:transport:")) {
-                    String serial = command.substring("host:transport:".length());
-                    selected = findDevice(serial);
-                    output.writeBytes("OKAY");
-                } else if ("sync:".equals(command)) {
-                    output.writeBytes("OKAY");
-                    try {
-                        sync(output, input);
-                    } catch (JadbException e) { // sync response with a different type of fail message
-                        SyncTransport sync = getSyncTransport(output, input);
-                        sync.send("FAIL", e.getMessage());
-                    }
-                } else if (command.startsWith("shell:")) {
-                    String shellCommand = command.substring("shell:".length());
-                    output.writeBytes("OKAY");
-                    shell(shellCommand, output, input);
-                    output.close();
-                    return;
-                } else if ("host:get-state".equals(command)) {
-                    // TODO: Check so that exactly one device is selected.
-                    AdbDeviceResponder device = responder.getDevices().get(0);
-                    output.writeBytes("OKAY");
-                    send(output, device.getType());
-                } else if (command.startsWith("host-serial:")) {
-                    String[] strs = command.split(":",0);
-                    if (strs.length != 3) {
-                        throw new ProtocolException("Invalid command: " + command);
-                    }
-
-                    String serial = strs[1];
-                    boolean found = false;
-                    output.writeBytes("OKAY");
-                    for (AdbDeviceResponder d : responder.getDevices()) {
-                        if (d.getSerial().equals(serial)) {
-                            send(output, d.getType());
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (!found) {
-                        send(output, "unknown");
-                    }
-                } else {
-                    throw new ProtocolException("Unknown command: " + command);
-                }
-            } catch (ProtocolException e) {
-                output.writeBytes("FAIL");
-                send(output, e.getMessage());
-            }
-            output.flush();
+        while (processCommand(input, output)) {
+                // nothing to do here
         }
+    }
+
+    private boolean processCommand(DataInput input, DataOutputStream output) throws IOException {
+        byte[] buffer = new byte[4];
+        input.readFully(buffer);
+        String encodedLength = new String(buffer, StandardCharsets.UTF_8);
+        int length = Integer.parseInt(encodedLength, 16);
+
+        buffer = new byte[length];
+        input.readFully(buffer);
+        String command = new String(buffer, StandardCharsets.UTF_8);
+
+        responder.onCommand(command);
+
+        try {
+            if ("host:version".equals(command)) {
+                output.writeBytes("OKAY");
+                send(output, String.format("%04x", responder.getVersion()));
+            } else if ("host:transport-any".equals(command)) {
+                // TODO: Check so that exactly one device is selected.
+                selected = responder.getDevices().get(0);
+                output.writeBytes("OKAY");
+            } else if ("host:devices".equals(command)) {
+                ByteArrayOutputStream tmp = new ByteArrayOutputStream();
+                DataOutputStream writer = new DataOutputStream(tmp);
+                for (AdbDeviceResponder d : responder.getDevices()) {
+                    writer.writeBytes(d.getSerial() + "\t" + d.getType() + "\n");
+                }
+                output.writeBytes("OKAY");
+                send(output, new String(tmp.toByteArray(), StandardCharsets.UTF_8));
+            } else if (command.startsWith("host:transport:")) {
+                String serial = command.substring("host:transport:".length());
+                selected = findDevice(serial);
+                output.writeBytes("OKAY");
+            } else if ("sync:".equals(command)) {
+                output.writeBytes("OKAY");
+                try {
+                    sync(output, input);
+                } catch (JadbException e) { // sync response with a different type of fail message
+                    SyncTransport sync = getSyncTransport(output, input);
+                    sync.send("FAIL", e.getMessage());
+                }
+            } else if (command.startsWith("shell:")) {
+                String shellCommand = command.substring("shell:".length());
+                output.writeBytes("OKAY");
+                shell(shellCommand, output, input);
+                output.close();
+                return false;
+            } else if ("host:get-state".equals(command)) {
+                // TODO: Check so that exactly one device is selected.
+                AdbDeviceResponder device = responder.getDevices().get(0);
+                output.writeBytes("OKAY");
+                send(output, device.getType());
+            } else if (command.startsWith("host-serial:")) {
+                String[] strs = command.split(":",0);
+                if (strs.length != 3) {
+                    throw new ProtocolException("Invalid command: " + command);
+                }
+
+                String serial = strs[1];
+                boolean found = false;
+                output.writeBytes("OKAY");
+                for (AdbDeviceResponder d : responder.getDevices()) {
+                    if (d.getSerial().equals(serial)) {
+                        send(output, d.getType());
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    send(output, "unknown");
+                }
+            } else {
+                throw new ProtocolException("Unknown command: " + command);
+            }
+        } catch (ProtocolException e) {
+            output.writeBytes("FAIL");
+            send(output, e.getMessage());
+        }
+        output.flush();
+        return true;
     }
 
     private void shell(String command, DataOutputStream stdout, DataInput stdin) throws IOException {
