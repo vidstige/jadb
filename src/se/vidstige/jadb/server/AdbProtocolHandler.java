@@ -61,13 +61,7 @@ class AdbProtocolHandler implements Runnable {
             } else if (command.startsWith("host:transport:")) {
                 hostTransport(output, command);
             } else if ("sync:".equals(command)) {
-                output.writeBytes("OKAY");
-                try {
-                    sync(output, input);
-                } catch (JadbException e) { // sync response with a different type of fail message
-                    SyncTransport sync = getSyncTransport(output, input);
-                    sync.send("FAIL", e.getMessage());
-                }
+                sync(output, input);
             } else if (command.startsWith("shell:")) {
                 shell(input, output, command);
                 return false;
@@ -171,14 +165,20 @@ class AdbProtocolHandler implements Runnable {
         return readString(input, length);
     }
 
-    private void sync(DataOutput output, DataInput input) throws IOException, JadbException {
-        String id = readString(input, 4);
-        int length = readInt(input);
-        if ("SEND".equals(id)) {
-            syncSend(output, input, length);
-        } else if ("RECV".equals(id)) {
-            syncRecv(output, input, length);
-        } else throw new JadbException("Unknown sync id " + id);
+    private void sync(DataOutput output, DataInput input) throws IOException {
+        output.writeBytes("OKAY");
+        try {
+            String id = readString(input, 4);
+            int length = readInt(input);
+            if ("SEND".equals(id)) {
+                syncSend(output, input, length);
+            } else if ("RECV".equals(id)) {
+                syncRecv(output, input, length);
+            } else throw new JadbException("Unknown sync id " + id);
+        } catch (JadbException e) { // sync response with a different type of fail message
+            SyncTransport sync = getSyncTransport(output, input);
+            sync.send("FAIL", e.getMessage());
+        }
     }
 
     private void syncRecv(DataOutput output, DataInput input, int length) throws IOException, JadbException {
