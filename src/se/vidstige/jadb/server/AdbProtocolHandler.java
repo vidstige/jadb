@@ -48,15 +48,7 @@ class AdbProtocolHandler implements Runnable {
     }
 
     private boolean processCommand(DataInput input, DataOutputStream output) throws IOException {
-        byte[] buffer = new byte[4];
-        input.readFully(buffer);
-        String encodedLength = new String(buffer, StandardCharsets.UTF_8);
-        int length = Integer.parseInt(encodedLength, 16);
-
-        buffer = new byte[length];
-        input.readFully(buffer);
-        String command = new String(buffer, StandardCharsets.UTF_8);
-
+        String command = readCommand(input);
         responder.onCommand(command);
 
         try {
@@ -136,10 +128,19 @@ class AdbProtocolHandler implements Runnable {
         return Integer.reverseBytes(input.readInt());
     }
 
+    private int readHexInt(DataInput input) throws IOException {
+        return Integer.parseInt(readString(input, 4), 16);
+    }
+
     private String readString(DataInput input, int length) throws IOException {
         byte[] responseBuffer = new byte[length];
         input.readFully(responseBuffer);
         return new String(responseBuffer, StandardCharsets.UTF_8);
+    }
+
+    private String readCommand(DataInput input) throws IOException {
+        int length = readHexInt(input);
+        return readString(input, length);
     }
 
     private void sync(DataOutput output, DataInput input) throws IOException, JadbException {
