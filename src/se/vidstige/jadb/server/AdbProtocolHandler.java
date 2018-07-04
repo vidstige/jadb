@@ -77,7 +77,7 @@ class AdbProtocolHandler implements Runnable {
                     try {
                         sync(output, input);
                     } catch (JadbException e) { // sync response with a different type of fail message
-                        SyncTransport sync = new SyncTransport(output, input);
+                        SyncTransport sync = getSyncTransport(output, input);
                         sync.send("FAIL", e.getMessage());
                     }
                 } else if (command.startsWith("shell:")) {
@@ -148,14 +148,14 @@ class AdbProtocolHandler implements Runnable {
                 path = remotePath.substring(0, idx);
                 mode = Integer.parseInt(remotePath.substring(idx + 1));
             }
-            SyncTransport transport = new SyncTransport(output, input);
+            SyncTransport transport = getSyncTransport(output, input);
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             transport.readChunksTo(buffer);
             selected.filePushed(new RemoteFile(path), mode, buffer);
             transport.sendStatus("OKAY", 0); // 0 = ignored
         } else if ("RECV".equals(id)) {
             String remotePath = readString(input, length);
-            SyncTransport transport = new SyncTransport(output, input);
+            SyncTransport transport = getSyncTransport(output, input);
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             selected.filePulled(new RemoteFile(remotePath), buffer);
             transport.sendStream(new ByteArrayInputStream(buffer.toByteArray()));
@@ -170,5 +170,9 @@ class AdbProtocolHandler implements Runnable {
     public void send(DataOutput writer, String response) throws IOException {
         writer.writeBytes(getCommandLength(response));
         writer.writeBytes(response);
+    }
+
+    private SyncTransport getSyncTransport(DataOutput output, DataInput input) {
+        return new SyncTransport(output, input);
     }
 }
