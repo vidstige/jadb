@@ -37,11 +37,13 @@ class AdbProtocolHandler implements Runnable {
     }
 
     private void runServer() throws IOException {
-        DataInput input = new DataInputStream(socket.getInputStream());
-        DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-
-        while (processCommand(input, output)) {
+        try (
+            DataInputStream input = new DataInputStream(socket.getInputStream());
+            DataOutputStream output = new DataOutputStream(socket.getOutputStream())
+        ) {
+            while (processCommand(input, output)) {
                 // nothing to do here
+            }
         }
     }
 
@@ -89,7 +91,6 @@ class AdbProtocolHandler implements Runnable {
                 String shellCommand = command.substring("shell:".length());
                 output.writeBytes("OKAY");
                 shell(shellCommand, output, input);
-                output.close();
                 return false;
             } else if ("host:get-state".equals(command)) {
                 // TODO: Check so that exactly one device is selected.
