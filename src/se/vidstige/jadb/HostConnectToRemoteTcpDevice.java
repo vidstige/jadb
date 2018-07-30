@@ -41,9 +41,9 @@ class HostConnectToRemoteTcpDevice {
         void validate(String response) throws ConnectionToRemoteDeviceException;
     }
 
-    final static class ResponseValidatorImp implements ResponseValidator {
-        private final static String SUCCESSFULLY_CONNECTED = "connected to";
-        private final static String ALREADY_CONNECTED = "already connected to";
+    static final class ResponseValidatorImp implements ResponseValidator {
+        private static final String SUCCESSFULLY_CONNECTED = "connected to";
+        private static final String ALREADY_CONNECTED = "already connected to";
 
 
         ResponseValidatorImp() {

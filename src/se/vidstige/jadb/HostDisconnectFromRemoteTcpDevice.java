@@ -41,10 +41,9 @@ public class HostDisconnectFromRemoteTcpDevice {
         void validate(String response) throws ConnectionToRemoteDeviceException;
     }
 
-    final static class ResponseValidatorImp implements ResponseValidator {
-        private final static String SUCCESSFULLY_DISCONNECTED = "disconnected";
-        private final static String ALREADY_DISCONNECTED = "error: no such device";
-
+    static final class ResponseValidatorImp implements ResponseValidator {
+        private static final String SUCCESSFULLY_DISCONNECTED = "disconnected";
+        private static final String ALREADY_DISCONNECTED = "error: no such device";
 
         ResponseValidatorImp() {
         }
