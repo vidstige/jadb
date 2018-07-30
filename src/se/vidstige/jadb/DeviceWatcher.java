@@ -18,6 +18,7 @@ public class DeviceWatcher implements Runnable {
         watch();
     }
 
+    @SuppressWarnings("squid:S2189") // watcher is stopped by closing transport
     public void watch() {
         try {
             while (true) {

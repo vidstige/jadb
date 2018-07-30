@@ -29,6 +29,7 @@ public abstract class SocketServer implements Runnable {
         return port;
     }
 
+    @SuppressWarnings("squid:S2189") // server is stopped by closing SocketServer
     @Override
     public void run() {
         try {
