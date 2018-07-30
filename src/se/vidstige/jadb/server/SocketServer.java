@@ -45,6 +45,7 @@ public abstract class SocketServer implements Runnable {
                 clientThread.start();
             }
         } catch (IOException e) {
+            // Empty on purpose
         }
     }
 
