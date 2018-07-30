@@ -58,7 +58,7 @@ public abstract class SocketServer implements Runnable {
 
     private void waitForServer() throws InterruptedException {
         synchronized (lockObject) {
-            if (!isStarted) {
+            while (!isStarted) {
                 lockObject.wait();
             }
         }
