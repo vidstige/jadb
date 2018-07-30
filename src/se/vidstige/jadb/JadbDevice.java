@@ -151,7 +151,7 @@ public class JadbDevice {
         SyncTransport sync = transport.startSync();
         sync.send("LIST", remotePath);
 
-        List<RemoteFile> result = new ArrayList<RemoteFile>();
+        List<RemoteFile> result = new ArrayList<>();
         for (RemoteFileRecord dent = sync.readDirectoryEntry(); dent != RemoteFileRecord.DONE; dent = sync.readDirectoryEntry()) {
             result.add(dent);
         }

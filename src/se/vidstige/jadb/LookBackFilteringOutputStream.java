@@ -13,7 +13,7 @@ public class LookBackFilteringOutputStream extends FilterOutputStream {
     {
         super(inner);
         this.lookBackBufferSize = lookBackBufferSize;
-        this.buffer = new ArrayDeque<Byte>(lookBackBufferSize);
+        this.buffer = new ArrayDeque<>(lookBackBufferSize);
     }
 
     protected void unwrite() {

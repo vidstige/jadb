@@ -22,7 +22,7 @@ public class PackageManager {
     }
 
     public List<Package> getPackages() throws IOException, JadbException {
-        ArrayList<Package> result = new ArrayList<Package>();
+        ArrayList<Package> result = new ArrayList<>();
         BufferedReader input = null;
         try {
             input = new BufferedReader(new InputStreamReader(device.executeShell("pm", "list", "packages"), Charset.forName("UTF-8")));
