@@ -7,7 +7,7 @@ import se.vidstige.jadb.SyncTransport;
 import java.io.*;
 import java.net.ProtocolException;
 import java.net.Socket;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 class AdbProtocolHandler implements Runnable {
     private final Socket socket;
@@ -43,12 +43,12 @@ class AdbProtocolHandler implements Runnable {
         while (true) {
             byte[] buffer = new byte[4];
             input.readFully(buffer);
-            String encodedLength = new String(buffer, Charset.forName("utf-8"));
+            String encodedLength = new String(buffer, StandardCharsets.UTF_8);
             int length = Integer.parseInt(encodedLength, 16);
 
             buffer = new byte[length];
             input.readFully(buffer);
-            String command = new String(buffer, Charset.forName("utf-8"));
+            String command = new String(buffer, StandardCharsets.UTF_8);
 
             responder.onCommand(command);
 
@@ -67,7 +67,7 @@ class AdbProtocolHandler implements Runnable {
                         writer.writeBytes(d.getSerial() + "\t" + d.getType() + "\n");
                     }
                     output.writeBytes("OKAY");
-                    send(output, new String(tmp.toByteArray(), Charset.forName("utf-8")));
+                    send(output, new String(tmp.toByteArray(), StandardCharsets.UTF_8));
                 } else if (command.startsWith("host:transport:")) {
                     String serial = command.substring("host:transport:".length());
                     selected = findDevice(serial);
@@ -133,7 +133,7 @@ class AdbProtocolHandler implements Runnable {
     private String readString(DataInput input, int length) throws IOException {
         byte[] responseBuffer = new byte[length];
         input.readFully(responseBuffer);
-        return new String(responseBuffer, Charset.forName("utf-8"));
+        return new String(responseBuffer, StandardCharsets.UTF_8);
     }
 
     private void sync(DataOutput output, DataInput input) throws IOException, JadbException {

@@ -6,7 +6,7 @@ import se.vidstige.jadb.RemoteFile;
 import se.vidstige.jadb.Stream;
 
 import java.io.*;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +25,7 @@ public class PackageManager {
         ArrayList<Package> result = new ArrayList<>();
         BufferedReader input = null;
         try {
-            input = new BufferedReader(new InputStreamReader(device.executeShell("pm", "list", "packages"), Charset.forName("UTF-8")));
+            input = new BufferedReader(new InputStreamReader(device.executeShell("pm", "list", "packages"), StandardCharsets.UTF_8));
             String line;
             while ((line = input.readLine()) != null) {
                 final String prefix = "package:";
@@ -49,7 +49,7 @@ public class PackageManager {
 
     public void remove(RemoteFile file) throws IOException, JadbException {
         InputStream s = device.executeShell("rm", "-f", Bash.quote(file.getPath()));
-        Stream.readAll(s, Charset.forName("UTF-8"));
+        Stream.readAll(s, StandardCharsets.UTF_8);
     }
 
     private void install(File apkFile, List<String> extraArguments) throws IOException, JadbException {
@@ -60,7 +60,7 @@ public class PackageManager {
         arguments.addAll(extraArguments);
         arguments.add(remote.getPath());
         InputStream s = device.executeShell("pm", arguments.toArray(new String[arguments.size()]));
-        String result = Stream.readAll(s, Charset.forName("UTF-8"));
+        String result = Stream.readAll(s, StandardCharsets.UTF_8);
         remove(remote);
         verifyOperation("install", apkFile.getName(), result);
     }
@@ -84,7 +84,7 @@ public class PackageManager {
 
     public void uninstall(Package name) throws IOException, JadbException {
         InputStream s = device.executeShell("pm", "uninstall", name.toString());
-        String result = Stream.readAll(s, Charset.forName("UTF-8"));
+        String result = Stream.readAll(s, StandardCharsets.UTF_8);
         verifyOperation("uninstall", name.toString(), result);
     }
 
