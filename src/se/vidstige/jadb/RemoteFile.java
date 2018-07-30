@@ -21,10 +21,7 @@ public class RemoteFile {
         if (o == null || getClass() != o.getClass()) return false;
 
         RemoteFile that = (RemoteFile) o;
-
-        if (!path.equals(that.path)) return false;
-
-        return true;
+        return path.equals(that.path);
     }
 
     @Override
