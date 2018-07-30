@@ -52,7 +52,7 @@ public abstract class SocketServer implements Runnable {
     private void serverReady() {
         synchronized (lockObject) {
             isStarted = true;
-            lockObject.notify();
+            lockObject.notifyAll();
         }
     }
 
