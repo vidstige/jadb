@@ -32,11 +32,11 @@ public class AdbServerLauncher {
     }
 
     private static String findAdbExecutable(Map<String, String> environment) {
-        String android_home = environment.get("ANDROID_HOME");
-        if (android_home == null || android_home.equals("")) {
+        String androidHome = environment.get("ANDROID_HOME");
+        if (androidHome == null || androidHome.equals("")) {
             return "adb";
         }
-        return android_home + "/platform-tools/adb";
+        return androidHome + "/platform-tools/adb";
     }
 
     public void launch() throws IOException, InterruptedException {
