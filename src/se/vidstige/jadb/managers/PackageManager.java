@@ -116,15 +116,18 @@ public class PackageManager {
     public static final InstallOption ALLOW_TEST_APK =
             new InstallOption("-t");
 
+    @SuppressWarnings("squid:S00100")
     public static InstallOption WITH_INSTALLER_PACKAGE_NAME(String name)
     {
         return new InstallOption("-t", name);
     }
 
+    @SuppressWarnings("squid:S00100")
     public static InstallOption ON_SHARED_MASS_STORAGE(String name) {
         return new InstallOption("-s", name);
     }
 
+    @SuppressWarnings("squid:S00100")
     public static InstallOption ON_INTERNAL_SYSTEM_MEMORY(String name) {
         return new InstallOption("-f", name);
     }
