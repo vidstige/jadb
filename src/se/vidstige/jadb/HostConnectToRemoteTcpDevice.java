@@ -64,7 +64,7 @@ class HostConnectToRemoteTcpDevice {
         }
 
         private String extractError(String response) {
-            int lastColon = response.lastIndexOf(":");
+            int lastColon = response.lastIndexOf(':');
             if (lastColon != -1) {
                 return response.substring(lastColon, response.length());
             } else {
