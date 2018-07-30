@@ -7,6 +7,10 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 public class Stream {
+    private Stream() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static void copy(InputStream in, OutputStream out) throws IOException {
         byte[] buffer = new byte[1024 * 10];
         int len;
