@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JadbDevice {
+    @SuppressWarnings("squid:S00115")
     public enum State {
         Unknown,
         Offline,
