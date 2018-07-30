@@ -14,7 +14,7 @@ public class JadbDevice {
         Device,
         Recovery,
         BootLoader
-    };
+    }
 
     private final String serial;
     private final ITransportFactory transportFactory;
