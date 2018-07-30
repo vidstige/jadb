@@ -22,10 +22,8 @@ public class PackageManager {
     }
 
     public List<Package> getPackages() throws IOException, JadbException {
-        ArrayList<Package> result = new ArrayList<>();
-        BufferedReader input = null;
-        try {
-            input = new BufferedReader(new InputStreamReader(device.executeShell("pm", "list", "packages"), StandardCharsets.UTF_8));
+        try (BufferedReader input = new BufferedReader(new InputStreamReader(device.executeShell("pm", "list", "packages"), StandardCharsets.UTF_8))) {
+            ArrayList<Package> result = new ArrayList<>();
             String line;
             while ((line = input.readLine()) != null) {
                 final String prefix = "package:";
@@ -33,10 +31,8 @@ public class PackageManager {
                     result.add(new Package(line.substring(prefix.length())));
                 }
             }
-        } finally {
-            if (input != null) input.close();
+            return result;
         }
-        return result;
     }
 
     private String getErrorMessage(String operation, String target, String errorMessage) {
