@@ -41,10 +41,9 @@ public class HostDisconnectFromRemoteTcpDevice {
         void validate(String response) throws ConnectionToRemoteDeviceException;
     }
 
-    final static class ResponseValidatorImp implements ResponseValidator {
-        private final static String SUCCESSFULLY_DISCONNECTED = "disconnected";
-        private final static String ALREADY_DISCONNECTED = "error: no such device";
-
+    static final class ResponseValidatorImp implements ResponseValidator {
+        private static final String SUCCESSFULLY_DISCONNECTED = "disconnected";
+        private static final String ALREADY_DISCONNECTED = "error: no such device";
 
         ResponseValidatorImp() {
         }
@@ -64,7 +63,7 @@ public class HostDisconnectFromRemoteTcpDevice {
         }
 
         private String extractError(String response) {
-            int lastColon = response.lastIndexOf(":");
+            int lastColon = response.lastIndexOf(':');
             if (lastColon != -1) {
                 return response.substring(lastColon, response.length());
             } else {

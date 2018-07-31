@@ -6,7 +6,7 @@ import se.vidstige.jadb.RemoteFile;
 import se.vidstige.jadb.Stream;
 
 import java.io.*;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,10 +22,8 @@ public class PackageManager {
     }
 
     public List<Package> getPackages() throws IOException, JadbException {
-        ArrayList<Package> result = new ArrayList<Package>();
-        BufferedReader input = null;
-        try {
-            input = new BufferedReader(new InputStreamReader(device.executeShell("pm", "list", "packages"), Charset.forName("UTF-8")));
+        try (BufferedReader input = new BufferedReader(new InputStreamReader(device.executeShell("pm", "list", "packages"), StandardCharsets.UTF_8))) {
+            ArrayList<Package> result = new ArrayList<>();
             String line;
             while ((line = input.readLine()) != null) {
                 final String prefix = "package:";
@@ -33,10 +31,8 @@ public class PackageManager {
                     result.add(new Package(line.substring(prefix.length())));
                 }
             }
-        } finally {
-            if (input != null) input.close();
+            return result;
         }
-        return result;
     }
 
     private String getErrorMessage(String operation, String target, String errorMessage) {
@@ -49,7 +45,7 @@ public class PackageManager {
 
     public void remove(RemoteFile file) throws IOException, JadbException {
         InputStream s = device.executeShell("rm", "-f", Bash.quote(file.getPath()));
-        Stream.readAll(s, Charset.forName("UTF-8"));
+        Stream.readAll(s, StandardCharsets.UTF_8);
     }
 
     private void install(File apkFile, List<String> extraArguments) throws IOException, JadbException {
@@ -60,7 +56,7 @@ public class PackageManager {
         arguments.addAll(extraArguments);
         arguments.add(remote.getPath());
         InputStream s = device.executeShell("pm", arguments.toArray(new String[arguments.size()]));
-        String result = Stream.readAll(s, Charset.forName("UTF-8"));
+        String result = Stream.readAll(s, StandardCharsets.UTF_8);
         remove(remote);
         verifyOperation("install", apkFile.getName(), result);
     }
@@ -84,7 +80,7 @@ public class PackageManager {
 
     public void uninstall(Package name) throws IOException, JadbException {
         InputStream s = device.executeShell("pm", "uninstall", name.toString());
-        String result = Stream.readAll(s, Charset.forName("UTF-8"));
+        String result = Stream.readAll(s, StandardCharsets.UTF_8);
         verifyOperation("uninstall", name.toString(), result);
     }
 
@@ -116,15 +112,18 @@ public class PackageManager {
     public static final InstallOption ALLOW_TEST_APK =
             new InstallOption("-t");
 
+    @SuppressWarnings("squid:S00100")
     public static InstallOption WITH_INSTALLER_PACKAGE_NAME(String name)
     {
         return new InstallOption("-t", name);
     }
 
+    @SuppressWarnings("squid:S00100")
     public static InstallOption ON_SHARED_MASS_STORAGE(String name) {
         return new InstallOption("-s", name);
     }
 
+    @SuppressWarnings("squid:S00100")
     public static InstallOption ON_INTERNAL_SYSTEM_MEMORY(String name) {
         return new InstallOption("-f", name);
     }

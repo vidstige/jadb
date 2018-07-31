@@ -7,13 +7,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JadbDevice {
+    @SuppressWarnings("squid:S00115")
     public enum State {
         Unknown,
         Offline,
         Device,
         Recovery,
         BootLoader
-    };
+    }
 
     private final String serial;
     private final ITransportFactory transportFactory;
@@ -150,7 +151,7 @@ public class JadbDevice {
         SyncTransport sync = transport.startSync();
         sync.send("LIST", remotePath);
 
-        List<RemoteFile> result = new ArrayList<RemoteFile>();
+        List<RemoteFile> result = new ArrayList<>();
         for (RemoteFileRecord dent = sync.readDirectoryEntry(); dent != RemoteFileRecord.DONE; dent = sync.readDirectoryEntry()) {
             result.add(dent);
         }

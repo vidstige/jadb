@@ -29,6 +29,7 @@ public abstract class SocketServer implements Runnable {
         return port;
     }
 
+    @SuppressWarnings("squid:S2189") // server is stopped by closing SocketServer
     @Override
     public void run() {
         try {
@@ -44,19 +45,20 @@ public abstract class SocketServer implements Runnable {
                 clientThread.start();
             }
         } catch (IOException e) {
+            // Empty on purpose
         }
     }
 
     private void serverReady() {
         synchronized (lockObject) {
             isStarted = true;
-            lockObject.notify();
+            lockObject.notifyAll();
         }
     }
 
     private void waitForServer() throws InterruptedException {
         synchronized (lockObject) {
-            if (!isStarted) {
+            while (!isStarted) {
                 lockObject.wait();
             }
         }
