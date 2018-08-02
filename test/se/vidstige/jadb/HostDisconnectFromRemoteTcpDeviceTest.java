@@ -47,7 +47,7 @@ public class HostDisconnectFromRemoteTcpDeviceTest {
         //Prepare
         Transport transport = mock(Transport.class);
         when(transport.readString()).thenReturn("any string");
-        HostDisconnectFromRemoteTcpDevice.ResponseValidator responseValidator = mock(HostDisconnectFromRemoteTcpDevice.ResponseValidator.class);
+        HostDisconnectFromRemoteTcpDevice.ResponseValidator responseValidator = mock(HostConnectionCommand.ResponseValidator.class);
         doThrow(new ConnectionToRemoteDeviceException("Fake exception")).when(responseValidator).validate(anyString());
 
         InetSocketAddress inetSocketAddress = new InetSocketAddress("host", 1);
