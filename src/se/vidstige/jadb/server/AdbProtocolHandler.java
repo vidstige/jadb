@@ -2,7 +2,7 @@ package se.vidstige.jadb.server;
 
 import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
-import se.vidstige.jadb.SyncTransport;
+import se.vidstige.jadb.RawSyncTransport;
 
 import java.io.*;
 import java.net.ProtocolException;
@@ -176,14 +176,14 @@ class AdbProtocolHandler implements Runnable {
                 syncRecv(output, input, length);
             } else throw new JadbException("Unknown sync id " + id);
         } catch (JadbException e) { // sync response with a different type of fail message
-            SyncTransport sync = getSyncTransport(output, input);
+            RawSyncTransport sync = getSyncTransport(output, input);
             sync.send("FAIL", e.getMessage());
         }
     }
 
     private void syncRecv(DataOutput output, DataInput input, int length) throws IOException, JadbException {
         String remotePath = readString(input, length);
-        SyncTransport transport = getSyncTransport(output, input);
+        RawSyncTransport transport = getSyncTransport(output, input);
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         selected.filePulled(new RemoteFile(remotePath), buffer);
         transport.sendStream(new ByteArrayInputStream(buffer.toByteArray()));
@@ -199,7 +199,7 @@ class AdbProtocolHandler implements Runnable {
             path = remotePath.substring(0, idx);
             mode = Integer.parseInt(remotePath.substring(idx + 1));
         }
-        SyncTransport transport = getSyncTransport(output, input);
+        RawSyncTransport transport = getSyncTransport(output, input);
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         transport.readChunksTo(buffer);
         selected.filePushed(new RemoteFile(path), mode, buffer);
@@ -215,7 +215,7 @@ class AdbProtocolHandler implements Runnable {
         writer.writeBytes(response);
     }
 
-    private SyncTransport getSyncTransport(DataOutput output, DataInput input) {
-        return new SyncTransport(output, input);
+    private RawSyncTransport getSyncTransport(DataOutput output, DataInput input) {
+        return new RawSyncTransport(output, input);
     }
 }
