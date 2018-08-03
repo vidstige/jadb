@@ -59,7 +59,7 @@ public class HostConnectToRemoteTcpDeviceTest {
         //Prepare
         Transport transport = mock(Transport.class);
         when(transport.readString()).thenReturn("connected to somehost:1");
-        HostConnectToRemoteTcpDevice.ResponseValidator responseValidator = mock(HostConnectToRemoteTcpDevice.ResponseValidator.class);
+        HostConnectToRemoteTcpDevice.ResponseValidator responseValidator = mock(HostConnectionCommand.ResponseValidator.class);
         doThrow(new ConnectionToRemoteDeviceException("Fake exception")).when(responseValidator).validate(anyString());
 
         InetSocketAddress tcpAddressEntity = new InetSocketAddress("somehost", 1);
