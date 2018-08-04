@@ -24,7 +24,13 @@ public class JadbConnection implements ITransportFactory {
     }
 
     public Transport createTransport() throws IOException {
-        return new Transport(new Socket(host, port));
+        Transport source;
+        try {
+            source = new Transport(new Socket(host, port));
+        } catch(BindException ex) {
+            source = createTransport();
+        }
+        return source;
     }
 
     public String getHostVersion() throws IOException, JadbException {
