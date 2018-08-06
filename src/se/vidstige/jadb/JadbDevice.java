@@ -46,11 +46,9 @@ public class JadbDevice {
     private Transport getTransport() throws IOException, JadbException {
         Transport transport = transportFactory.createTransport();
         if (serial == null) {
-            transport.send("host:transport-any");
-            transport.verifyResponse();
+            send(transport,"host:transport-any");
         } else {
-            transport.send("host:transport:" + serial);
-            transport.verifyResponse();
+            send(transport,"host:transport:" + serial);
         }
         return transport;
     }
@@ -62,11 +60,9 @@ public class JadbDevice {
     public State getState() throws IOException, JadbException {
         Transport transport = transportFactory.createTransport();
         if (serial == null) {
-            transport.send("host:get-state");
-            transport.verifyResponse();
+            send(transport, "host:get-state");
         } else {
-            transport.send("host-serial:" + serial + ":get-state");
-            transport.verifyResponse();
+            send(transport, "host-serial:" + serial + ":get-state");
         }
 
         State state = convertState(transport.readString());
