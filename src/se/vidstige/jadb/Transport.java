@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-class Transport {
+class Transport implements Closeable {
 
     private final OutputStream outputStream;
     private final InputStream inputStream;
@@ -64,6 +64,7 @@ class Transport {
         return new SyncTransport(outputStream, inputStream);
     }
 
+    @Override
     public void close() throws IOException {
         inputStream.close();
         outputStream.close();
