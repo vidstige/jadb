@@ -19,7 +19,7 @@ public class JadbDevice {
     private final String serial;
     private final ITransportFactory transportFactory;
 
-    JadbDevice(String serial, String type, ITransportFactory tFactory) {
+    JadbDevice(String serial, ITransportFactory tFactory) {
         this.serial = serial;
         this.transportFactory = tFactory;
     }
