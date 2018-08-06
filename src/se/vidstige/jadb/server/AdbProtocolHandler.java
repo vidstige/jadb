@@ -80,7 +80,7 @@ class AdbProtocolHandler implements Runnable {
         return true;
     }
 
-    private void hostSerial(DataOutputStream output, String command) throws IOException {
+    private void hostSerial(DataOutput output, String command) throws IOException {
         String[] strs = command.split(":",0);
         if (strs.length != 3) {
             throw new ProtocolException("Invalid command: " + command);
@@ -102,7 +102,7 @@ class AdbProtocolHandler implements Runnable {
         }
     }
 
-    private void hostGetState(DataOutputStream output) throws IOException {
+    private void hostGetState(DataOutput output) throws IOException {
         // TODO: Check so that exactly one device is selected.
         AdbDeviceResponder device = responder.getDevices().get(0);
         output.writeBytes("OKAY");
@@ -115,13 +115,13 @@ class AdbProtocolHandler implements Runnable {
         shell(shellCommand, output, input);
     }
 
-    private void hostTransport(DataOutputStream output, String command) throws IOException {
+    private void hostTransport(DataOutput output, String command) throws IOException {
         String serial = command.substring("host:transport:".length());
         selected = findDevice(serial);
         output.writeBytes("OKAY");
     }
 
-    private void hostDevices(DataOutputStream output) throws IOException {
+    private void hostDevices(DataOutput output) throws IOException {
         ByteArrayOutputStream tmp = new ByteArrayOutputStream();
         DataOutputStream writer = new DataOutputStream(tmp);
         for (AdbDeviceResponder d : responder.getDevices()) {
@@ -131,13 +131,13 @@ class AdbProtocolHandler implements Runnable {
         send(output, new String(tmp.toByteArray(), StandardCharsets.UTF_8));
     }
 
-    private void hostTransportAny(DataOutputStream output) throws IOException {
+    private void hostTransportAny(DataOutput output) throws IOException {
         // TODO: Check so that exactly one device is selected.
         selected = responder.getDevices().get(0);
         output.writeBytes("OKAY");
     }
 
-    private void hostVersion(DataOutputStream output) throws IOException {
+    private void hostVersion(DataOutput output) throws IOException {
         output.writeBytes("OKAY");
         send(output, String.format("%04x", responder.getVersion()));
     }
