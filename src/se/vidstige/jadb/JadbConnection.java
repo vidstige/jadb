@@ -28,41 +28,34 @@ public class JadbConnection implements ITransportFactory {
     }
 
     public String getHostVersion() throws IOException, JadbException {
-        Transport main = createTransport();
-        main.send("host:version");
-        main.verifyResponse();
-        String version = main.readString();
-        main.close();
-        return version;
+        try (Transport transport = createTransport()) {
+            transport.send("host:version");
+            transport.verifyResponse();
+            return transport.readString();
+        }
     }
 
     public InetSocketAddress connectToTcpDevice(InetSocketAddress inetSocketAddress)
             throws IOException, JadbException, ConnectionToRemoteDeviceException {
-        Transport transport = createTransport();
-        try {
+        try (Transport transport = createTransport()) {
             return new HostConnectToRemoteTcpDevice(transport).connect(inetSocketAddress);
-        } finally {
-            transport.close();
         }
     }
 
     public InetSocketAddress disconnectFromTcpDevice(InetSocketAddress tcpAddressEntity)
             throws IOException, JadbException, ConnectionToRemoteDeviceException {
-        Transport transport = createTransport();
-        try {
+        try (Transport transport = createTransport()) {
             return new HostDisconnectFromRemoteTcpDevice(transport).disconnect(tcpAddressEntity);
-        } finally {
-            transport.close();
         }
     }
 
     public List<JadbDevice> getDevices() throws IOException, JadbException {
-        Transport devices = createTransport();
-        devices.send("host:devices");
-        devices.verifyResponse();
-        String body = devices.readString();
-        devices.close();
-        return parseDevices(body);
+        try (Transport transport = createTransport()) {
+            transport.send("host:devices");
+            transport.verifyResponse();
+            String body = transport.readString();
+            return parseDevices(body);
+        }
     }
 
     public DeviceWatcher createDeviceWatcher(DeviceDetectionListener listener) throws IOException, JadbException {
