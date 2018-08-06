@@ -18,7 +18,6 @@ public class PackageManagerTest {
     private static final String DEVICE_SERIAL = "serial-123";
 
     private FakeAdbServer server;
-    private JadbConnection connection;
     private JadbDevice device;
 
     @Before
@@ -26,9 +25,7 @@ public class PackageManagerTest {
         server = new FakeAdbServer(15037);
         server.start();
         server.add(DEVICE_SERIAL);
-        connection = new JadbConnection("localhost", 15037);
-
-        device = connection.getDevices().get(0);
+        device = new JadbConnection("localhost", 15037).getDevices().get(0);
     }
 
     @After
