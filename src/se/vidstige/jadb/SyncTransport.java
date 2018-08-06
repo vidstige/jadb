@@ -11,11 +11,6 @@ public class SyncTransport {
     private final DataOutput output;
     private final DataInput input;
 
-    public SyncTransport(OutputStream outputStream, InputStream inputStream) {
-        output = new DataOutputStream(outputStream);
-        input = new DataInputStream(inputStream);
-    }
-
     public SyncTransport(DataOutput outputStream, DataInput inputStream) {
         output = outputStream;
         input = inputStream;
