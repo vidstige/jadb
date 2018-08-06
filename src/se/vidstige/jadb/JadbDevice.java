@@ -210,10 +210,8 @@ public class JadbDevice {
             return false;
         JadbDevice other = (JadbDevice) obj;
         if (serial == null) {
-            if (other.serial != null)
-                return false;
-        } else if (!serial.equals(other.serial))
-            return false;
-        return true;
+            return other.serial == null;
+        }
+        return serial.equals(other.serial);
     }
 }
