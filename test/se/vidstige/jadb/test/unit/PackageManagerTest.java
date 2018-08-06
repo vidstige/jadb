@@ -15,7 +15,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 public class PackageManagerTest {
-    private final String DEVICE_SERIAL = "serial-123";
+    private static final String DEVICE_SERIAL = "serial-123";
 
     private FakeAdbServer server;
     private JadbConnection connection;

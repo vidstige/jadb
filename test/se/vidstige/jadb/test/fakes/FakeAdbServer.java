@@ -91,7 +91,7 @@ public class FakeAdbServer implements AdbResponder {
         return new ArrayList<AdbDeviceResponder>(devices);
     }
 
-    private class DeviceResponder implements AdbDeviceResponder {
+    private static class DeviceResponder implements AdbDeviceResponder {
         private final String serial;
         private final String type;
         private List<FileExpectation> fileExpectations = new ArrayList<FileExpectation>();
@@ -155,7 +155,7 @@ public class FakeAdbServer implements AdbResponder {
             org.junit.Assert.assertEquals(0, shellExpectations.size());
         }
 
-        private class FileExpectation implements ExpectationBuilder {
+        private static class FileExpectation implements ExpectationBuilder {
             private final RemoteFile path;
             private byte[] content;
             private String failMessage;
@@ -199,7 +199,7 @@ public class FakeAdbServer implements AdbResponder {
             }
         }
 
-        public class ShellExpectation {
+        public static class ShellExpectation {
             private final String command;
             private byte[] stdout;
 

@@ -48,7 +48,7 @@ public class FakeSubprocess extends Subprocess {
         }
     }
 
-    private class Expectation {
+    private static class Expectation {
         private final String[] command;
         private final int exitValue;
 
