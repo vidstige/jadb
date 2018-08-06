@@ -31,9 +31,7 @@ public class RealDeviceTestCases {
     public static void tryToStartAdbServer() {
         try {
             new AdbServerLauncher(new Subprocess(), System.getenv()).launch();
-        } catch (IOException e) {
-            System.out.println("Could not start adb-server");
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             System.out.println("Could not start adb-server");
         }
     }
