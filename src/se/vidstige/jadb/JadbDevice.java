@@ -16,6 +16,8 @@ public class JadbDevice {
         BootLoader
     }
 
+    //noinspection OctalInteger
+    private static final int DEFAULT_MODE = 0664;
     private final String serial;
     private final ITransportFactory transportFactory;
 
@@ -146,11 +148,6 @@ public class JadbDevice {
         return result;
     }
 
-    private int getMode(File file) {
-        //noinspection OctalInteger
-        return 0664;
-    }
-
     public void push(InputStream source, long lastModified, int mode, RemoteFile remote) throws IOException, JadbException {
         Transport transport = getTransport();
         SyncTransport sync = transport.startSync();
@@ -164,7 +161,7 @@ public class JadbDevice {
 
     public void push(File local, RemoteFile remote) throws IOException, JadbException {
         try (FileInputStream fileStream = new FileInputStream(local)) {
-            push(fileStream, local.lastModified(), getMode(local), remote);
+            push(fileStream, local.lastModified(), DEFAULT_MODE, remote);
         }
     }
 
