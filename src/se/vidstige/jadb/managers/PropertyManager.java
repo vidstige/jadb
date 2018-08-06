@@ -6,6 +6,7 @@ import se.vidstige.jadb.JadbException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -24,7 +25,7 @@ public class PropertyManager {
 
     public Map<String, String> getprop() throws IOException, JadbException {
         try (BufferedReader bufferedReader =
-                     new BufferedReader(new InputStreamReader(device.executeShell("getprop")))) {
+                     new BufferedReader(new InputStreamReader(device.executeShell("getprop"), StandardCharsets.UTF_8))) {
             return parseProp(bufferedReader);
         }
     }

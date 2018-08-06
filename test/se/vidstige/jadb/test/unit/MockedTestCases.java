@@ -12,7 +12,7 @@ import se.vidstige.jadb.test.fakes.FakeAdbServer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -72,7 +72,7 @@ public class MockedTestCases {
         server.add("serial-123");
         server.expectPush("serial-123", new RemoteFile("/remote/path/abc.txt")).withContent("abc");
         JadbDevice device = connection.getDevices().get(0);
-        ByteArrayInputStream fileContents = new ByteArrayInputStream("abc".getBytes());
+        ByteArrayInputStream fileContents = new ByteArrayInputStream("abc".getBytes(StandardCharsets.UTF_8));
         device.push(fileContents, parseDate("1981-08-25 13:37"), 0666, new RemoteFile("/remote/path/abc.txt"));
     }
 
@@ -81,7 +81,7 @@ public class MockedTestCases {
         server.add("serial-123");
         server.expectPush("serial-123", new RemoteFile("/remote/path/abc.txt")).failWith("No such directory");
         JadbDevice device = connection.getDevices().get(0);
-        ByteArrayInputStream fileContents = new ByteArrayInputStream("abc".getBytes());
+        ByteArrayInputStream fileContents = new ByteArrayInputStream("abc".getBytes(StandardCharsets.UTF_8));
         device.push(fileContents, parseDate("1981-08-25 13:37"), 0666, new RemoteFile("/remote/path/abc.txt"));
     }
 
@@ -92,7 +92,7 @@ public class MockedTestCases {
         JadbDevice device = connection.getDevices().get(0);
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         device.pull(new RemoteFile("/remote/path/abc.txt"), buffer);
-        Assert.assertArrayEquals("foobar".getBytes(Charset.forName("utf-8")), buffer.toByteArray());
+        Assert.assertArrayEquals("foobar".getBytes(StandardCharsets.UTF_8), buffer.toByteArray());
     }
 
     @Test

@@ -11,7 +11,7 @@ import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ProtocolException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -179,7 +179,7 @@ public class FakeAdbServer implements AdbResponder {
 
             @Override
             public void withContent(String content) {
-                this.content = content.getBytes(Charset.forName("utf-8"));
+                this.content = content.getBytes(StandardCharsets.UTF_8);
             }
 
             public boolean matches(RemoteFile path) {
@@ -212,7 +212,7 @@ public class FakeAdbServer implements AdbResponder {
             }
 
             public void returns(String stdout) {
-                this.stdout = stdout.getBytes(Charset.forName("utf-8"));
+                this.stdout = stdout.getBytes(StandardCharsets.UTF_8);
             }
 
             public void writeOutputTo(DataOutputStream stdout) throws IOException {

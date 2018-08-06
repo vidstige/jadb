@@ -1,7 +1,7 @@
 package se.vidstige.jadb;
 
 import java.io.*;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Created by vidstige on 2014-03-19.
@@ -52,7 +52,7 @@ public class SyncTransport {
     public String readString(int length) throws IOException {
         byte[] buffer = new byte[length];
         input.readFully(buffer);
-        return new String(buffer, Charset.forName("utf-8"));
+        return new String(buffer, StandardCharsets.UTF_8);
     }
 
     public RemoteFileRecord readDirectoryEntry() throws IOException {
