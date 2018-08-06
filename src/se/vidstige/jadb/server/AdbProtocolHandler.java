@@ -41,6 +41,7 @@ class AdbProtocolHandler implements Runnable {
             DataInputStream input = new DataInputStream(socket.getInputStream());
             DataOutputStream output = new DataOutputStream(socket.getOutputStream())
         ) {
+            //noinspection StatementWithEmptyBody
             while (processCommand(input, output)) {
                 // nothing to do here
             }
