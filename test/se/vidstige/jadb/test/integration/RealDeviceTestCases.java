@@ -111,13 +111,9 @@ public class RealDeviceTestCases {
     @Test
     public void testScreenshot() throws Exception {
         JadbDevice any = jadb.getAnyDevice();
-        FileOutputStream outputStream = null;
-        try {
-            outputStream = new FileOutputStream(temporaryFolder.newFile("screenshot.png"));
+        try (FileOutputStream outputStream = new FileOutputStream(temporaryFolder.newFile("screenshot.png"))) {
             InputStream stdout = any.executeShell("screencap", "-p");
             Stream.copy(stdout, outputStream);
-        }  finally {
-            if (outputStream != null) outputStream.close();
         }
     }
 
