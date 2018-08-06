@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  * A class which works with properties, uses getprop and setprop methods of android shell
  */
 public class PropertyManager {
-    private final Pattern pattern = Pattern.compile("^\\[([a-zA-Z0-9_.-]*)\\]:.\\[([^\\[\\]]*)\\]");
+    private final Pattern pattern = Pattern.compile("^\\[([a-zA-Z0-9_.-]*)]:.\\[([^\\[\\]]*)]");
     private final JadbDevice device;
 
     public PropertyManager(JadbDevice device) {
