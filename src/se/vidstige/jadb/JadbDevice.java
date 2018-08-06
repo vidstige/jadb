@@ -163,9 +163,9 @@ public class JadbDevice {
     }
 
     public void push(File local, RemoteFile remote) throws IOException, JadbException {
-        FileInputStream fileStream = new FileInputStream(local);
-        push(fileStream, local.lastModified(), getMode(local), remote);
-        fileStream.close();
+        try (FileInputStream fileStream = new FileInputStream(local)) {
+            push(fileStream, local.lastModified(), getMode(local), remote);
+        }
     }
 
     public void pull(RemoteFile remote, OutputStream destination) throws IOException, JadbException {
@@ -177,9 +177,9 @@ public class JadbDevice {
     }
 
     public void pull(RemoteFile remote, File local) throws IOException, JadbException {
-        FileOutputStream fileStream = new FileOutputStream(local);
-        pull(remote, fileStream);
-        fileStream.close();
+        try (FileOutputStream fileStream = new FileOutputStream(local)) {
+            pull(remote, fileStream);
+        }
     }
 
     private void send(Transport transport, String command) throws IOException, JadbException {
