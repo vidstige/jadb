@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class FakeAdbServer implements AdbResponder {
     private final AdbServer server;
-    private final List<DeviceResponder> devices = new ArrayList<DeviceResponder>();
+    private final List<DeviceResponder> devices = new ArrayList<>();
 
     public FakeAdbServer(int port) {
         server = new AdbServer(this, port);
@@ -94,8 +94,8 @@ public class FakeAdbServer implements AdbResponder {
     private static class DeviceResponder implements AdbDeviceResponder {
         private final String serial;
         private final String type;
-        private List<FileExpectation> fileExpectations = new ArrayList<FileExpectation>();
-        private List<ShellExpectation> shellExpectations = new ArrayList<ShellExpectation>();
+        private List<FileExpectation> fileExpectations = new ArrayList<>();
+        private List<ShellExpectation> shellExpectations = new ArrayList<>();
 
         private DeviceResponder(String serial, String type) {
             this.serial = serial;
