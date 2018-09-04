@@ -43,7 +43,7 @@ public class PackageManager {
         if (!result.contains("Success")) throw new JadbException(getErrorMessage(operation, target, result));
     }
 
-    public void remove(RemoteFile file) throws IOException, JadbException {
+    private void remove(RemoteFile file) throws IOException, JadbException {
         InputStream s = device.executeShell("rm", "-f", Bash.quote(file.getPath()));
         Stream.readAll(s, StandardCharsets.UTF_8);
     }
@@ -51,7 +51,7 @@ public class PackageManager {
     private void install(File apkFile, List<String> extraArguments) throws IOException, JadbException {
         RemoteFile remote = new RemoteFile("/sdcard/tmp/" + apkFile.getName());
         device.push(apkFile, remote);
-        ArrayList<String> arguments = new ArrayList<>();
+        List<String> arguments = new ArrayList<>();
         arguments.add("install");
         arguments.addAll(extraArguments);
         arguments.add(remote.getPath());
@@ -91,13 +91,15 @@ public class PackageManager {
 
     //<editor-fold desc="InstallOption">
     public static class InstallOption {
+        private final StringBuilder stringBuilder = new StringBuilder();
+
         InstallOption(String ... varargs) {
+            String space = "";
             for(String str: varargs) {
-                stringBuilder.append(str).append(" ");
+                stringBuilder.append(space).append(str);
+                space = " ";
             }
         }
-
-        private final StringBuilder stringBuilder = new StringBuilder();
 
         private String getStringRepresentation() {
             return stringBuilder.toString();

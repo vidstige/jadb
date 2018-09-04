@@ -9,6 +9,7 @@ import se.vidstige.jadb.managers.Package;
 import se.vidstige.jadb.managers.PackageManager;
 import se.vidstige.jadb.test.fakes.FakeAdbServer;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,4 +92,26 @@ public class PackageManagerTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void testWithForwardLock() throws Exception {
+        PackageManager.InstallOption withForwardLock = PackageManager.WITH_FORWARD_LOCK;
+        // Letter L not number 1
+        String expected = "-l";
+        Method privateMethod = withForwardLock.getClass().getDeclaredMethod("getStringRepresentation");
+        privateMethod.setAccessible(true);
+        String actual = (String) privateMethod.invoke(withForwardLock);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testWithInstallerPackageName() throws Exception {
+        PackageManager.InstallOption withInstallerPackageName = PackageManager.WITH_INSTALLER_PACKAGE_NAME("aaa bbb");
+        String expected = "-t aaa bbb";
+        Method privateMethod = withInstallerPackageName.getClass().getDeclaredMethod("getStringRepresentation");
+        privateMethod.setAccessible(true);
+        String actual = (String) privateMethod.invoke(withInstallerPackageName);
+
+        assertEquals(expected, actual);
+    }
 }
