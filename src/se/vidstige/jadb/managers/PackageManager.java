@@ -94,10 +94,10 @@ public class PackageManager {
         private final StringBuilder stringBuilder = new StringBuilder();
 
         InstallOption(String ... varargs) {
-            String space = "";
+            String suffix = "";
             for(String str: varargs) {
-                stringBuilder.append(space).append(str);
-                space = " ";
+                stringBuilder.append(suffix).append(str);
+                suffix = " ";
             }
         }
 
