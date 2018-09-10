@@ -100,7 +100,7 @@ public class PackageManager {
         private final StringBuilder stringBuilder = new StringBuilder();
 
         private String getStringRepresentation() {
-            return stringBuilder.toString();
+            return stringBuilder.toString().trim();
         }
     }
 
