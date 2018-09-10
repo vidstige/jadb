@@ -44,7 +44,7 @@ An overview of the protocol can be found here: [Overview](https://android.google
 A list of the available commands that a ADB Server may accept can be found here:
 [Services](https://android.googlesource.com/platform/system/adb/+/master/SERVICES.TXT)
 
-The description for the protocol for transfering files can be found here: [SYNC.TXT](https://android.googlesource.com/platform/system/adb/+/master/SYNC.TXT).
+The description for the protocol for transferring files can be found here: [SYNC.TXT](https://android.googlesource.com/platform/system/adb/+/master/SYNC.TXT).
 
 
 ## Using JADB in your application ##

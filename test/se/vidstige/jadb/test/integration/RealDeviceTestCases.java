@@ -31,9 +31,7 @@ public class RealDeviceTestCases {
     public static void tryToStartAdbServer() {
         try {
             new AdbServerLauncher(new Subprocess(), System.getenv()).launch();
-        } catch (IOException e) {
-            System.out.println("Could not start adb-server");
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             System.out.println("Could not start adb-server");
         }
     }
@@ -113,13 +111,9 @@ public class RealDeviceTestCases {
     @Test
     public void testScreenshot() throws Exception {
         JadbDevice any = jadb.getAnyDevice();
-        FileOutputStream outputStream = null;
-        try {
-            outputStream = new FileOutputStream(temporaryFolder.newFile("screenshot.png"));
+        try (FileOutputStream outputStream = new FileOutputStream(temporaryFolder.newFile("screenshot.png"))) {
             InputStream stdout = any.executeShell("screencap", "-p");
             Stream.copy(stdout, outputStream);
-        }  finally {
-            if (outputStream != null) outputStream.close();
         }
     }
 

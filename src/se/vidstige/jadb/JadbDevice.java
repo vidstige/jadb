@@ -16,10 +16,12 @@ public class JadbDevice {
         BootLoader
     }
 
+    //noinspection OctalInteger
+    private static final int DEFAULT_MODE = 0664;
     private final String serial;
     private final ITransportFactory transportFactory;
 
-    JadbDevice(String serial, String type, ITransportFactory tFactory) {
+    JadbDevice(String serial, ITransportFactory tFactory) {
         this.serial = serial;
         this.transportFactory = tFactory;
     }
@@ -45,13 +47,7 @@ public class JadbDevice {
 
     private Transport getTransport() throws IOException, JadbException {
         Transport transport = transportFactory.createTransport();
-        if (serial == null) {
-            transport.send("host:transport-any");
-            transport.verifyResponse();
-        } else {
-            transport.send("host:transport:" + serial);
-            transport.verifyResponse();
-        }
+        send(transport, serial == null ? "host:transport-any" : "host:transport:" + serial );
         return transport;
     }
 
@@ -61,13 +57,7 @@ public class JadbDevice {
 
     public State getState() throws IOException, JadbException {
         Transport transport = transportFactory.createTransport();
-        if (serial == null) {
-            transport.send("host:get-state");
-            transport.verifyResponse();
-        } else {
-            transport.send("host-serial:" + serial + ":get-state");
-            transport.verifyResponse();
-        }
+        send(transport, serial == null ? "host:get-state" : "host-serial:" + serial + ":get-state");
 
         State state = convertState(transport.readString());
         transport.close();
@@ -158,11 +148,6 @@ public class JadbDevice {
         return result;
     }
 
-    private int getMode(File file) {
-        //noinspection OctalInteger
-        return 0664;
-    }
-
     public void push(InputStream source, long lastModified, int mode, RemoteFile remote) throws IOException, JadbException {
         Transport transport = getTransport();
         SyncTransport sync = transport.startSync();
@@ -175,9 +160,9 @@ public class JadbDevice {
     }
 
     public void push(File local, RemoteFile remote) throws IOException, JadbException {
-        FileInputStream fileStream = new FileInputStream(local);
-        push(fileStream, local.lastModified(), getMode(local), remote);
-        fileStream.close();
+        try (FileInputStream fileStream = new FileInputStream(local)) {
+            push(fileStream, local.lastModified(), DEFAULT_MODE, remote);
+        }
     }
 
     public void pull(RemoteFile remote, OutputStream destination) throws IOException, JadbException {
@@ -189,9 +174,9 @@ public class JadbDevice {
     }
 
     public void pull(RemoteFile remote, File local) throws IOException, JadbException {
-        FileOutputStream fileStream = new FileOutputStream(local);
-        pull(remote, fileStream);
-        fileStream.close();
+        try (FileOutputStream fileStream = new FileOutputStream(local)) {
+            pull(remote, fileStream);
+        }
     }
 
     private void send(Transport transport, String command) throws IOException, JadbException {
@@ -222,10 +207,8 @@ public class JadbDevice {
             return false;
         JadbDevice other = (JadbDevice) obj;
         if (serial == null) {
-            if (other.serial != null)
-                return false;
-        } else if (!serial.equals(other.serial))
-            return false;
-        return true;
+            return other.serial == null;
+        }
+        return serial.equals(other.serial);
     }
 }

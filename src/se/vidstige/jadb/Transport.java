@@ -2,7 +2,7 @@ package se.vidstige.jadb;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 class Transport {
 
@@ -44,7 +44,7 @@ class Transport {
         DataInput reader = new DataInputStream(inputStream);
         byte[] responseBuffer = new byte[length];
         reader.readFully(responseBuffer);
-        return new String(responseBuffer, Charset.forName("utf-8"));
+        return new String(responseBuffer, StandardCharsets.UTF_8);
     }
 
     public String getCommandLength(String command) {
@@ -52,7 +52,7 @@ class Transport {
     }
 
     public void send(String command) throws IOException {
-        OutputStreamWriter writer = new OutputStreamWriter(outputStream);
+        OutputStreamWriter writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
         writer.write(getCommandLength(command));
         writer.write(command);
         writer.flush();

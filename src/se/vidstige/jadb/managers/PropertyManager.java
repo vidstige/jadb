@@ -6,6 +6,7 @@ import se.vidstige.jadb.JadbException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -15,7 +16,7 @@ import java.util.regex.Pattern;
  * A class which works with properties, uses getprop and setprop methods of android shell
  */
 public class PropertyManager {
-    private final Pattern pattern = Pattern.compile("^\\[([a-zA-Z0-9_.-]*)\\]:.\\[([^\\[\\]]*)\\]");
+    private final Pattern pattern = Pattern.compile("^\\[([a-zA-Z0-9_.-]*)]:.\\[([^\\[\\]]*)]");
     private final JadbDevice device;
 
     public PropertyManager(JadbDevice device) {
@@ -24,7 +25,7 @@ public class PropertyManager {
 
     public Map<String, String> getprop() throws IOException, JadbException {
         try (BufferedReader bufferedReader =
-                     new BufferedReader(new InputStreamReader(device.executeShell("getprop")))) {
+                     new BufferedReader(new InputStreamReader(device.executeShell("getprop"), StandardCharsets.UTF_8))) {
             return parseProp(bufferedReader);
         }
     }

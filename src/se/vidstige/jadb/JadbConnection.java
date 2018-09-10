@@ -78,7 +78,7 @@ public class JadbConnection implements ITransportFactory {
         for (String line : lines) {
             String[] parts = line.split("\t");
             if (parts.length > 1) {
-                devices.add(new JadbDevice(parts[0], parts[1], this));
+                devices.add(new JadbDevice(parts[0], this)); // parts[1] is type
             }
         }
         return devices;

@@ -11,7 +11,7 @@ import java.io.DataInput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ProtocolException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class FakeAdbServer implements AdbResponder {
     private final AdbServer server;
-    private final List<DeviceResponder> devices = new ArrayList<DeviceResponder>();
+    private final List<DeviceResponder> devices = new ArrayList<>();
 
     public FakeAdbServer(int port) {
         server = new AdbServer(this, port);
@@ -91,11 +91,11 @@ public class FakeAdbServer implements AdbResponder {
         return new ArrayList<AdbDeviceResponder>(devices);
     }
 
-    private class DeviceResponder implements AdbDeviceResponder {
+    private static class DeviceResponder implements AdbDeviceResponder {
         private final String serial;
         private final String type;
-        private List<FileExpectation> fileExpectations = new ArrayList<FileExpectation>();
-        private List<ShellExpectation> shellExpectations = new ArrayList<ShellExpectation>();
+        private List<FileExpectation> fileExpectations = new ArrayList<>();
+        private List<ShellExpectation> shellExpectations = new ArrayList<>();
 
         private DeviceResponder(String serial, String type) {
             this.serial = serial;
@@ -155,7 +155,7 @@ public class FakeAdbServer implements AdbResponder {
             org.junit.Assert.assertEquals(0, shellExpectations.size());
         }
 
-        private class FileExpectation implements ExpectationBuilder {
+        private static class FileExpectation implements ExpectationBuilder {
             private final RemoteFile path;
             private byte[] content;
             private String failMessage;
@@ -179,7 +179,7 @@ public class FakeAdbServer implements AdbResponder {
 
             @Override
             public void withContent(String content) {
-                this.content = content.getBytes(Charset.forName("utf-8"));
+                this.content = content.getBytes(StandardCharsets.UTF_8);
             }
 
             public boolean matches(RemoteFile path) {
@@ -199,7 +199,7 @@ public class FakeAdbServer implements AdbResponder {
             }
         }
 
-        public class ShellExpectation {
+        public static class ShellExpectation {
             private final String command;
             private byte[] stdout;
 
@@ -212,7 +212,7 @@ public class FakeAdbServer implements AdbResponder {
             }
 
             public void returns(String stdout) {
-                this.stdout = stdout.getBytes(Charset.forName("utf-8"));
+                this.stdout = stdout.getBytes(StandardCharsets.UTF_8);
             }
 
             public void writeOutputTo(DataOutputStream stdout) throws IOException {

@@ -1,6 +1,6 @@
 # Contributing #
 ## Why contributing? ##
-The original author and all users of this library are very greatful for your contribution
+The original author and all users of this library are very grateful for your contribution
 to this Open Source Project. Also most employers value people active in the Open Source
 community.
 
@@ -25,4 +25,4 @@ your proposed change meets, or exceeds, the quality of the jadb source code.
   full terse.
 * Newline at end of file - This makes `cat`-ing files, etc easier.
 
-Happy coding! I, the original author, and all users are greatful for your contribution. :-)
+Happy coding! I, the original author, and all users are grateful for your contribution. :-)
