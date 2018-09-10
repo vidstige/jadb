@@ -102,7 +102,7 @@ public class PackageManager {
         }
 
         private String getStringRepresentation() {
-            return stringBuilder.toString();
+            return stringBuilder.toString().trim();
         }
     }
 
