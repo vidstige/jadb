@@ -47,7 +47,7 @@ class Transport {
         return new String(responseBuffer, StandardCharsets.UTF_8);
     }
 
-    public String getCommandLength(String command) {
+    private String getCommandLength(String command) {
         return String.format("%04x", command.length());
     }
 

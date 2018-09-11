@@ -19,7 +19,7 @@ public class DeviceWatcher implements Runnable {
     }
 
     @SuppressWarnings("squid:S2189") // watcher is stopped by closing transport
-    public void watch() {
+    private void watch() {
         try {
             while (true) {
                 listener.onDetect(connection.parseDevices(transport.readString()));
