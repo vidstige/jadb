@@ -211,7 +211,7 @@ class AdbProtocolHandler implements Runnable {
         return String.format("%04x", command.length());
     }
 
-    public void send(DataOutput writer, String response) throws IOException {
+    private void send(DataOutput writer, String response) throws IOException {
         writer.writeBytes(getCommandLength(response));
         writer.writeBytes(response);
     }

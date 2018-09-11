@@ -45,11 +45,11 @@ public class SyncTransport {
         }
     }
 
-    public int readInt() throws IOException {
+    private int readInt() throws IOException {
         return Integer.reverseBytes(input.readInt());
     }
 
-    public String readString(int length) throws IOException {
+    private String readString(int length) throws IOException {
         byte[] buffer = new byte[length];
         input.readFully(buffer);
         return new String(buffer, StandardCharsets.UTF_8);
