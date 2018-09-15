@@ -1,11 +1,11 @@
 package se.vidstige.jadb;
 
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
+import java.net.Socket;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.net.BindException;
+import java.net.InetSocketAddress;
 
 public class JadbConnection implements ITransportFactory {
 
@@ -24,7 +24,13 @@ public class JadbConnection implements ITransportFactory {
     }
 
     public Transport createTransport() throws IOException {
-        return new Transport(new Socket(host, port));
+        Transport source;
+        try {
+            source = new Transport(new Socket(host, port));
+        } catch(BindException ex) {
+            source = createTransport();
+        }
+        return source;
     }
 
     public String getHostVersion() throws IOException, JadbException {
