@@ -14,7 +14,7 @@ overall clean code.
 Before submitting a pull request, please go through the below checklist to verify
 your proposed change meets, or exceeds, the quality of the jadb source code.
 
-* Builds - Make sure the code builds by issuing `ant build`.
+* Builds - Make sure the code builds by issuing `mvn clean install test`.
 * Works - Make sure all the test runs and passes.
 * Works - Double check any features you might have changed, and of course any _new_ code
   by testing manually.
