@@ -44,7 +44,7 @@ public class PackageManager {
     }
 
     private void remove(RemoteFile file) throws IOException, JadbException {
-        InputStream s = device.executeShell("rm", "-f", Bash.quote(file.getPath()));
+        InputStream s = device.executeShell("rm", "-f", file.getPath());
         Stream.readAll(s, StandardCharsets.UTF_8);
     }
 
