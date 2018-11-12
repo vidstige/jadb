@@ -47,7 +47,14 @@ public class JadbDevice {
 
     private Transport getTransport() throws IOException, JadbException {
         Transport transport = transportFactory.createTransport();
-        send(transport, serial == null ? "host:transport-any" : "host:transport:" + serial );
+        // Do not use try-with-resources here. We want to return unclosed Transport and it is up to caller
+        // to close it. Here we close it only in case of exception.
+        try {
+            send(transport, serial == null ? "host:transport-any" : "host:transport:" + serial );
+        } catch (IOException|JadbException e) {
+            transport.close();
+            throw e;
+        }
         return transport;
     }
 
@@ -56,12 +63,10 @@ public class JadbDevice {
     }
 
     public State getState() throws IOException, JadbException {
-        Transport transport = transportFactory.createTransport();
-        send(transport, serial == null ? "host:get-state" : "host-serial:" + serial + ":get-state");
-
-        State state = convertState(transport.readString());
-        transport.close();
-        return state;
+        try (Transport transport = transportFactory.createTransport()) {
+            send(transport, serial == null ? "host:get-state" : "host-serial:" + serial + ":get-state");
+            return convertState(transport.readString());
+        }
     }
 
     /** <p>Execute a shell command.</p>
@@ -88,16 +93,14 @@ public class JadbDevice {
      */
     @Deprecated
     public void executeShell(OutputStream output, String command, String... args) throws IOException, JadbException {
-        Transport transport = getTransport();
-        StringBuilder shellLine = buildCmdLine(command, args);
-        send(transport, "shell:" + shellLine.toString());
-        if (output != null) {
-        	AdbFilterOutputStream out = new AdbFilterOutputStream(output);
-        	try {
-        		transport.readResponseTo(out);
-        	} finally {
-        		out.close();
-        	}
+        try (Transport transport = getTransport()) {
+            StringBuilder shellLine = buildCmdLine(command, args);
+            send(transport, "shell:" + shellLine.toString());
+            if (output == null)
+                return;
+
+            AdbFilterOutputStream out = new AdbFilterOutputStream(output);
+            transport.readResponseTo(out);
         }
     }
 
@@ -137,26 +140,28 @@ public class JadbDevice {
     }
 
     public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
-        Transport transport = getTransport();
-        SyncTransport sync = transport.startSync();
-        sync.send("LIST", remotePath);
+        try (Transport transport = getTransport()) {
+            SyncTransport sync = transport.startSync();
+            sync.send("LIST", remotePath);
 
-        List<RemoteFile> result = new ArrayList<>();
-        for (RemoteFileRecord dent = sync.readDirectoryEntry(); dent != RemoteFileRecord.DONE; dent = sync.readDirectoryEntry()) {
-            result.add(dent);
+            List<RemoteFile> result = new ArrayList<>();
+            for (RemoteFileRecord dent = sync.readDirectoryEntry(); dent != RemoteFileRecord.DONE; dent = sync.readDirectoryEntry()) {
+                result.add(dent);
+            }
+            return result;
         }
-        return result;
     }
 
     public void push(InputStream source, long lastModified, int mode, RemoteFile remote) throws IOException, JadbException {
-        Transport transport = getTransport();
-        SyncTransport sync = transport.startSync();
-        sync.send("SEND", remote.getPath() + "," + Integer.toString(mode));
+        try (Transport transport = getTransport()) {
+            SyncTransport sync = transport.startSync();
+            sync.send("SEND", remote.getPath() + "," + Integer.toString(mode));
 
-        sync.sendStream(source);
+            sync.sendStream(source);
 
-        sync.sendStatus("DONE", (int) lastModified);
-        sync.verifyStatus();
+            sync.sendStatus("DONE", (int) lastModified);
+            sync.verifyStatus();
+        }
     }
 
     public void push(File local, RemoteFile remote) throws IOException, JadbException {
@@ -166,11 +171,12 @@ public class JadbDevice {
     }
 
     public void pull(RemoteFile remote, OutputStream destination) throws IOException, JadbException {
-        Transport transport = getTransport();
-        SyncTransport sync = transport.startSync();
-        sync.send("RECV", remote.getPath());
+        try (Transport transport = getTransport()) {
+            SyncTransport sync = transport.startSync();
+            sync.send("RECV", remote.getPath());
 
-        sync.readChunksTo(destination);
+            sync.readChunksTo(destination);
+        }
     }
 
     public void pull(RemoteFile remote, File local) throws IOException, JadbException {
