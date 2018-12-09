@@ -19,8 +19,9 @@ public class SyncTransport {
     public void send(String syncCommand, String name) throws IOException {
         if (syncCommand.length() != 4) throw new IllegalArgumentException("sync commands must have length 4");
         output.writeBytes(syncCommand);
-        output.writeInt(Integer.reverseBytes(name.length()));
-        output.writeBytes(name);
+        byte[] data = name.getBytes();
+        output.writeInt(Integer.reverseBytes(data.length));
+        output.write(data);
     }
 
     public void sendStatus(String statusCode, int length) throws IOException {
