@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.ProtocolException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -86,6 +87,10 @@ public class FakeAdbServer implements AdbResponder {
         return findBySerial(serial).expectShell(commands);
     }
 
+    public DeviceResponder.ListExpectation expectList(String serial, String remotePath) {
+        return findBySerial(serial).expectList(remotePath);
+    }
+
     @Override
     public List<AdbDeviceResponder> getDevices() {
         return new ArrayList<AdbDeviceResponder>(devices);
@@ -96,6 +101,7 @@ public class FakeAdbServer implements AdbResponder {
         private final String type;
         private List<FileExpectation> fileExpectations = new ArrayList<>();
         private List<ShellExpectation> shellExpectations = new ArrayList<>();
+        private List<ListExpectation> listExpectations = new ArrayList<>();
 
         private DeviceResponder(String serial, String type) {
             this.serial = serial;
@@ -150,9 +156,21 @@ public class FakeAdbServer implements AdbResponder {
             throw new ProtocolException("Unexpected shell to device " + serial + ": " + command);
         }
 
+        @Override
+        public List<RemoteFile> list(String path) throws IOException {
+            for (ListExpectation le : listExpectations) {
+                if (le.matches(path)) {
+                    listExpectations.remove(le);
+                    return le.getFiles();
+                }
+            }
+            throw new ProtocolException("Unexpected list of device " + serial + " in dir " + path);
+        }
+
         public void verifyExpectations() {
             org.junit.Assert.assertEquals(0, fileExpectations.size());
             org.junit.Assert.assertEquals(0, shellExpectations.size());
+            org.junit.Assert.assertEquals(0, listExpectations.size());
         }
 
         private static class FileExpectation implements ExpectationBuilder {
@@ -161,7 +179,6 @@ public class FakeAdbServer implements AdbResponder {
             private String failMessage;
 
             public FileExpectation(RemoteFile path) {
-
                 this.path = path;
                 content = null;
                 failMessage = null;
@@ -220,6 +237,62 @@ public class FakeAdbServer implements AdbResponder {
             }
         }
 
+        public static class ListExpectation {
+
+            private final String remotePath;
+            private final List<RemoteFile> files = new ArrayList<>();
+
+            public ListExpectation(String remotePath) {
+                this.remotePath = remotePath;
+            }
+
+            public boolean matches(String remotePath) {
+                return remotePath.equals(this.remotePath);
+            }
+
+            public ListExpectation withFile(String path, int size, long modifyTime) {
+                files.add(new MockFileEntry(path, size, modifyTime, false));
+                return this;
+            }
+
+            public ListExpectation withDir(String path, long modifyTime) {
+                files.add(new MockFileEntry(path, -1, modifyTime, true));
+                return this;
+            }
+
+            public List<RemoteFile> getFiles() {
+                return Collections.unmodifiableList(files);
+            }
+
+            private static class MockFileEntry extends RemoteFile {
+
+                private final int size;
+                private final long modifyTime;
+                private final boolean dir;
+
+                MockFileEntry(String path, int size, long modifyTime, boolean dir) {
+                    super(path);
+                    this.size = size;
+                    this.modifyTime = modifyTime;
+                    this.dir = dir;
+                }
+
+                public int getSize() {
+                    return size;
+                }
+
+                public long getLastModified() {
+                    return modifyTime;
+                }
+
+                public boolean isDirectory() {
+                    return dir;
+                }
+
+            }
+
+        }
+
         public ExpectationBuilder expectPush(RemoteFile path) {
             FileExpectation expectation = new FileExpectation(path);
             fileExpectations.add(expectation);
@@ -235,6 +308,12 @@ public class FakeAdbServer implements AdbResponder {
         public ShellExpectation expectShell(String command) {
             ShellExpectation expectation = new ShellExpectation(command);
             shellExpectations.add(expectation);
+            return expectation;
+        }
+
+        public ListExpectation expectList(String remotePath) {
+            ListExpectation expectation = new ListExpectation(remotePath);
+            listExpectations.add(expectation);
             return expectation;
         }
     }
