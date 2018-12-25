@@ -175,6 +175,8 @@ class AdbProtocolHandler implements Runnable {
                 syncSend(output, input, length);
             } else if ("RECV".equals(id)) {
                 syncRecv(output, input, length);
+            } else if ("LIST".equals(id)) {
+                syncList(output, input, length);
             } else throw new JadbException("Unknown sync id " + id);
         } catch (JadbException e) { // sync response with a different type of fail message
             SyncTransport sync = getSyncTransport(output, input);
@@ -205,6 +207,15 @@ class AdbProtocolHandler implements Runnable {
         transport.readChunksTo(buffer);
         selected.filePushed(new RemoteFile(path), mode, buffer);
         transport.sendStatus("OKAY", 0); // 0 = ignored
+    }
+
+    private void syncList(DataOutput output, DataInput input, int length) throws IOException, JadbException {
+        String remotePath = readString(input, length);
+        SyncTransport transport = getSyncTransport(output, input);
+        for (RemoteFile file : selected.list(remotePath)) {
+            transport.sendDirectoryEntry(file);
+        }
+        transport.sendDirectoryEntryDone();
     }
 
     private String getCommandLength(String command) {

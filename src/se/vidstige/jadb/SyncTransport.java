@@ -19,7 +19,7 @@ public class SyncTransport {
     public void send(String syncCommand, String name) throws IOException {
         if (syncCommand.length() != 4) throw new IllegalArgumentException("sync commands must have length 4");
         output.writeBytes(syncCommand);
-        byte[] data = name.getBytes();
+        byte[] data = name.getBytes(StandardCharsets.UTF_8);
         output.writeInt(Integer.reverseBytes(data.length));
         output.write(data);
     }
@@ -49,6 +49,21 @@ public class SyncTransport {
         byte[] buffer = new byte[length];
         input.readFully(buffer);
         return new String(buffer, StandardCharsets.UTF_8);
+    }
+
+    public void sendDirectoryEntry(RemoteFile file) throws IOException {
+        output.writeBytes("DENT");
+        output.writeInt(Integer.reverseBytes(0666 | (file.isDirectory() ? (1 << 14) : 0)));
+        output.writeInt(Integer.reverseBytes(file.getSize()));
+        output.writeInt(Integer.reverseBytes(Long.valueOf(file.getLastModified()).intValue()));
+        byte[] pathChars = file.getPath().getBytes(StandardCharsets.UTF_8);
+        output.writeInt(Integer.reverseBytes(pathChars.length));
+        output.write(pathChars);
+    }
+
+    public void sendDirectoryEntryDone() throws IOException {
+        output.writeBytes("DONE");
+        output.writeBytes("\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"); // equivalent to the length of a "normal" dent
     }
 
     public RemoteFileRecord readDirectoryEntry() throws IOException {

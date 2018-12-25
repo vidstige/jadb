@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.List;
 
 public class MockedTestCases {
@@ -117,8 +118,59 @@ public class MockedTestCases {
         device.executeShell("echo", "newline2\r\nstring");
     }
 
-    private long parseDate(String date) throws ParseException {
+    @Test
+    public void testFileList() throws Exception {
+        server.add("serial-123");
+        server.expectList("serial-123", "/sdcard/Documents")
+                .withDir("school", 123456789L)
+                .withDir("finances", 7070707L)
+                .withDir("\u904A\u6232", 528491L)
+                .withFile("user_manual.pdf", 3000, 648649L)
+                .withFile("effective java vol. 7.epub", 0xCAFE, 0xBABEL)
+                .withFile("\uB9AC\uADF8 \uC624\uBE0C \uB808\uC804\uB4DC", 240, 9001L);
+        JadbDevice device = connection.getDevices().get(0);
+        List<RemoteFile> files = device.list("/sdcard/Documents");
+        Assert.assertEquals(6, files.size());
+        assertHasDir("school", 123456789L, files);
+        assertHasDir("finances", 7070707L, files);
+        assertHasDir("\u904A\u6232", 528491L, files);
+        assertHasFile("user_manual.pdf", 3000, 648649L, files);
+        assertHasFile("effective java vol. 7.epub", 0xCAFE, 0xBABEL, files);
+        assertHasFile("\uB9AC\uADF8 \uC624\uBE0C \uB808\uC804\uB4DC", 240, 9001L, files);
+    }
+
+    private static long parseDate(String date) throws ParseException {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         return dateFormat.parse(date).getTime();
+    }
+
+    private static void assertHasFile(String expPath, int expSize, long expModifyTime, List<RemoteFile> actualFiles) {
+        for (RemoteFile file : actualFiles) {
+            if (expPath.equals(file.getPath())) {
+                if (file.isDirectory()) {
+                    Assert.fail("File " + expPath + " was listed as a dir!");
+                } else if (expSize != file.getSize() || expModifyTime != file.getLastModified()) {
+                    Assert.fail("File " + expPath + " exists but has incorrect properties!");
+                } else {
+                    return;
+                }
+            }
+        }
+        Assert.fail("File " + expPath + " could not be found!");
+    }
+
+    private static void assertHasDir(String expPath, long expModifyTime, List<RemoteFile> actualFiles) {
+        for (RemoteFile file : actualFiles) {
+            if (expPath.equals(file.getPath())) {
+                if (!file.isDirectory()) {
+                    Assert.fail("Dir " + expPath + " was listed as a file!");
+                } else if (expModifyTime != file.getLastModified()) {
+                    Assert.fail("Dir " + expPath + " exists but has incorrect properties!");
+                } else {
+                    return;
+                }
+            }
+        }
+        Assert.fail("Dir " + expPath + " could not be found!");
     }
 }
