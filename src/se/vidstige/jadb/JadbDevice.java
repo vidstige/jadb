@@ -1,10 +1,12 @@
 package se.vidstige.jadb;
 
 import se.vidstige.jadb.managers.Bash;
-
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+
+import static se.vidstige.jadb.Util.inputStreamToString;
 
 public class JadbDevice {
     @SuppressWarnings("squid:S00115")
@@ -146,10 +148,7 @@ public class JadbDevice {
      * @return success or failure
      */
     public boolean enableTcpip() throws IOException, JadbException {
-        Transport transport = getTransport();
-
-        send(transport, String.format("tcpip: %d", DEFAULT_TCPIP_PORT));
-        return transport.readString().trim().equals(String.format("restarting in TCP Mode: %d", DEFAULT_TCPIP_PORT));
+        return enableTcpip(DEFAULT_TCPIP_PORT);
     }
 
     /**
@@ -161,8 +160,10 @@ public class JadbDevice {
      */
     public boolean enableTcpip(int port) throws IOException, JadbException {
         Transport transport = getTransport();
-        send(transport, String.format("tcpip: %d", port));
-        return transport.readString().trim().equals(String.format("restarting in TCP Mode: %d", port));
+        send(transport, String.format("tcpip:%d", port));
+        String expectedResult = String.format("restarting in TCP Mode: %d", port);
+
+        return inputStreamToString(transport.getInputStream()).equals(expectedResult);
     }
 
     public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
