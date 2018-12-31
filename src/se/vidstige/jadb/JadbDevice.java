@@ -20,6 +20,7 @@ public class JadbDevice {
     private static final int DEFAULT_MODE = 0664;
     private final String serial;
     private final ITransportFactory transportFactory;
+    private static final int DEFAULT_TCPIP_PORT = 5555;
 
     JadbDevice(String serial, ITransportFactory tFactory) {
         this.serial = serial;
@@ -137,6 +138,31 @@ public class JadbDevice {
             shellLine.append(Bash.quote(arg));
         }
         return shellLine;
+    }
+
+    /**
+     * Enable tcpip on the default port (5555)
+     *
+     * @return success or failure
+     */
+    public boolean enableTcpip() throws IOException, JadbException {
+        Transport transport = getTransport();
+
+        send(transport, String.format("tcpip: %d", DEFAULT_TCPIP_PORT));
+        return transport.readString().trim().equals(String.format("restarting in TCP Mode: %d", DEFAULT_TCPIP_PORT));
+    }
+
+    /**
+     * Enable tcpip on a specific port
+     *
+     * @param port for the device to bind on
+     *
+     * @return success or failure
+     */
+    public boolean enableTcpip(int port) throws IOException, JadbException {
+        Transport transport = getTransport();
+        send(transport, String.format("tcpip: %d", port));
+        return transport.readString().trim().equals(String.format("restarting in TCP Mode: %d", port));
     }
 
     public List<RemoteFile> list(String remotePath) throws IOException, JadbException {
