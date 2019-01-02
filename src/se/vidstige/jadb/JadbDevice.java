@@ -13,7 +13,11 @@ public class JadbDevice {
         Offline,
         Device,
         Recovery,
-        BootLoader
+        BootLoader,
+        Unauthorized,
+        Authorizing,
+        Sideload,
+        Connecting
     }
 
     //noinspection OctalInteger
@@ -41,6 +45,10 @@ public class JadbDevice {
             case "offline":    return State.Offline;
             case "bootloader": return State.BootLoader;
             case "recovery":   return State.Recovery;
+            case "unauthorized": return State.Unauthorized;
+            case "authorizing" : return State.Authorizing;
+            case "connecting": return State.Connecting;
+            case "sideload": return State.Sideload;
             default:           return State.Unknown;
         }
     }
