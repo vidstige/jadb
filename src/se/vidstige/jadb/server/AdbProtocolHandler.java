@@ -70,6 +70,8 @@ class AdbProtocolHandler implements Runnable {
                 hostGetState(output);
             } else if (command.startsWith("host-serial:")) {
                 hostSerial(output, command);
+            } else if (command.startsWith("tcpip:")) {
+                handleTcpip(output, command);
             } else {
                 throw new ProtocolException("Unknown command: " + command);
             }
@@ -79,6 +81,11 @@ class AdbProtocolHandler implements Runnable {
         }
         output.flush();
         return true;
+    }
+
+    private void handleTcpip(DataOutputStream output, String command) throws IOException {
+        output.writeBytes("OKAY");
+        selected.enableIpCommand(command.substring("tcpip:".length()), output);
     }
 
     private void hostSerial(DataOutput output, String command) throws IOException {

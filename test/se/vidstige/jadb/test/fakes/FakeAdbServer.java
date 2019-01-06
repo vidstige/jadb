@@ -1,15 +1,13 @@
 package se.vidstige.jadb.test.fakes;
 
+import com.sun.tools.doclets.standard.Standard;
 import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
 import se.vidstige.jadb.server.AdbDeviceResponder;
 import se.vidstige.jadb.server.AdbResponder;
 import se.vidstige.jadb.server.AdbServer;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ProtocolException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -87,6 +85,10 @@ public class FakeAdbServer implements AdbResponder {
         return findBySerial(serial).expectShell(commands);
     }
 
+    public DeviceResponder.TcpIpException expectTcpip(String serial, String port) {
+        return findBySerial(serial).expectTcpip(port);
+    }
+
     public DeviceResponder.ListExpectation expectList(String serial, String remotePath) {
         return findBySerial(serial).expectList(remotePath);
     }
@@ -102,6 +104,7 @@ public class FakeAdbServer implements AdbResponder {
         private List<FileExpectation> fileExpectations = new ArrayList<>();
         private List<ShellExpectation> shellExpectations = new ArrayList<>();
         private List<ListExpectation> listExpectations = new ArrayList<>();
+        private List<TcpIpException> tcpipExpectations = new ArrayList<>();
 
         private DeviceResponder(String serial, String type) {
             this.serial = serial;
@@ -157,6 +160,21 @@ public class FakeAdbServer implements AdbResponder {
         }
 
         @Override
+        public void enableIpCommand(String port, DataOutputStream outputStream) throws IOException {
+            for (TcpIpException expectation : tcpipExpectations) {
+                if (expectation.matches(port)) {
+                    tcpipExpectations.remove(expectation);
+                    outputStream.write(String.format("restarting in TCP Mode: %s\n", port).getBytes(StandardCharsets.UTF_8));
+                    outputStream.flush();
+                    return;
+                }
+            }
+
+            throw new ProtocolException("Unexpected tcpip to device " + serial + ": (port) " + port);
+
+        }
+
+        @Override
         public List<RemoteFile> list(String path) throws IOException {
             for (ListExpectation le : listExpectations) {
                 if (le.matches(path)) {
@@ -173,6 +191,32 @@ public class FakeAdbServer implements AdbResponder {
             org.junit.Assert.assertEquals(0, listExpectations.size());
         }
 
+        private static class TcpIpException implements ExpectationBuilder {
+
+            private String port;
+
+            public TcpIpException(final String port) {
+                this.port = port;
+            }
+
+            public boolean matches(String cmd) {
+                return cmd.equals(port);
+            }
+
+            @Override
+            public void failWith(String message) {
+
+            }
+
+            @Override
+            public void withContent(byte[] content) {
+
+            }
+
+            @Override
+            public void withContent(String content) {
+            }
+        }
         private static class FileExpectation implements ExpectationBuilder {
             private final RemoteFile path;
             private byte[] content;
@@ -314,6 +358,12 @@ public class FakeAdbServer implements AdbResponder {
         public ListExpectation expectList(String remotePath) {
             ListExpectation expectation = new ListExpectation(remotePath);
             listExpectations.add(expectation);
+            return expectation;
+        }
+
+        public TcpIpException expectTcpip(String port) {
+            TcpIpException expectation = new TcpIpException(port);
+            tcpipExpectations.add(expectation);
             return expectation;
         }
     }

@@ -3,10 +3,7 @@ package se.vidstige.jadb.server;
 import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -20,6 +17,7 @@ public interface AdbDeviceResponder {
     void filePulled(RemoteFile path, ByteArrayOutputStream buffer) throws JadbException, IOException;
 
     void shell(String command, DataOutputStream stdout, DataInput stdin) throws IOException;
+    void enableIpCommand(String ip, DataOutputStream outputStream) throws IOException;
 
     List<RemoteFile> list(String path) throws IOException;
 }
