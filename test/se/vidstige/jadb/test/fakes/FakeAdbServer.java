@@ -1,13 +1,15 @@
 package se.vidstige.jadb.test.fakes;
 
-import com.sun.tools.doclets.standard.Standard;
 import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
 import se.vidstige.jadb.server.AdbDeviceResponder;
 import se.vidstige.jadb.server.AdbResponder;
 import se.vidstige.jadb.server.AdbServer;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.ProtocolException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
