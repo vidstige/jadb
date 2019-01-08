@@ -17,7 +17,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.List;
 
 public class MockedTestCases {
@@ -108,9 +107,9 @@ public class MockedTestCases {
     @Test
     public void testExecuteEnableTcpip() throws IOException, JadbException {
         server.add("serial-123");
-        server.expectTcpip("serial-123", "5555");
+        server.expectTcpip("serial-123", 5555);
         JadbDevice device = connection.getDevices().get(0);
-        device.enableTcpip();
+        device.enableAdbOverTCP();
     }
 
     @Test

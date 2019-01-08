@@ -3,7 +3,6 @@ package se.vidstige.jadb;
 import se.vidstige.jadb.managers.Bash;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -146,8 +145,8 @@ public class JadbDevice {
      *
      * @return success or failure
      */
-    public boolean enableTcpip() throws IOException, JadbException {
-        return enableTcpip(DEFAULT_TCPIP_PORT);
+    public void enableAdbOverTCP() throws IOException, JadbException {
+        enableAdbOverTCP(DEFAULT_TCPIP_PORT);
     }
 
     /**
@@ -157,11 +156,9 @@ public class JadbDevice {
      *
      * @return success or failure
      */
-    public boolean enableTcpip(int port) throws IOException, JadbException {
+    public void enableAdbOverTCP(int port) throws IOException, JadbException {
         try (Transport transport = getTransport()) {
             send(transport, String.format("tcpip:%d", port));
-            String expectedResult = String.format("restarting in TCP Mode: %d\n", port);
-            return transport.readString(expectedResult.length()).equals(expectedResult);
         }
     }
 
