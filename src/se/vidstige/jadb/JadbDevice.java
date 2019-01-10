@@ -24,6 +24,7 @@ public class JadbDevice {
     private static final int DEFAULT_MODE = 0664;
     private final String serial;
     private final ITransportFactory transportFactory;
+    private static final int DEFAULT_TCPIP_PORT = 5555;
 
     JadbDevice(String serial, ITransportFactory tFactory) {
         this.serial = serial;
@@ -145,6 +146,28 @@ public class JadbDevice {
             shellLine.append(Bash.quote(arg));
         }
         return shellLine;
+    }
+
+    /**
+     * Enable tcpip on the default port (5555)
+     *
+     * @return success or failure
+     */
+    public void enableAdbOverTCP() throws IOException, JadbException {
+        enableAdbOverTCP(DEFAULT_TCPIP_PORT);
+    }
+
+    /**
+     * Enable tcpip on a specific port
+     *
+     * @param port for the device to bind on
+     *
+     * @return success or failure
+     */
+    public void enableAdbOverTCP(int port) throws IOException, JadbException {
+        try (Transport transport = getTransport()) {
+            send(transport, String.format("tcpip:%d", port));
+        }
     }
 
     public List<RemoteFile> list(String remotePath) throws IOException, JadbException {

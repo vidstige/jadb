@@ -87,6 +87,10 @@ public class FakeAdbServer implements AdbResponder {
         return findBySerial(serial).expectShell(commands);
     }
 
+    public void expectTcpip(String serial, Integer port) {
+        findBySerial(serial).expectTcpip(port);
+    }
+
     public DeviceResponder.ListExpectation expectList(String serial, String remotePath) {
         return findBySerial(serial).expectList(remotePath);
     }
@@ -102,6 +106,7 @@ public class FakeAdbServer implements AdbResponder {
         private List<FileExpectation> fileExpectations = new ArrayList<>();
         private List<ShellExpectation> shellExpectations = new ArrayList<>();
         private List<ListExpectation> listExpectations = new ArrayList<>();
+        private List<Integer> tcpipExpectations = new ArrayList<>();
 
         private DeviceResponder(String serial, String type) {
             this.serial = serial;
@@ -157,6 +162,19 @@ public class FakeAdbServer implements AdbResponder {
         }
 
         @Override
+        public void enableIpCommand(String port, DataOutputStream outputStream) throws IOException {
+            for (Integer expectation : tcpipExpectations) {
+                if (expectation == Integer.parseInt(port)) {
+                    tcpipExpectations.remove(expectation);
+                    return;
+                }
+            }
+
+            throw new ProtocolException("Unexpected tcpip to device " + serial + ": (port) " + port);
+
+        }
+
+        @Override
         public List<RemoteFile> list(String path) throws IOException {
             for (ListExpectation le : listExpectations) {
                 if (le.matches(path)) {
@@ -171,6 +189,7 @@ public class FakeAdbServer implements AdbResponder {
             org.junit.Assert.assertEquals(0, fileExpectations.size());
             org.junit.Assert.assertEquals(0, shellExpectations.size());
             org.junit.Assert.assertEquals(0, listExpectations.size());
+            org.junit.Assert.assertEquals(0, tcpipExpectations.size());
         }
 
         private static class FileExpectation implements ExpectationBuilder {
@@ -315,6 +334,10 @@ public class FakeAdbServer implements AdbResponder {
             ListExpectation expectation = new ListExpectation(remotePath);
             listExpectations.add(expectation);
             return expectation;
+        }
+
+        public void expectTcpip(int port) {
+            tcpipExpectations.add(port);
         }
     }
 }

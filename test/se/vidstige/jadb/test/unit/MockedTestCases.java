@@ -12,11 +12,11 @@ import se.vidstige.jadb.test.fakes.FakeAdbServer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.List;
 
 public class MockedTestCases {
@@ -102,6 +102,14 @@ public class MockedTestCases {
         server.expectShell("serial-123", "ls -l").returns("total 0");
         JadbDevice device = connection.getDevices().get(0);
         device.executeShell("ls", "-l");
+    }
+
+    @Test
+    public void testExecuteEnableTcpip() throws IOException, JadbException {
+        server.add("serial-123");
+        server.expectTcpip("serial-123", 5555);
+        JadbDevice device = connection.getDevices().get(0);
+        device.enableAdbOverTCP();
     }
 
     @Test
