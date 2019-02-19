@@ -269,12 +269,12 @@ public class FakeAdbServer implements AdbResponder {
                 return remotePath.equals(this.remotePath);
             }
 
-            public ListExpectation withFile(String path, int size, long modifyTime) {
+            public ListExpectation withFile(String path, int size, int modifyTime) {
                 files.add(new MockFileEntry(path, size, modifyTime, false));
                 return this;
             }
 
-            public ListExpectation withDir(String path, long modifyTime) {
+            public ListExpectation withDir(String path, int modifyTime) {
                 files.add(new MockFileEntry(path, -1, modifyTime, true));
                 return this;
             }
@@ -286,10 +286,10 @@ public class FakeAdbServer implements AdbResponder {
             private static class MockFileEntry extends RemoteFile {
 
                 private final int size;
-                private final long modifyTime;
+                private final int modifyTime;
                 private final boolean dir;
 
-                MockFileEntry(String path, int size, long modifyTime, boolean dir) {
+                MockFileEntry(String path, int size, int modifyTime, boolean dir) {
                     super(path);
                     this.size = size;
                     this.modifyTime = modifyTime;
@@ -300,7 +300,7 @@ public class FakeAdbServer implements AdbResponder {
                     return size;
                 }
 
-                public long getLastModified() {
+                public int getLastModified() {
                     return modifyTime;
                 }
 

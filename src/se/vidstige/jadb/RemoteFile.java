@@ -10,7 +10,7 @@ public class RemoteFile {
 
     public String getName() { throw new UnsupportedOperationException(); }
     public int getSize() { throw new UnsupportedOperationException(); }
-    public long getLastModified() { throw new UnsupportedOperationException(); }
+    public int getLastModified() { throw new UnsupportedOperationException(); }
     public boolean isDirectory() { throw new UnsupportedOperationException(); }
 
     public String getPath() { return path;}
