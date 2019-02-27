@@ -8,9 +8,9 @@ class RemoteFileRecord extends RemoteFile {
 
     private final int mode;
     private final int size;
-    private final long lastModified;
+    private final int lastModified;
 
-    public RemoteFileRecord(String name, int mode, int size, long lastModified) {
+    public RemoteFileRecord(String name, int mode, int size, int lastModified) {
         super(name);
         this.mode = mode;
         this.size = size;
@@ -23,7 +23,7 @@ class RemoteFileRecord extends RemoteFile {
     }
 
     @Override
-    public long getLastModified() {
+    public int getLastModified() {
         return lastModified;
     }
 

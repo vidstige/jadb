@@ -130,21 +130,21 @@ public class MockedTestCases {
     public void testFileList() throws Exception {
         server.add("serial-123");
         server.expectList("serial-123", "/sdcard/Documents")
-                .withDir("school", 123456789L)
-                .withDir("finances", 7070707L)
-                .withDir("\u904A\u6232", 528491L)
-                .withFile("user_manual.pdf", 3000, 648649L)
-                .withFile("effective java vol. 7.epub", 0xCAFE, 0xBABEL)
-                .withFile("\uB9AC\uADF8 \uC624\uBE0C \uB808\uC804\uB4DC", 240, 9001L);
+                .withDir("school", 123456789)
+                .withDir("finances", 7070707)
+                .withDir("\u904A\u6232", 528491)
+                .withFile("user_manual.pdf", 3000, 648649)
+                .withFile("effective java vol. 7.epub", 0xCAFE, 0xBABE)
+                .withFile("\uB9AC\uADF8 \uC624\uBE0C \uB808\uC804\uB4DC", 240, 9001);
         JadbDevice device = connection.getDevices().get(0);
         List<RemoteFile> files = device.list("/sdcard/Documents");
         Assert.assertEquals(6, files.size());
-        assertHasDir("school", 123456789L, files);
-        assertHasDir("finances", 7070707L, files);
-        assertHasDir("\u904A\u6232", 528491L, files);
-        assertHasFile("user_manual.pdf", 3000, 648649L, files);
-        assertHasFile("effective java vol. 7.epub", 0xCAFE, 0xBABEL, files);
-        assertHasFile("\uB9AC\uADF8 \uC624\uBE0C \uB808\uC804\uB4DC", 240, 9001L, files);
+        assertHasDir("school", 123456789, files);
+        assertHasDir("finances", 7070707, files);
+        assertHasDir("\u904A\u6232", 528491, files);
+        assertHasFile("user_manual.pdf", 3000, 648649, files);
+        assertHasFile("effective java vol. 7.epub", 0xCAFE, 0xBABE, files);
+        assertHasFile("\uB9AC\uADF8 \uC624\uBE0C \uB808\uC804\uB4DC", 240, 9001, files);
     }
 
     private static long parseDate(String date) throws ParseException {

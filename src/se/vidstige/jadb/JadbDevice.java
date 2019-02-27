@@ -186,7 +186,7 @@ public class JadbDevice {
     public void push(InputStream source, long lastModified, int mode, RemoteFile remote) throws IOException, JadbException {
         try (Transport transport = getTransport()) {
             SyncTransport sync = transport.startSync();
-            sync.send("SEND", remote.getPath() + "," + Integer.toString(mode));
+            sync.send("SEND", remote.getPath() + "," + mode);
 
             sync.sendStream(source);
 

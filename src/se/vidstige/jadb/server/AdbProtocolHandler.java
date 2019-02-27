@@ -178,13 +178,19 @@ class AdbProtocolHandler implements Runnable {
         try {
             String id = readString(input, 4);
             int length = readInt(input);
-            if ("SEND".equals(id)) {
-                syncSend(output, input, length);
-            } else if ("RECV".equals(id)) {
-                syncRecv(output, input, length);
-            } else if ("LIST".equals(id)) {
-                syncList(output, input, length);
-            } else throw new JadbException("Unknown sync id " + id);
+            switch (id) {
+                case "SEND":
+                    syncSend(output, input, length);
+                    break;
+                case "RECV":
+                    syncRecv(output, input, length);
+                    break;
+                case "LIST":
+                    syncList(output, input, length);
+                    break;
+                default:
+                    throw new JadbException("Unknown sync id " + id);
+            }
         } catch (JadbException e) { // sync response with a different type of fail message
             SyncTransport sync = getSyncTransport(output, input);
             sync.send("FAIL", e.getMessage());

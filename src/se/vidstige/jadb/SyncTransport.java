@@ -55,7 +55,7 @@ public class SyncTransport {
         output.writeBytes("DENT");
         output.writeInt(Integer.reverseBytes(0666 | (file.isDirectory() ? (1 << 14) : 0)));
         output.writeInt(Integer.reverseBytes(file.getSize()));
-        output.writeInt(Integer.reverseBytes(Long.valueOf(file.getLastModified()).intValue()));
+        output.writeInt(Integer.reverseBytes(file.getLastModified()));
         byte[] pathChars = file.getPath().getBytes(StandardCharsets.UTF_8);
         output.writeInt(Integer.reverseBytes(pathChars.length));
         output.write(pathChars);
