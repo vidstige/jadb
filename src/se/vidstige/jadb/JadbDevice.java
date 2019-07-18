@@ -113,6 +113,24 @@ public class JadbDevice {
         }
     }
 
+    /** <p>Execute a shell command.</p>
+     *
+     * <p>This method supports separate stdin, stdout, and stderr streams, as well as a return code. The shell command
+     * is not executed until calling {@link ShellProcessBuilder#start()}, which returns a {@link Process}.</p>
+     *
+     * @param command main command to run, e.g. "screencap"
+     * @param args arguments to the command, e.g. "-p".
+     * @return a {@link ShellProcessBuilder}
+     */
+    public ShellProcessBuilder shellProcessBuilder(String command, String... args) {
+        return new ShellProcessBuilder(new ShellProcessBuilder.TransportCallable() {
+            @Override
+            public Transport getTransport() throws JadbException, IOException {
+                return JadbDevice.this.getTransport();
+            }
+        }, buildCmdLine(command, args).toString());
+    }
+
     /** <p>Execute a command with raw binary output.</p>
      *
      * <p>Support for this command was added in Lollipop (Android 5.0), and is the recommended way to transmit binary

@@ -67,6 +67,12 @@ class Transport implements Closeable {
         return new SyncTransport(dataOutput, dataInput);
     }
 
+    public ShellV2Transport startShellV2(String command) throws IOException, JadbException {
+        send("shell,v2,raw:" + command);
+        verifyResponse();
+        return new ShellV2Transport(dataOutput, dataInput);
+    }
+
     @Override
     public void close() throws IOException {
         dataInput.close();
