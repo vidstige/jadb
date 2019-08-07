@@ -54,7 +54,7 @@ public class JadbDevice {
         }
     }
 
-    private Transport getTransport() throws IOException, JadbException {
+    Transport getTransport() throws IOException, JadbException {
         Transport transport = transportFactory.createTransport();
         // Do not use try-with-resources here. We want to return unclosed Transport and it is up to caller
         // to close it. Here we close it only in case of exception.
@@ -123,12 +123,7 @@ public class JadbDevice {
      * @return a {@link ShellProcessBuilder}
      */
     public ShellProcessBuilder shellProcessBuilder(String command, String... args) {
-        return new ShellProcessBuilder(new ShellProcessBuilder.TransportCallable() {
-            @Override
-            public Transport getTransport() throws JadbException, IOException {
-                return JadbDevice.this.getTransport();
-            }
-        }, buildCmdLine(command, args).toString());
+        return new ShellProcessBuilder(this, buildCmdLine(command, args).toString());
     }
 
     /** <p>Execute a command with raw binary output.</p>

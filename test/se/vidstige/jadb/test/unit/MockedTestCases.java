@@ -131,7 +131,7 @@ public class MockedTestCases {
     }
 
     @Test
-    public void testExecuteShellV2() throws Exception {
+    public void testExecuteShellProtocol() throws Exception {
         server.add("serial-123");
         server.expectShell("serial-123", "ls -l").returns(buildStream(null, null, 0));
         server.expectShell("serial-123", "ls foobar").returns(buildStream("123", "456", 0));

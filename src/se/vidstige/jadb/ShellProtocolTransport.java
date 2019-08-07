@@ -3,11 +3,11 @@ package se.vidstige.jadb;
 import java.io.*;
 
 
-class ShellV2Transport implements Closeable {
+class ShellProtocolTransport implements Closeable {
     private final DataOutputStream output;
     private final DataInputStream input;
 
-    ShellV2Transport(DataOutputStream outputStream, DataInputStream inputStream) {
+    ShellProtocolTransport(DataOutputStream outputStream, DataInputStream inputStream) {
         output = outputStream;
         input = inputStream;
     }
@@ -71,7 +71,7 @@ class ShellV2Transport implements Closeable {
     }
 
     OutputStream getOutputStream() {
-        return new ShellV2OutputStream(this);
+        return new ShellProtocolOutputStream(this);
     }
 
     @Override
@@ -130,11 +130,11 @@ class ShellV2Transport implements Closeable {
         }
     }
 
-    private static class ShellV2OutputStream extends OutputStream {
+    private static class ShellProtocolOutputStream extends OutputStream {
 
-        private final ShellV2Transport transport;
+        private final ShellProtocolTransport transport;
 
-        ShellV2OutputStream(ShellV2Transport transport) {
+        ShellProtocolOutputStream(ShellProtocolTransport transport) {
             this.transport = transport;
         }
 

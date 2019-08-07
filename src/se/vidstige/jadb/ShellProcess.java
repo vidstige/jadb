@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 
-class ShellV2Process extends Process {
+public class ShellProcess extends Process {
 
     private static final int KILLED_STATUS_CODE = 9;
     private final OutputStream outputStream;
@@ -17,8 +17,8 @@ class ShellV2Process extends Process {
     private final Future<Integer> exitCodeFuture;
     private Integer exitCode = null;
 
-    ShellV2Process(OutputStream outputStream, InputStream inputStream, InputStream errorStream,
-                   Future<Integer> exitCodeFuture) {
+    ShellProcess(OutputStream outputStream, InputStream inputStream, InputStream errorStream,
+                 Future<Integer> exitCodeFuture) {
         this.outputStream = outputStream;
         this.inputStream = inputStream;
         this.errorStream = errorStream;

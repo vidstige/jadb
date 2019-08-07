@@ -3,10 +3,7 @@ package se.vidstige.jadb;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.*;
 
 
 /**
@@ -51,7 +48,7 @@ import java.util.concurrent.FutureTask;
  */
 public class ShellProcessBuilder {
 
-    private TransportCallable transportCallable;
+    private JadbDevice device;
     private String command;
     private ProcessBuilder.Redirect outRedirect = ProcessBuilder.Redirect.PIPE;
     private OutputStream outOs = null;
@@ -60,8 +57,8 @@ public class ShellProcessBuilder {
     private boolean redirectErrorStream;
     private Executor executor = null;
 
-    ShellProcessBuilder(TransportCallable transportCallable, String command) {
-        this.transportCallable = transportCallable;
+    ShellProcessBuilder(JadbDevice device, String command) {
+        this.device = device;
         this.command = command;
     }
 
@@ -156,7 +153,7 @@ public class ShellProcessBuilder {
      * @throws IOException
      * @throws JadbException
      */
-    public Process start() throws IOException, JadbException {
+    public ShellProcess start() throws IOException, JadbException {
         Transport transport = null;
         try {
             final OutputStream outOs = getOutputStream(this.outOs, this.outRedirect, System.out);
@@ -172,27 +169,30 @@ public class ShellProcessBuilder {
                 errIs = getConnectedPipe(errOs);
             }
 
-            transport = transportCallable.getTransport();
-            final ShellV2Transport shellV2Transport = transport.startShellV2(this.command);
-            OutputStream inOs = shellV2Transport.getOutputStream();
+            transport = device.getTransport();
+            final ShellProtocolTransport shellProtocolTransport = transport.startShellProtocol(this.command);
+            OutputStream inOs = shellProtocolTransport.getOutputStream();
 
             FutureTask<Integer> transportTask = new FutureTask<>(new Callable<Integer>() {
                 @Override
                 public Integer call() throws Exception {
-                    try (ShellV2Transport unused1 = shellV2Transport;
+                    try (ShellProtocolTransport unused1 = shellProtocolTransport;
                          OutputStream unused2 = outOs;
                          OutputStream unused3 = errOs) {
-                        return shellV2Transport.demuxOutput(outOs, errOs);
+                        return shellProtocolTransport.demuxOutput(outOs, errOs);
                     }
                 }
             });
 
             if (executor == null) {
-                executor = Executors.newSingleThreadExecutor();
+                ExecutorService service = Executors.newSingleThreadExecutor();
+                service.execute(transportTask);
+                service.shutdown();
+            } else {
+                executor.execute(transportTask);
             }
-            executor.execute(transportTask);
 
-            return new ShellV2Process(inOs, outIs, errIs, transportTask);
+            return new ShellProcess(inOs, outIs, errIs, transportTask);
         } catch (IOException | JadbException | RuntimeException e) {
             if (transport != null) {
                 transport.close();
@@ -242,9 +242,5 @@ public class ShellProcessBuilder {
         public int available() {
             return 0;
         }
-    }
-
-    interface TransportCallable {
-        Transport getTransport() throws JadbException, IOException;
     }
 }
