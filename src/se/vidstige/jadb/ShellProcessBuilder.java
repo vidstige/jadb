@@ -3,7 +3,11 @@ package se.vidstige.jadb;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 
 
 /**
@@ -192,7 +196,7 @@ public class ShellProcessBuilder {
                 executor.execute(transportTask);
             }
 
-            return new ShellProcess(inOs, outIs, errIs, transportTask);
+            return new ShellProcess(inOs, outIs, errIs, transportTask, shellProtocolTransport);
         } catch (IOException | JadbException | RuntimeException e) {
             if (transport != null) {
                 transport.close();

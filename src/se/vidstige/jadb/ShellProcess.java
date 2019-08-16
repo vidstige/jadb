@@ -1,7 +1,9 @@
 package se.vidstige.jadb;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -16,13 +18,15 @@ public class ShellProcess extends Process {
     private final InputStream errorStream;
     private final Future<Integer> exitCodeFuture;
     private Integer exitCode = null;
+    private final ShellProtocolTransport transport;
 
     ShellProcess(OutputStream outputStream, InputStream inputStream, InputStream errorStream,
-                 Future<Integer> exitCodeFuture) {
+                 Future<Integer> exitCodeFuture, ShellProtocolTransport transport) {
         this.outputStream = outputStream;
         this.inputStream = inputStream;
         this.errorStream = errorStream;
         this.exitCodeFuture = exitCodeFuture;
+        this.transport = transport;
     }
 
     @Override
@@ -45,6 +49,8 @@ public class ShellProcess extends Process {
         if (exitCode == null) {
             try {
                 exitCode = exitCodeFuture.get();
+            } catch (CancellationException e) {
+                exitCode = KILLED_STATUS_CODE;
             } catch (ExecutionException e) {
                 throw new RuntimeException(e);
             }
@@ -57,6 +63,8 @@ public class ShellProcess extends Process {
         if (exitCode == null) {
             try {
                 exitCode = exitCodeFuture.get(timeout, unit);
+            } catch (CancellationException e) {
+                exitCode = KILLED_STATUS_CODE;
             } catch (ExecutionException e) {
                 throw new RuntimeException(e);
             } catch (TimeoutException e) {
@@ -75,6 +83,8 @@ public class ShellProcess extends Process {
             try {
                 exitCode = exitCodeFuture.get(0, TimeUnit.SECONDS);
                 return exitCode;
+            } catch (CancellationException e) {
+                exitCode = KILLED_STATUS_CODE;
             } catch (ExecutionException e) {
                 throw new RuntimeException(e);
             } catch (TimeoutException e) {
@@ -90,8 +100,13 @@ public class ShellProcess extends Process {
     @Override
     public void destroy() {
         if (isAlive()) {
-            exitCodeFuture.cancel(true);
-            exitCode = KILLED_STATUS_CODE;
+            try {
+                exitCodeFuture.cancel(true);
+                // interrupt (usually) doesn't work for blocking read -- this will cause SocketException
+                transport.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

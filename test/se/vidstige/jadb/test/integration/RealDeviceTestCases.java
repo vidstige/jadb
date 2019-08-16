@@ -9,6 +9,9 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,6 +25,7 @@ import se.vidstige.jadb.JadbConnection;
 import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
+import se.vidstige.jadb.ShellProcess;
 import se.vidstige.jadb.Stream;
 import se.vidstige.jadb.Subprocess;
 
@@ -163,6 +167,17 @@ public class RealDeviceTestCases {
         String stdout = new Scanner(process.getInputStream()).useDelimiter("\\A").next();
         process.waitFor();
         System.out.println(stdout);
+    }
+
+    @Test
+    public void testShellExecuteProcessDestroy() throws Exception {
+        JadbDevice anyDevice = jadb.getAnyDevice();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        ShellProcess process = anyDevice.shellProcessBuilder("sleep 30").redirectErrorStream(true).useExecutor(executor).start();
+        process.destroy();
+        assertEquals(process.waitFor(), 9);
+        executor.shutdown();
+        assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS));
     }
 
     @Test
