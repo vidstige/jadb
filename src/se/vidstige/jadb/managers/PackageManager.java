@@ -49,7 +49,7 @@ public class PackageManager {
     }
 
     private void install(File apkFile, List<String> extraArguments) throws IOException, JadbException {
-        RemoteFile remote = new RemoteFile("/sdcard/tmp/" + apkFile.getName());
+        RemoteFile remote = new RemoteFile("/data/local/tmp/" + apkFile.getName());
         device.push(apkFile, remote);
         List<String> arguments = new ArrayList<>();
         arguments.add("install");
