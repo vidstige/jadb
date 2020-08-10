@@ -17,7 +17,8 @@ public class JadbDevice {
         Unauthorized,
         Authorizing,
         Sideload,
-        Connecting
+        Connecting,
+        Rescue
     }
 
     //noinspection OctalInteger
@@ -50,6 +51,7 @@ public class JadbDevice {
             case "authorizing" : return State.Authorizing;
             case "connecting": return State.Connecting;
             case "sideload": return State.Sideload;
+            case "rescue"  : return State.Rescue;
             default:           return State.Unknown;
         }
     }
