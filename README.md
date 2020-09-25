@@ -94,6 +94,8 @@ This project would not be where it is, if it where not for the helpful [contribu
 supporting jadb with pull requests, issue reports, and great ideas. If _you_ would like to
 contribute, please read through [CONTRIBUTING.md](CONTRIBUTING.md).
 
+* If you fix a bug, try to _first_ create a failing test. Reach out to me for assistance or guidance if needed.
+
 ## Authors ##
 Samuel Carlsson <samuel.carlsson@gmail.com>
 
