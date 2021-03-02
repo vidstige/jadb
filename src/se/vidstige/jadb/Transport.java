@@ -51,7 +51,7 @@ class Transport implements Closeable {
     }
 
     private String getCommandLength(String command) {
-        return String.format("%04x", command.length());
+        return String.format("%04x", command.getBytes().length);
     }
 
     public void send(String command) throws IOException {
