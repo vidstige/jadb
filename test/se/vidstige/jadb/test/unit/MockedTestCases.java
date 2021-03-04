@@ -119,11 +119,15 @@ public class MockedTestCases {
         server.expectShell("serial-123", "echo 'tab\tstring'").returns("tab\tstring");
         server.expectShell("serial-123", "echo 'newline1\nstring'").returns("newline1\nstring");
         server.expectShell("serial-123", "echo 'newline2\r\nstring'").returns("newline2\r\nstring");
+        server.expectShell("serial-123", "echo 'fuö äzpo'").returns("fuö äzpo");
+        server.expectShell("serial-123", "echo 'h¡t]&poli'").returns("h¡t]&poli");
         JadbDevice device = connection.getDevices().get(0);
         device.executeShell("ls", "space file");
         device.executeShell("echo", "tab\tstring");
         device.executeShell("echo", "newline1\nstring");
         device.executeShell("echo", "newline2\r\nstring");
+        device.executeShell("echo", "fuö äzpo");
+        device.executeShell("echo", "h¡t]&poli");
     }
 
     @Test
