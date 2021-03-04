@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import se.vidstige.jadb.JadbConnection;
 import se.vidstige.jadb.JadbDevice;
+import se.vidstige.jadb.Stream;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -60,41 +61,6 @@ public class ExecuteCmdTests {
     @Test
     public void testExecuteWithSpecialChars() throws Exception {
         InputStream response = jadbDevice.execute("echo", input);
-        ResponseReader responseReader = new ResponseReader(response);
-        responseReader.start();
-        responseReader.join(1000L);
-        String ret = responseReader.output;
-        //remove newline
-        ret = ret.replaceAll("\n$", "");
-        Assert.assertEquals(input, ret);
+        Assert.assertEquals(input, Stream.readAll(response, StandardCharsets.UTF_8).replaceAll("\n$", ""));
     }
-
-
-    private class ResponseReader extends Thread {
-        public String output;
-        private InputStream response;
-
-        ResponseReader(InputStream response) {
-            super();
-            this.response = response;
-        }
-
-        @Override
-        public void run() {
-            try {
-                StringBuilder textBuilder = new StringBuilder();
-                try (Reader reader = new BufferedReader(new InputStreamReader
-                        (response, Charset.forName(StandardCharsets.UTF_8.name())))) {
-                    int c = 0;
-                    while ((c = reader.read()) != -1) {
-                        textBuilder.append((char) c);
-                    }
-                }
-                output = textBuilder.toString();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
 }
