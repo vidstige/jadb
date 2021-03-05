@@ -44,7 +44,7 @@ public class PackageManagerTest {
         String response = "package:/system/priv-app/Contacts.apk-com.android.contacts\n" +
                 "package:/system/priv-app/Teleservice.apk-com.android.phone";
 
-        server.expectShell(DEVICE_SERIAL, "pm list packages").returns(response);
+        server.expectShell(DEVICE_SERIAL, "pm 'list' 'packages'").returns(response);
 
         //Act
         List<Package> actual = new PackageManager(device).getPackages();
@@ -64,7 +64,7 @@ public class PackageManagerTest {
                 "[malformed_line]\n" +
                 "package:/system/priv-app/Teleservice.apk-com.android.phone";
 
-        server.expectShell(DEVICE_SERIAL, "pm list packages").returns(response);
+        server.expectShell(DEVICE_SERIAL, "pm 'list' 'packages'").returns(response);
 
         //Act
         List<Package> actual = new PackageManager(device).getPackages();
@@ -79,7 +79,7 @@ public class PackageManagerTest {
         List<Package> expected = new ArrayList<>();
         String response = "";
 
-        server.expectShell(DEVICE_SERIAL, "pm list packages").returns(response);
+        server.expectShell(DEVICE_SERIAL, "pm 'list' 'packages'").returns(response);
 
         //Act
         List<Package> actual = new PackageManager(device).getPackages();
