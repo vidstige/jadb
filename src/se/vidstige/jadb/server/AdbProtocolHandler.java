@@ -63,7 +63,7 @@ class AdbProtocolHandler implements Runnable {
                 hostTransport(output, command);
             } else if ("sync:".equals(command)) {
                 sync(output, input);
-            } else if (command.startsWith("shell:")) {
+            } else if (command.startsWith("shell")) {
                 shell(input, output, command);
                 return false;
             } else if ("host:get-state".equals(command)) {
@@ -118,7 +118,7 @@ class AdbProtocolHandler implements Runnable {
     }
 
     private void shell(DataInput input, DataOutputStream output, String command) throws IOException {
-        String shellCommand = command.substring("shell:".length());
+        String shellCommand = command.split(":", 2)[1];
         output.writeBytes("OKAY");
         shell(shellCommand, output, input);
     }

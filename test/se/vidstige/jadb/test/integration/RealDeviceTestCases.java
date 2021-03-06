@@ -1,24 +1,36 @@
 package se.vidstige.jadb.test.integration;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import se.vidstige.jadb.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import se.vidstige.jadb.AdbServerLauncher;
+import se.vidstige.jadb.ConnectionToRemoteDeviceException;
+import se.vidstige.jadb.JadbConnection;
+import se.vidstige.jadb.JadbDevice;
+import se.vidstige.jadb.JadbException;
+import se.vidstige.jadb.RemoteFile;
+import se.vidstige.jadb.ShellProcess;
+import se.vidstige.jadb.Stream;
+import se.vidstige.jadb.Subprocess;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+
 
 public class RealDeviceTestCases {
 
@@ -106,6 +118,66 @@ public class RealDeviceTestCases {
         any.executeShell(bout, "ls /");
         any.executeShell(bout, "ls", "-la", "/");
         System.out.write(bout.toByteArray());
+    }
+
+    @Test
+    public void testShellProcessBuilderStart() throws Exception {
+        JadbDevice any = jadb.getAnyDevice();
+        Process process = any.shellProcessBuilder("ls /").start();
+        AtomicReference<String> stdout = new AtomicReference<>();
+        AtomicReference<String> stderr = new AtomicReference<>();
+        Thread thread1 = gobbler(process.getInputStream(), stdout);
+        Thread thread2 = gobbler(process.getErrorStream(), stderr);
+        thread1.start();
+        thread2.start();
+        process.waitFor();
+        thread1.join();
+        thread2.join();
+        System.out.println(stdout.get());
+        System.out.println(stderr.get());
+    }
+
+    private Thread gobbler(final InputStream stream, final AtomicReference<String> out) {
+        return new Thread(new Runnable() {
+            @Override
+            public void run() {
+                out.set(new Scanner(stream).useDelimiter("\\A").next());
+            }
+        });
+    }
+
+    @Test
+    public void testShellExecuteProcessRedirectToOutputStream() throws Exception {
+        JadbDevice any = jadb.getAnyDevice();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream err = new ByteArrayOutputStream();
+        Process process = any.shellProcessBuilder("ls /")
+            .redirectOutput(out)
+            .redirectError(err)
+            .start();
+        process.waitFor();
+        System.out.println(out.toString(StandardCharsets.UTF_8.name()));
+        System.out.println(err.toString(StandardCharsets.UTF_8.name()));
+    }
+
+    @Test
+    public void testShellExecuteProcessRedirectErrorStream() throws Exception {
+        JadbDevice any = jadb.getAnyDevice();
+        Process process = any.shellProcessBuilder("ls /").redirectErrorStream(true).start();
+        String stdout = new Scanner(process.getInputStream()).useDelimiter("\\A").next();
+        process.waitFor();
+        System.out.println(stdout);
+    }
+
+    @Test
+    public void testShellExecuteProcessDestroy() throws Exception {
+        JadbDevice anyDevice = jadb.getAnyDevice();
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        ShellProcess process = anyDevice.shellProcessBuilder("sleep 30").redirectErrorStream(true).useExecutor(executor).start();
+        process.destroy();
+        assertEquals(process.waitFor(), 9);
+        executor.shutdown();
+        assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS));
     }
 
     @Test
