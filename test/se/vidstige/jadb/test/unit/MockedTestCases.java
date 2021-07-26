@@ -1,5 +1,13 @@
 package se.vidstige.jadb.test.unit;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.List;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -9,15 +17,6 @@ import se.vidstige.jadb.JadbDevice;
 import se.vidstige.jadb.JadbException;
 import se.vidstige.jadb.RemoteFile;
 import se.vidstige.jadb.test.fakes.FakeAdbServer;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.List;
 
 public class MockedTestCases {
 
@@ -51,6 +50,7 @@ public class MockedTestCases {
 
     @Test
     public void testGetDeviceState() throws Exception {
+        System.out.println("getDeviceState");
         server.add("serial-1", "offline");
         server.add("serial-2", "device");
         server.add("serial-3", "unknown");
@@ -64,12 +64,14 @@ public class MockedTestCases {
 
     @Test
     public void testListNoDevices() throws Exception {
+        System.out.println("listNoDevices");
         List<JadbDevice> devices = connection.getDevices();
         Assert.assertEquals(0, devices.size());
     }
 
     @Test
     public void testPushFile() throws Exception {
+        System.out.println("pushFile");
         server.add("serial-123");
         server.expectPush("serial-123", new RemoteFile("/remote/path/abc.txt")).withContent("abc");
         JadbDevice device = connection.getDevices().get(0);
@@ -79,6 +81,7 @@ public class MockedTestCases {
 
     @Test(expected = JadbException.class)
     public void testPushToInvalidPath() throws Exception {
+        System.out.println("pushToInvalidPath");
         server.add("serial-123");
         server.expectPush("serial-123", new RemoteFile("/remote/path/abc.txt")).failWith("No such directory");
         JadbDevice device = connection.getDevices().get(0);
@@ -88,6 +91,7 @@ public class MockedTestCases {
 
     @Test
     public void testPullFile() throws Exception {
+        System.out.println("pullFile");
         server.add("serial-123");
         server.expectPull("serial-123", new RemoteFile("/remote/path/abc.txt")).withContent("foobar");
         JadbDevice device = connection.getDevices().get(0);
@@ -98,6 +102,7 @@ public class MockedTestCases {
 
     @Test
     public void testExecuteShell() throws Exception {
+        System.out.println("executeShell");
         server.add("serial-123");
         server.expectShell("serial-123", "ls '-l'").returns("total 0");
         JadbDevice device = connection.getDevices().get(0);
@@ -106,6 +111,7 @@ public class MockedTestCases {
 
     @Test
     public void testExecuteEnableTcpip() throws IOException, JadbException {
+        System.out.println("executeEnableTcpip");
         server.add("serial-123");
         server.expectTcpip("serial-123", 5555);
         JadbDevice device = connection.getDevices().get(0);
@@ -114,24 +120,22 @@ public class MockedTestCases {
 
     @Test
     public void testExecuteShellQuotesWhitespace() throws Exception {
+        System.out.println("executeShellQuotesWhitespace");
         server.add("serial-123");
         server.expectShell("serial-123", "ls 'space file'").returns("space file");
         server.expectShell("serial-123", "echo 'tab\tstring'").returns("tab\tstring");
         server.expectShell("serial-123", "echo 'newline1\nstring'").returns("newline1\nstring");
         server.expectShell("serial-123", "echo 'newline2\r\nstring'").returns("newline2\r\nstring");
-        server.expectShell("serial-123", "echo 'fuö äzpo'").returns("fuö äzpo");
-        server.expectShell("serial-123", "echo 'h¡t]&poli'").returns("h¡t]&poli");
         JadbDevice device = connection.getDevices().get(0);
         device.executeShell("ls", "space file");
         device.executeShell("echo", "tab\tstring");
         device.executeShell("echo", "newline1\nstring");
         device.executeShell("echo", "newline2\r\nstring");
-        device.executeShell("echo", "fuö äzpo");
-        device.executeShell("echo", "h¡t]&poli");
     }
 
     @Test
     public void testFileList() throws Exception {
+        System.out.println("fileList");
         server.add("serial-123");
         server.expectList("serial-123", "/sdcard/Documents")
                 .withDir("school", 123456789)
@@ -152,6 +156,7 @@ public class MockedTestCases {
     }
 
     private static long parseDate(String date) throws ParseException {
+        System.out.println("parseDate");
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         return dateFormat.parse(date).getTime();
     }

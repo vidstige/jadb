@@ -1,11 +1,5 @@
 package se.vidstige.jadb.test.fakes;
 
-import se.vidstige.jadb.JadbException;
-import se.vidstige.jadb.RemoteFile;
-import se.vidstige.jadb.server.AdbDeviceResponder;
-import se.vidstige.jadb.server.AdbResponder;
-import se.vidstige.jadb.server.AdbServer;
-
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataOutputStream;
@@ -15,11 +9,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import se.vidstige.jadb.JadbException;
+import se.vidstige.jadb.RemoteFile;
+import se.vidstige.jadb.server.AdbDeviceResponder;
+import se.vidstige.jadb.server.AdbResponder;
+import se.vidstige.jadb.server.AdbServer;
 
 /**
  * Created by vidstige on 2014-03-20.
  */
 public class FakeAdbServer implements AdbResponder {
+
     private final AdbServer server;
     private final List<DeviceResponder> devices = new ArrayList<>();
 
@@ -56,11 +56,13 @@ public class FakeAdbServer implements AdbResponder {
     }
 
     public void verifyExpectations() {
-        for (DeviceResponder d : devices)
+        for (DeviceResponder d : devices) {
             d.verifyExpectations();
+        }
     }
 
     public interface ExpectationBuilder {
+
         void failWith(String message);
 
         void withContent(byte[] content);
@@ -70,7 +72,9 @@ public class FakeAdbServer implements AdbResponder {
 
     private DeviceResponder findBySerial(String serial) {
         for (DeviceResponder d : devices) {
-            if (d.getSerial().equals(serial)) return d;
+            if (d.getSerial().equals(serial)) {
+                return d;
+            }
         }
         return null;
     }
@@ -101,6 +105,7 @@ public class FakeAdbServer implements AdbResponder {
     }
 
     private static class DeviceResponder implements AdbDeviceResponder {
+
         private final String serial;
         private final String type;
         private List<FileExpectation> fileExpectations = new ArrayList<>();
@@ -193,6 +198,7 @@ public class FakeAdbServer implements AdbResponder {
         }
 
         private static class FileExpectation implements ExpectationBuilder {
+
             private final RemoteFile path;
             private byte[] content;
             private String failMessage;
@@ -223,7 +229,9 @@ public class FakeAdbServer implements AdbResponder {
             }
 
             public void throwIfFail() throws JadbException {
-                if (failMessage != null) throw new JadbException(failMessage);
+                if (failMessage != null) {
+                    throw new JadbException(failMessage);
+                }
             }
 
             public void verifyContent(byte[] content) {
@@ -236,6 +244,7 @@ public class FakeAdbServer implements AdbResponder {
         }
 
         public static class ShellExpectation {
+
             private final String command;
             private byte[] stdout;
 
