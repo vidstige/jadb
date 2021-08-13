@@ -24,11 +24,30 @@ public class JadbDevice {
     //noinspection OctalInteger
     private static final int DEFAULT_MODE = 0664;
     private final String serial;
+    private final String usb;
+    private final String product;
+    private final String model;
+    private final String device;
+    private final String transport_id;
     private final ITransportFactory transportFactory;
     private static final int DEFAULT_TCPIP_PORT = 5555;
 
+
+    private JadbDevice(ITransportFactory tFactory) {
+        this(null, null, null, null, null, null, tFactory);
+    }
+
     JadbDevice(String serial, ITransportFactory tFactory) {
+        this(serial, null, null, null, null, null, tFactory);
+    }
+
+    JadbDevice(String serial, String usb, String product, String model, String device, String transport_id, ITransportFactory tFactory) {
         this.serial = serial;
+        this.usb = usb;
+        this.product = product;
+        this.model = model;
+        this.device = device;
+        this.transport_id = transport_id;
         this.transportFactory = tFactory;
     }
 
@@ -36,23 +55,28 @@ public class JadbDevice {
         return new JadbDevice(connection);
     }
 
-    private JadbDevice(ITransportFactory tFactory) {
-        serial = null;
-        this.transportFactory = tFactory;
-    }
-
     private State convertState(String type) {
         switch (type) {
-            case "device":     return State.Device;
-            case "offline":    return State.Offline;
-            case "bootloader": return State.BootLoader;
-            case "recovery":   return State.Recovery;
-            case "unauthorized": return State.Unauthorized;
-            case "authorizing" : return State.Authorizing;
-            case "connecting": return State.Connecting;
-            case "sideload": return State.Sideload;
-            case "rescue"  : return State.Rescue;
-            default:           return State.Unknown;
+            case "device":
+                return State.Device;
+            case "offline":
+                return State.Offline;
+            case "bootloader":
+                return State.BootLoader;
+            case "recovery":
+                return State.Recovery;
+            case "unauthorized":
+                return State.Unauthorized;
+            case "authorizing":
+                return State.Authorizing;
+            case "connecting":
+                return State.Connecting;
+            case "sideload":
+                return State.Sideload;
+            case "rescue":
+                return State.Rescue;
+            default:
+                return State.Unknown;
         }
     }
 
@@ -61,8 +85,8 @@ public class JadbDevice {
         // Do not use try-with-resources here. We want to return unclosed Transport and it is up to caller
         // to close it. Here we close it only in case of exception.
         try {
-            send(transport, serial == null ? "host:transport-any" : "host:transport:" + serial );
-        } catch (IOException|JadbException e) {
+            send(transport, serial == null ? "host:transport-any" : "host:transport:" + serial);
+        } catch (IOException | JadbException e) {
             transport.close();
             throw e;
         }
@@ -73,6 +97,26 @@ public class JadbDevice {
         return serial;
     }
 
+    public String getUsb() {
+        return usb;
+    }
+
+    public String getProduct() {
+        return product;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public String getDevice() {
+        return device;
+    }
+
+    public String getTransport_id() {
+        return transport_id;
+    }
+
     public State getState() throws IOException, JadbException {
         try (Transport transport = transportFactory.createTransport()) {
             send(transport, serial == null ? "host:get-state" : "host-serial:" + serial + ":get-state");
@@ -80,12 +124,13 @@ public class JadbDevice {
         }
     }
 
-    /** <p>Execute a shell command.</p>
+    /**
+     * <p>Execute a shell command.</p>
      *
      * <p>For Lollipop and later see: {@link #execute(String, String...)}</p>
      *
      * @param command main command to run. E.g. "ls"
-     * @param args arguments to the command.
+     * @param args    arguments to the command.
      * @return combined stdout/stderr stream.
      * @throws IOException
      * @throws JadbException
@@ -98,7 +143,6 @@ public class JadbDevice {
     }
 
     /**
-     *
      * @deprecated Use InputStream executeShell(String command, String... args) method instead. Together with
      * Stream.copy(in, out), it is possible to achieve the same effect.
      */
@@ -115,14 +159,15 @@ public class JadbDevice {
         }
     }
 
-    /** <p>Execute a command with raw binary output.</p>
+    /**
+     * <p>Execute a command with raw binary output.</p>
      *
      * <p>Support for this command was added in Lollipop (Android 5.0), and is the recommended way to transmit binary
      * data with that version or later. For earlier versions of Android, use
      * {@link #executeShell(String, String...)}.</p>
      *
      * @param command main command to run, e.g. "screencap"
-     * @param args arguments to the command, e.g. "-p".
+     * @param args    arguments to the command, e.g. "-p".
      * @return combined stdout/stderr stream.
      * @throws IOException
      * @throws JadbException
@@ -138,7 +183,7 @@ public class JadbDevice {
      * Builds a command line string from the command and its arguments.
      *
      * @param command the command.
-     * @param args the list of arguments.
+     * @param args    the list of arguments.
      * @return the command line.
      */
     private StringBuilder buildCmdLine(String command, String... args) {
@@ -163,7 +208,6 @@ public class JadbDevice {
      * Enable tcpip on a specific port
      *
      * @param port for the device to bind on
-     *
      * @return success or failure
      */
     public void enableAdbOverTCP(int port) throws IOException, JadbException {
@@ -216,6 +260,32 @@ public class JadbDevice {
         try (FileOutputStream fileStream = new FileOutputStream(local)) {
             pull(remote, fileStream);
         }
+    }
+
+    public FrameBuffer screenshot() throws IOException, JadbException {
+        Transport transport = getTransport();
+        send(transport, "framebuffer:");
+        FrameBuffer frameBuffer = new FrameBuffer();
+        frameBuffer.version = transport.readInt();
+        frameBuffer.bpp = transport.readInt();
+        frameBuffer.colorSpace = transport.readInt();
+        frameBuffer.size = transport.readInt();
+        frameBuffer.width = transport.readInt();
+        frameBuffer.height = transport.readInt();
+        frameBuffer.red_offset = transport.readInt();
+        frameBuffer.red_length = transport.readInt();
+        frameBuffer.blue_offset = transport.readInt();
+        frameBuffer.blue_length = transport.readInt();
+        frameBuffer.green_offset = transport.readInt();
+        frameBuffer.green_length = transport.readInt();
+        frameBuffer.alpha_offset = transport.readInt();
+        frameBuffer.alpha_length = transport.readInt();
+        byte[] imageData = new byte[frameBuffer.size];
+        DataInputStream inputStream = transport.getDataInputStream();
+        inputStream.readFully(imageData);
+        inputStream.close();
+        frameBuffer.data = imageData;
+        return frameBuffer;
     }
 
     private void send(Transport transport, String command) throws IOException, JadbException {

@@ -58,6 +58,15 @@ public class JadbConnection implements ITransportFactory {
         }
     }
 
+    public List<JadbDevice> getDevicesList() throws IOException, JadbException {
+        try (Transport transport = createTransport()) {
+            transport.send("host:devices-l");
+            transport.verifyResponse();
+            String body = transport.readString();
+            return parseDevicesList(body);
+        }
+    }
+
     public DeviceWatcher createDeviceWatcher(DeviceDetectionListener listener) throws IOException, JadbException {
         Transport transport = createTransport();
         transport.send("host:track-devices");
@@ -72,6 +81,37 @@ public class JadbConnection implements ITransportFactory {
             String[] parts = line.split("\t");
             if (parts.length > 1) {
                 devices.add(new JadbDevice(parts[0], this)); // parts[1] is type
+            }
+        }
+        return devices;
+    }
+
+    public List<JadbDevice> parseDevicesList(String body) {
+        String[] lines = body.split("\n");
+        ArrayList<JadbDevice> devices = new ArrayList<>(lines.length);
+        for (String line : lines) {
+            String[] parts = line.split(" ");
+            if (parts.length > 1) {
+                String serial = parts[0];
+                String usb = null;
+                String product = null;
+                String model = null;
+                String device = null;
+                String transport_id = null;
+                for (String info : parts) {
+                    if (info.startsWith("usb:")) {
+                        usb = info.substring("usb:".length());
+                    } else if (info.startsWith("product:")) {
+                        product = info.substring("product:".length());
+                    } else if (info.startsWith("model:")) {
+                        model = info.substring("model:".length());
+                    } else if (info.startsWith("device:")) {
+                        device = info.substring("device:".length());
+                    } else if (info.startsWith("transport_id:")) {
+                        transport_id = info.substring("transport_id:".length());
+                    }
+                }
+                devices.add(new JadbDevice(serial, usb, product, model, device, transport_id, this)); // parts[1] is type
             }
         }
         return devices;
