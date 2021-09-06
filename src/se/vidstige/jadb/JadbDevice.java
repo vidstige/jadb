@@ -5,6 +5,7 @@ import se.vidstige.jadb.managers.Bash;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class JadbDevice {
     @SuppressWarnings("squid:S00115")
@@ -199,7 +200,7 @@ public class JadbDevice {
 
     public void push(File local, RemoteFile remote) throws IOException, JadbException {
         try (FileInputStream fileStream = new FileInputStream(local)) {
-            push(fileStream, local.lastModified(), DEFAULT_MODE, remote);
+            push(fileStream, TimeUnit.MILLISECONDS.toSeconds(local.lastModified()), DEFAULT_MODE, remote);
         }
     }
 
