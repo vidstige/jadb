@@ -186,10 +186,18 @@ public class FakeAdbServer implements AdbResponder {
         }
 
         public void verifyExpectations() {
-            org.junit.Assert.assertEquals(0, fileExpectations.size());
-            org.junit.Assert.assertEquals(0, shellExpectations.size());
-            org.junit.Assert.assertEquals(0, listExpectations.size());
-            org.junit.Assert.assertEquals(0, tcpipExpectations.size());
+            for (FileExpectation expectation : fileExpectations) {
+                org.junit.Assert.fail(expectation.toString());
+            }
+            for (ShellExpectation expectation : shellExpectations) {
+                org.junit.Assert.fail(expectation.toString());
+            }
+            for (ListExpectation expectation : listExpectations) {
+                org.junit.Assert.fail(expectation.toString());
+            }
+            for (int expectation : tcpipExpectations) {
+                org.junit.Assert.fail("Expected tcp/ip on" + expectation);
+            }
         }
 
         private static class FileExpectation implements ExpectationBuilder {
@@ -233,6 +241,11 @@ public class FakeAdbServer implements AdbResponder {
             public void returnFile(ByteArrayOutputStream buffer) throws IOException {
                 buffer.write(content);
             }
+
+            @Override
+            public String toString() {
+                return "Expected file " + path;
+            }
         }
 
         public static class ShellExpectation {
@@ -253,6 +266,11 @@ public class FakeAdbServer implements AdbResponder {
 
             public void writeOutputTo(DataOutputStream stdout) throws IOException {
                 stdout.write(this.stdout);
+            }
+            
+            @Override
+            public String toString() {
+                return "Expected shell " + command;
             }
         }
 
@@ -281,6 +299,11 @@ public class FakeAdbServer implements AdbResponder {
 
             public List<RemoteFile> getFiles() {
                 return Collections.unmodifiableList(files);
+            }
+            
+            @Override
+            public String toString() {
+                return "Expected file list " + remotePath;
             }
 
             private static class MockFileEntry extends RemoteFile {
