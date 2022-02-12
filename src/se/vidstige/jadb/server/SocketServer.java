@@ -40,9 +40,7 @@ public abstract class SocketServer implements Runnable {
 
             while (true) {
                 Socket c = socket.accept();
-                Thread clientThread = new Thread(createResponder(c), "AdbClientWorker");
-                clientThread.setDaemon(true);
-                clientThread.start();
+                createResponder(c).run();
             }
         } catch (IOException e) {
             // Empty on purpose
