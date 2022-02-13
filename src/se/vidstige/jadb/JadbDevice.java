@@ -57,7 +57,7 @@ public class JadbDevice {
         }
     }
 
-    private Transport getTransport() throws IOException, JadbException {
+    Transport getTransport() throws IOException, JadbException {
         Transport transport = transportFactory.createTransport();
         // Do not use try-with-resources here. We want to return unclosed Transport and it is up to caller
         // to close it. Here we close it only in case of exception.
@@ -114,6 +114,19 @@ public class JadbDevice {
             AdbFilterOutputStream out = new AdbFilterOutputStream(output);
             transport.readResponseTo(out);
         }
+    }
+
+    /** <p>Execute a shell command.</p>
+     *
+     * <p>This method supports separate stdin, stdout, and stderr streams, as well as a return code. The shell command
+     * is not executed until calling {@link ShellProcessBuilder#start()}, which returns a {@link Process}.</p>
+     *
+     * @param command main command to run, e.g. "screencap"
+     * @param args arguments to the command, e.g. "-p".
+     * @return a {@link ShellProcessBuilder}
+     */
+    public ShellProcessBuilder shellProcessBuilder(String command, String... args) {
+        return new ShellProcessBuilder(this, buildCmdLine(command, args).toString());
     }
 
     /** <p>Execute a command with raw binary output.</p>

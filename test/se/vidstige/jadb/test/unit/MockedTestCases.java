@@ -12,12 +12,16 @@ import se.vidstige.jadb.test.fakes.FakeAdbServer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Scanner;
+
+import static org.junit.Assert.assertEquals;
 
 public class MockedTestCases {
 
@@ -39,14 +43,14 @@ public class MockedTestCases {
 
     @Test
     public void testGetHostVersion() throws Exception {
-        Assert.assertEquals("001f", connection.getHostVersion());
+        assertEquals("001f", connection.getHostVersion());
     }
 
     @Test
     public void testListDevices() throws Exception {
         server.add("serial-123");
         List<JadbDevice> devices = connection.getDevices();
-        Assert.assertEquals("serial-123", devices.get(0).getSerial());
+        assertEquals("serial-123", devices.get(0).getSerial());
     }
 
     @Test
@@ -56,16 +60,16 @@ public class MockedTestCases {
         server.add("serial-3", "unknown");
         server.add("serial-4", "foobar");
         List<JadbDevice> devices = connection.getDevices();
-        Assert.assertEquals(JadbDevice.State.Offline, devices.get(0).getState());
-        Assert.assertEquals(JadbDevice.State.Device, devices.get(1).getState());
-        Assert.assertEquals(JadbDevice.State.Unknown, devices.get(2).getState());
-        Assert.assertEquals(JadbDevice.State.Unknown, devices.get(3).getState());
+        assertEquals(JadbDevice.State.Offline, devices.get(0).getState());
+        assertEquals(JadbDevice.State.Device, devices.get(1).getState());
+        assertEquals(JadbDevice.State.Unknown, devices.get(2).getState());
+        assertEquals(JadbDevice.State.Unknown, devices.get(3).getState());
     }
 
     @Test
     public void testListNoDevices() throws Exception {
         List<JadbDevice> devices = connection.getDevices();
-        Assert.assertEquals(0, devices.size());
+        assertEquals(0, devices.size());
     }
 
     @Test
@@ -131,6 +135,39 @@ public class MockedTestCases {
     }
 
     @Test
+    public void testExecuteShellProtocol() throws Exception {
+        server.add("serial-123");
+        server.expectShell("serial-123", "ls -l").returns(buildStream(null, null, 0));
+        server.expectShell("serial-123", "ls foobar").returns(buildStream("123", "456", 0));
+        JadbDevice device = connection.getDevices().get(0);
+
+        assertEquals(device.shellProcessBuilder("ls", "-l").start().waitFor(), 0);
+
+        Process process = device.shellProcessBuilder("ls", "foobar").redirectErrorStream(true).start();
+        assertEquals(new Scanner(process.getInputStream()).useDelimiter("\\A").next(), "123456");
+        assertEquals(process.waitFor(), 0);
+    }
+
+    private String buildStream(String out, String err, int exitCode) throws Exception {
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(os);
+        if (out != null) {
+            os.write(1);
+            dos.writeInt(Integer.reverseBytes(out.length()));
+            os.write(out.getBytes(StandardCharsets.US_ASCII));
+        }
+        if (err != null) {
+            os.write(2);
+            dos.writeInt(Integer.reverseBytes(err.length()));
+            os.write(err.getBytes(StandardCharsets.US_ASCII));
+        }
+        os.write(3); // exitcode stream
+        dos.writeInt(Integer.reverseBytes(1));
+        os.write(exitCode);
+        return os.toString(StandardCharsets.US_ASCII.name());
+    }
+
+    @Test
     public void testFileList() throws Exception {
         server.add("serial-123");
         server.expectList("serial-123", "/sdcard/Documents")
@@ -142,7 +179,7 @@ public class MockedTestCases {
                 .withFile("\uB9AC\uADF8 \uC624\uBE0C \uB808\uC804\uB4DC", 240, 9001);
         JadbDevice device = connection.getDevices().get(0);
         List<RemoteFile> files = device.list("/sdcard/Documents");
-        Assert.assertEquals(6, files.size());
+        assertEquals(6, files.size());
         assertHasDir("school", 123456789, files);
         assertHasDir("finances", 7070707, files);
         assertHasDir("\u904A\u6232", 528491, files);
