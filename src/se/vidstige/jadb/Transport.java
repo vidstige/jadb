@@ -2,6 +2,8 @@ package se.vidstige.jadb;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
 class Transport implements Closeable {
@@ -36,6 +38,10 @@ class Transport implements Closeable {
         return inputStream;
     }
 
+    public DataInputStream getDataInputStream() {
+        return dataInput;
+    }
+
     public void verifyResponse() throws IOException, JadbException {
         String response = readString(4);
         if (!"OKAY".equals(response)) {
@@ -50,6 +56,14 @@ class Transport implements Closeable {
         return new String(responseBuffer, StandardCharsets.UTF_8);
     }
 
+    public int readInt() throws IOException {
+        byte[] responseBuffer = new byte[4];
+        dataInput.readFully(responseBuffer);
+        ByteBuffer buffer = ByteBuffer.wrap(responseBuffer);
+        buffer.order(ByteOrder.LITTLE_ENDIAN);
+        return buffer.getInt();
+    }
+
     private String getCommandLength(String command) {
         return String.format("%04x", command.getBytes().length);
     }
@@ -59,6 +73,11 @@ class Transport implements Closeable {
         writer.write(getCommandLength(command));
         writer.write(command);
         writer.flush();
+    }
+
+    public void sendBytes(byte[] bytes) throws IOException {
+        outputStream.write(bytes);
+        outputStream.flush();
     }
 
     public SyncTransport startSync() throws IOException, JadbException {
