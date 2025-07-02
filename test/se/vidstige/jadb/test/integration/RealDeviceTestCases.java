@@ -14,11 +14,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class RealDeviceTestCases {
 
@@ -30,7 +30,7 @@ public class RealDeviceTestCases {
     @BeforeClass
     public static void tryToStartAdbServer() {
         try {
-            new AdbServerLauncher(new Subprocess(), System.getenv()).launch();
+            new AdbServerController(new Subprocess(), System.getenv()).launch();
         } catch (IOException | InterruptedException e) {
             System.out.println("Could not start adb-server");
         }
@@ -96,6 +96,20 @@ public class RealDeviceTestCases {
     public void testPullInvalidFile() throws Exception {
         JadbDevice any = jadb.getAnyDevice();
         any.pull(new RemoteFile("/file/does/not/exist"), temporaryFolder.newFile("xyz"));
+    }
+
+    @Test
+    public void testPullDir() throws Exception {
+        JadbDevice any = jadb.getAnyDevice();
+        InputStream is = any.executeShell("mkdir", "-p", "/sdcard/jadb-test");
+        Stream.readAll(is, StandardCharsets.UTF_8);
+        File readme = new File("README.md");
+        any.push(readme, new RemoteFile("/sdcard/jadb-test/README.md"));
+        any.push(readme, new RemoteFile("/sdcard/jadb-test/README_copy.md"));
+
+        File local = temporaryFolder.newFolder("jadb-test");
+        any.pull(new RemoteDir("/sdcard/jadb-test"), local);
+        assertEquals(2, Objects.requireNonNull(local.list()).length);
     }
 
     @SuppressWarnings("deprecation")

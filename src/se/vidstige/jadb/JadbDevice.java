@@ -3,6 +3,7 @@ package se.vidstige.jadb;
 import se.vidstige.jadb.managers.Bash;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -217,6 +218,31 @@ public class JadbDevice {
         try (FileOutputStream fileStream = new FileOutputStream(local)) {
             pull(remote, fileStream);
         }
+    }
+
+    public void pull(RemoteDir remote, File local) throws IOException, JadbException {
+        if (!isDirectory(remote)) throw new JadbException("Remote path must be an exists directory");
+        if (!local.exists()) local.mkdirs();
+        if (!local.isDirectory()) throw new JadbException("Local path must be a directory");
+
+        InputStream is = executeShell("ls", "-1", remote.getPath());
+        String[] remoteFiles = Stream.readAll(is, StandardCharsets.UTF_8).trim().split("\n");
+        for (String remoteFile : remoteFiles) {
+            if (remoteFile.isEmpty() || ".".equals(remoteFile) || "..".equals(remoteFile)) continue;
+            RemoteFile remotePath = new RemoteFile(remote.getPath() + "/" + remoteFile);
+            if (isDirectory(remotePath)) {
+                // Pull file recursively
+                pull(new RemoteDir(remotePath), new File(local, remoteFile));
+            } else {
+                pull(remotePath, new File(local, remoteFile));
+            }
+        }
+    }
+
+    public boolean isDirectory(RemoteFile remote) throws IOException, JadbException {
+        InputStream is = executeShell("if [ -d \"" + remote.getPath() + "\" ]; then echo 'dir'; fi");
+        String result = Stream.readAll(is, StandardCharsets.UTF_8).trim();
+        return "dir".equals(result);
     }
 
     private void send(Transport transport, String command) throws IOException, JadbException {
