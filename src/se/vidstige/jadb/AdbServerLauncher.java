@@ -5,7 +5,10 @@ import java.util.Map;
 
 /**
  * Launches the ADB server
+ *
+ * @deprecated Use {@link AdbServerController} instead.
  */
+@Deprecated
 public class AdbServerLauncher {
     private final String executable;
     private Subprocess subprocess;
